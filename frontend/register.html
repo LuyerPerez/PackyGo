@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Register</h1>
+    <a href="/">Regresar</a>
+    <h3>{{ text }}</h3>
+    <form action="/registro" method="post">
+        <input type="text" name="nombre" placeholder="Nombre" required>
+        <input type="number" name="noDocumento" placeholder="DNI" required>
+        <input type="email" name="correo" placeholder="Correo" required>
+        <input type="number" name="telefono" placeholder="Telefono" required>
+        <select name="rol" id="">
+            <option value="cliente">Cliente</option>
+            <option value="admin">Administrador</option>
+            <option value="camionero">Camionero</option>
+        </select>
+        <input type="password" name="contrasena" placeholder="Contraseña" required>
+        <input type="submit" value="Register">
+        <p>Ya estas registrado? <a href="/InicioSesion">Inicia Sesion</a></p>
+    </form>
+</body>
+</html>
