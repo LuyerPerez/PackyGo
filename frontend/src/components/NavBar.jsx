@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faEnvelope, faLock, faEye, faEyeSlash, faHome, faTruck, faRightFromBracket} from "@fortawesome/free-solid-svg-icons";
 
 function NavBar() {
   const [user, setUser] = useState(null);
@@ -26,18 +28,26 @@ function NavBar() {
   return (
     <nav className="navbar">
       <div className="navbar-logo">
-        <img
-          src="../../public/logo.jpeg"
-          alt="logo"
-          className="logo-img"
-        />
+        <Link to="/">
+          <img
+            src="../../public/logo.png"
+            alt="logo"
+            className="logo-img"
+          />
+        </Link>
       </div>
       <ul className="navbar-links">
         <li>
-          <Link to="/">Inicio</Link>
+          <Link to="/">
+            <FontAwesomeIcon icon={faHome} style={{ marginRight: "6px" }} />
+            Inicio
+          </Link>
         </li>
         <li>
-          <Link to="/explorar">Explorar Camiones</Link>
+          <Link to="/explorar">
+            <FontAwesomeIcon icon={faTruck} style={{ marginRight: "6px" }} />
+            Explorar Camiones
+          </Link>
         </li>
         {user ? (
           <li ref={dropdownRef} style={{ position: "relative" }}>
@@ -55,6 +65,7 @@ function NavBar() {
               }}
               onClick={() => setOpen((prev) => !prev)}
             >
+              <FontAwesomeIcon icon={faUser} style={{ marginRight: "6px" }} />
               {user.nombre} ▼
             </button>
             {open && (
@@ -81,6 +92,7 @@ function NavBar() {
                   }}
                   onClick={() => setOpen(false)}
                 >
+                  <FontAwesomeIcon icon={faUser} style={{ marginRight: "6px" }} />
                   Perfil
                 </Link>
                 <Link
@@ -94,6 +106,7 @@ function NavBar() {
                   }}
                   onClick={() => setOpen(false)}
                 >
+                  <FontAwesomeIcon icon={faRightFromBracket} style={{ marginRight: "6px" }} />
                   Cerrar sesión
                 </Link>
               </div>
@@ -101,7 +114,10 @@ function NavBar() {
           </li>
         ) : (
           <li>
-            <Link to="/login">Iniciar Sesion</Link>
+            <Link to="/login">
+              <FontAwesomeIcon icon={faUser} style={{ marginRight: "6px" }} />
+              Iniciar Sesion
+            </Link>
           </li>
         )}
       </ul>

@@ -1,10 +1,22 @@
 import { useState } from 'react'
 import { Login } from '../api'
 import "../assets/LoginForm.css"
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUser, faEnvelope, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faUser, faEnvelope, faLock, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons"
+import { faGoogle, faFacebook } from "@fortawesome/free-brands-svg-icons"
 import { Link } from 'react-router-dom'
 import VerificationForm from './VerificationForm'
+
+// Función para validar características de la contraseña
+function validarContrasena(str) {
+  return (
+    str.length >= 8 &&
+    /[A-Z]/.test(str) &&
+    /[a-z]/.test(str) &&
+    /\d/.test(str) &&
+    /[^A-Za-z0-9]/.test(str)
+  )
+}
 
 export default function LoginForm() {
   const [correo, setCorreo] = useState('')
@@ -12,10 +24,16 @@ export default function LoginForm() {
   const [error, setError] = useState(null)
   const [showPassword, setShowPassword] = useState(false)
   const [showVerification, setShowVerification] = useState(false)
+  const [passwordError, setPasswordError] = useState(null)
 
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError(null)
+    setPasswordError(null)
+    if (!validarContrasena(contrasena)) {
+      setPasswordError("La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.")
+      return
+    }
     try {
       await Login(correo, contrasena)
       setShowVerification(true)
@@ -43,7 +61,7 @@ export default function LoginForm() {
         <FontAwesomeIcon icon={faUser} />
         Inicio de Sesion
       </h2>
-
+      {error && <p className="error">{error}</p>}
       <form onSubmit={handleSubmit} className="login-form">
         <div className="input-group">
           <FontAwesomeIcon icon={faEnvelope} />
@@ -79,12 +97,11 @@ export default function LoginForm() {
             <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
           </button>
         </div>
+        {passwordError && <p className="error">{passwordError}</p>}
 
         <button type="submit" className="btn-submit">
           Ingresar
         </button>
-
-        {error && <p className="error">{error}</p>}
       </form>
 
       <div className="extra-links">
@@ -95,9 +112,16 @@ export default function LoginForm() {
       <p className="divider">o continuar con</p>
 
       <div className="social-login">
-        <button className="google-btn">Google</button>
-        <button className="facebook-btn">Facebook</button>
+        <button className="google-btn">
+          <FontAwesomeIcon icon={faGoogle} />
+          Google
+        </button>
+        <button className="facebook-btn">
+          <FontAwesomeIcon icon={faFacebook} />
+          Facebook
+        </button>
       </div>
+
 
       <a href="/" className="back-link">Volver</a>
     </div>

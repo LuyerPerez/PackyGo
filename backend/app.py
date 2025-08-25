@@ -105,7 +105,6 @@ def verify():
     if not verif or verif["code"] != code:
         return {"error": "Código incorrecto"}, 400
 
-    # Registro
     if tipo == "register":
         datos = verif["data"]
         hashed_password = generate_password_hash(datos["contrasena"])
@@ -131,7 +130,6 @@ def verify():
         verification_codes.pop(correo)
         return {"message": "Usuario registrado exitosamente."}, 201
 
-    # Login
     elif tipo == "login":
         user = verif["user"]
         verification_codes.pop(correo)

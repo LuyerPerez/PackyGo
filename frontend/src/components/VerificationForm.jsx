@@ -10,11 +10,11 @@ export default function VerificationForm({ correo, tipo, onVerified, onCancel })
 
   const handleChange = (e, index) => {
     const value = e.target.value.replace(/[^0-9]/g, "")
-    if (value) {
-      const newCode = [...code]
-      newCode[index] = value
-      setCode(newCode)
-      if (index < code.length - 1) inputs.current[index + 1].focus()
+    const newCode = [...code]
+    newCode[index] = value
+    setCode(newCode)
+    if (value && index < code.length - 1) {
+      inputs.current[index + 1].focus()
     }
   }
 

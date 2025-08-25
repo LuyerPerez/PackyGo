@@ -1,10 +1,22 @@
 import { useState } from 'react'
 import "../assets/LoginForm.css"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUser, faEnvelope, faLock, faIdCard, faPhone, faUserShield } from '@fortawesome/free-solid-svg-icons'
+import { faUser, faEnvelope, faLock, faIdCard, faPhone, faUserShield, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
+import { faGoogle, faFacebook } from "@fortawesome/free-brands-svg-icons"
 import { Link } from 'react-router-dom'
 import { Register } from '../api'
 import VerificationForm from './VerificationForm'
+
+// Función para validar características de la contraseña
+function validarContrasena(str) {
+  return (
+    str.length >= 8 &&
+    /[A-Z]/.test(str) &&
+    /[a-z]/.test(str) &&
+    /\d/.test(str) &&
+    /[^A-Za-z0-9]/.test(str)
+  )
+}
 
 export default function RegisterForm() {
   const [nombre, setNombre] = useState('')
@@ -16,11 +28,18 @@ export default function RegisterForm() {
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
   const [showVerification, setShowVerification] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [passwordError, setPasswordError] = useState(null)
 
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError(null)
     setSuccess(null)
+    setPasswordError(null)
+    if (!validarContrasena(contrasena)) {
+      setPasswordError("La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.")
+      return
+    }
     try {
       await Register({ nombre, noDocumento, correo, telefono, contrasena, rol })
       setShowVerification(true)
@@ -44,6 +63,11 @@ export default function RegisterForm() {
         <FontAwesomeIcon icon={faUser} />
         Registro
       </h2>
+      {success && (
+        <p style={{ color: "green", fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>
+          {success}
+        </p>
+      )}
       <form onSubmit={handleSubmit} className="login-form">
         <div className="input-group">
           <FontAwesomeIcon icon={faUser} />
@@ -88,13 +112,27 @@ export default function RegisterForm() {
         <div className="input-group">
           <FontAwesomeIcon icon={faLock} />
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Contraseña"
             value={contrasena}
             onChange={(e) => setContrasena(e.target.value)}
             required
           />
+          <button
+            type="button"
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              marginLeft: "8px"
+            }}
+            onClick={() => setShowPassword((prev) => !prev)}
+            aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+          >
+            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+          </button>
         </div>
+        {passwordError && <p className="error">{passwordError}</p>}
         <div className="input-group">
           <FontAwesomeIcon icon={faUserShield} />
           <select
@@ -117,13 +155,24 @@ export default function RegisterForm() {
         <button type="submit" className="btn-submit">
           Registrarse
         </button>
-        {error && <p className="error">{error}</p>}
-        {success && <p style={{ color: "green", fontSize: "13px" }}>{success}</p>}
       </form>
       <div className="extra-links">
         <span>¿YA TIENES CUENTA?</span>
         <Link to="/login">Iniciar Sesión</Link>
       </div>
+
+      <p className="divider">o continuar con</p>
+      <div className="social-login">
+        <button className="google-btn">
+          <FontAwesomeIcon icon={faGoogle} />
+          Google
+        </button>
+        <button className="facebook-btn">
+          <FontAwesomeIcon icon={faFacebook} />
+          Facebook
+        </button>
+      </div>
+
       <a href="/" className="back-link">Volver</a>
     </div>
   )
