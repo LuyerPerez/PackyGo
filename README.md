@@ -1,33 +1,92 @@
-# Estructura de Carpetas del Proyecto
+# PackyGo
 
-El proyecto está organizado de la siguiente manera:
+PackyGo es una plataforma web para gestión de usuarios y envíos, desarrollada con **React + Vite** en el frontend y **Flask** en el backend. Incluye autenticación con verificación por correo y conexión a base de datos MySQL.
+
+---
+
+## Estructura de Carpetas
 
 ```
-PackyGo
-├── backend/         # Código fuente del backend (API, lógica de negocio, etc.)
-│   └── app.py
-├── db/              # Scripts y archivos relacionados con la base de datos
+PackyGo/
+├── backend/         # Backend Flask (API, lógica de negocio, envío de correos)
+│   ├── app.py
+│   ├── requirements.txt
+│   └── .env
+├── db/              # Scripts y archivos de base de datos
 │   └── scripts.sql
-├── docs/            # Documentación adicional del proyecto
-├── frontend/        # Código fuente del frontend (React + Vite)
+├── docs/            # Documentación técnica y manuales
+├── frontend/        # Frontend React + Vite
 │   ├── public/      # Archivos públicos y estáticos
-│   ├── src/         # Código fuente de React
-│   ├── index.html   # HTML principal de la aplicación
-│   ├── package.json # Configuración de dependencias y scripts de npm
-│   └── ...otros archivos de configuración
-├── .gitignore       # Archivos y carpetas ignorados por git
-├── Git_Workflow.md  # Guía de flujo de trabajo con Git
-├── README.md        # Este archivo
+│   ├── src/         # Componentes, estilos y lógica de React
+│   │   ├── assets/  # Archivos CSS e imágenes
+│   │   ├── components/ # Componentes reutilizables
+│   │   ├── pages/   # Vistas principales
+│   │   ├── api.js   # Conexión con el backend
+│   │   └── ...
+│   ├── index.html
+│   ├── package.json
+│   └── ...
+├── .gitignore
+├── Git_Workflow.md
+├── README.md
 ```
 
-## Descripción de carpetas principales
+---
 
-- **backend/**: Contiene el código del servidor, API y lógica de negocio.
-- **db/**: Incluye scripts SQL para la creación y gestión de la base de datos.
-- **docs/**: Espacio para documentación técnica o manuales adicionales.
-- **frontend/**: Todo el código del cliente, construido con React y Vite.
-  - **public/**: Archivos estáticos accesibles públicamente.
-  - **src/**: Componentes, estilos y lógica de la aplicación React.
-- **.gitignore**: Define qué archivos/directorios no se suben al repositorio.
-- **Git_Workflow.md**: Explica el flujo de trabajo recomendado con Git.
-- **README.md**: Documentación principal
+## Instalación y ejecución
+
+### Backend
+
+1. Instala dependencias:
+   ```
+   pip install -r requirements.txt
+   ```
+2. Configura el archivo `.env` con tus credenciales de MySQL y correo.
+3. Ejecuta el servidor:
+   ```
+   python app.py
+   ```
+
+### Frontend
+
+1. Instala dependencias:
+   ```
+   npm install
+   ```
+2. Ejecuta la app:
+   ```
+   npm run dev
+   ```
+
+---
+
+## Funcionalidades principales
+
+- Registro y login de usuarios con verificación por correo electrónico.
+- Encriptación de contraseñas (Werkzeug).
+- Gestión de roles (cliente, camionero, admin).
+- Conexión segura con MySQL.
+- Interfaz moderna y responsiva con React.
+
+---
+
+## Documentación adicional
+
+- **db/scripts.sql**: Estructura y datos de la base de datos.
+- **docs/**: Manuales y guías técnicas.
+- **Git_Workflow.md**: Flujo de trabajo recomendado con Git.
+
+---
+
+## Requisitos
+
+- Python 3.10+
+- Node.js 18+
+- MySQL Server
+- Contraseña de aplicación de Gmail para envío de correos
+
+---
+
+## Contacto
+
+Para dudas o soporte, contacta al equipo de desarrollo.
