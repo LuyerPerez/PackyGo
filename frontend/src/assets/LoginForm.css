@@ -1,0 +1,120 @@
+.login-container {
+  max-width: 420px;         /* Aumenta el ancho */
+  margin: 60px auto;        /* Más espacio arriba/abajo */
+  padding: 32px;            /* Más padding interno */
+  background: #e6f0f2;
+  text-align: center;
+  border-radius: 16px;      /* Bordes más redondeados */
+  font-family: Arial, sans-serif;
+  box-shadow: 0 4px 24px rgba(8, 60, 93, 0.12); /* Sombra suave */
+}
+
+.login-title {
+  font-size: 28px;          /* Título más grande */
+  font-weight: bold;
+  color: #083c5d;
+  margin-bottom: 28px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;                /* Más espacio entre campos */
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 24px;
+  padding: 12px 18px;       /* Más padding */
+  font-size: 18px;          /* Texto más grande */
+}
+
+.input-group .icon {
+  margin-right: 12px;
+  font-size: 22px;
+}
+
+.input-group input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 18px;          /* Input más grande */
+  color: #333;
+  background: transparent;
+}
+
+.btn-submit {
+  background: #083c5d;
+  color: white;
+  border: none;
+  border-radius: 24px;
+  padding: 14px;
+  font-size: 18px;          /* Botón más grande */
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-submit:hover {
+  background: #062c47;
+}
+
+.error {
+  color: red;
+  font-size: 13px;
+}
+
+.extra-links {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+.extra-links a {
+  font-weight: bold;
+  color: #083c5d;
+  text-decoration: none;
+}
+
+.divider {
+  margin: 15px 0 5px;
+  font-size: 12px;
+  color: #333;
+}
+
+.social-login {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.google-btn {
+  background: #db4437;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.facebook-btn {
+  background: #3b5998;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.back-link {
+  display: block;
+  margin-top: 10px;
+  font-size: 13px;
+  color: #083c5d;
+  text-decoration: none;
+  font-weight: bold;
+}

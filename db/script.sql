@@ -122,7 +122,7 @@ CREATE TABLE `vehiculo` (
   `tipo_vehiculo` varchar(50) DEFAULT NULL,
   `placa` varchar(20) NOT NULL,
   `modelo` varchar(50) DEFAULT NULL,
-  `anio_modelo` year(4) DEFAULT NULL,
+  `ano_modelo` year(4) DEFAULT NULL,
   `imagen_url` text DEFAULT NULL,
   `tarifa_diaria` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
