@@ -48,7 +48,6 @@ def register():
     if not all([nombre, noDocumento, correo, telefono, contrasena, rol]):
         return {"error": "Todos los campos son obligatorios"}, 400
 
-    # Genera y guarda el código
     codigo = str(random.randint(100000, 999999))
     verification_codes[correo] = {
         "code": codigo,
@@ -100,7 +99,7 @@ def verify():
     data = request.json
     correo = data.get("correo")
     code = data.get("code")
-    tipo = data.get("tipo")  # "register" o "login"
+    tipo = data.get("tipo")
 
     verif = verification_codes.get(correo)
     if not verif or verif["code"] != code:

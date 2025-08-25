@@ -1,16 +1,16 @@
 .login-container {
-  max-width: 420px;         /* Aumenta el ancho */
-  margin: 60px auto;        /* Más espacio arriba/abajo */
-  padding: 32px;            /* Más padding interno */
+  max-width: 420px;
+  margin: 60px auto;
+  padding: 32px; 
   background: #e6f0f2;
   text-align: center;
-  border-radius: 16px;      /* Bordes más redondeados */
+  border-radius: 16px;
   font-family: Arial, sans-serif;
-  box-shadow: 0 4px 24px rgba(8, 60, 93, 0.12); /* Sombra suave */
+  box-shadow: 0 4px 24px rgba(8, 60, 93, 0.12);
 }
 
 .login-title {
-  font-size: 28px;          /* Título más grande */
+  font-size: 28px;
   font-weight: bold;
   color: #083c5d;
   margin-bottom: 28px;
@@ -19,7 +19,7 @@
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 22px;                /* Más espacio entre campos */
+  gap: 22px;
 }
 
 .input-group {
@@ -27,8 +27,8 @@
   align-items: center;
   background: white;
   border-radius: 24px;
-  padding: 12px 18px;       /* Más padding */
-  font-size: 18px;          /* Texto más grande */
+  padding: 12px 18px;
+  font-size: 18px;
 }
 
 .input-group .icon {
@@ -40,7 +40,7 @@
   border: none;
   outline: none;
   flex: 1;
-  font-size: 18px;          /* Input más grande */
+  font-size: 18px;
   color: #333;
   background: transparent;
 }
@@ -51,7 +51,7 @@
   border: none;
   border-radius: 24px;
   padding: 14px;
-  font-size: 18px;          /* Botón más grande */
+  font-size: 18px;
   font-weight: bold;
   cursor: pointer;
   transition: background 0.3s;
