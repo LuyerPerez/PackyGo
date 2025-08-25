@@ -47,6 +47,20 @@ PackyGo/
    python app.py
    ```
 
+#### Ejemplo de archivo `.env` para el backend
+
+```properties
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USER=root
+MYSQL_PASSWORD=
+MYSQL_DATABASE=packygo
+FLASK_DEBUG=1
+FLASK_PORT=5000
+
+PASSWORD=tu_contraseña_de_aplicacion_gmail
+```
+
 ### Frontend
 
 1. Instala dependencias:
