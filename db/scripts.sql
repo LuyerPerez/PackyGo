@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-08-2025 a las 19:43:26
+-- Tiempo de generación: 27-08-2025 a las 19:24:51
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -21,8 +21,11 @@ SET time_zone = "+00:00";
 -- Base de datos: `packygo`
 --
 
-CREATE DATABASE IF NOT EXISTS `packygo` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `packygo`;
+CREATE DATABASE packygo;
+USE packygo;
+DROP DATABASE packygo;
+
+-- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `calificacion`
@@ -39,6 +42,7 @@ CREATE TABLE `calificacion` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
+
 --
 -- Estructura de tabla para la tabla `notificacion`
 --
@@ -46,7 +50,7 @@ CREATE TABLE `calificacion` (
 CREATE TABLE `notificacion` (
   `id` int(11) NOT NULL,
   `usuario_id` int(11) NOT NULL,
-  `reserva_id` int(11) DEFAULT NULL, -- Nuevo campo para conectar con reserva
+  `reserva_id` int(11) DEFAULT NULL,
   `mensaje` text NOT NULL,
   `leido` tinyint(1) DEFAULT 0,
   `fecha_envio` timestamp NOT NULL DEFAULT current_timestamp()
@@ -93,12 +97,12 @@ CREATE TABLE `reserva` (
 CREATE TABLE `usuario` (
   `id` int(11) NOT NULL,
   `nombre` varchar(100) NOT NULL,
-  `noDocumento` varchar(20) DEFAULT NULL, -- Cambiado a varchar
+  `noDocumento` varchar(20) DEFAULT NULL,
   `correo` varchar(100) NOT NULL,
-  `telefono` varchar(15) DEFAULT NULL, -- Más dígitos
+  `telefono` varchar(15) DEFAULT NULL,
   `contrasena` varchar(255) NOT NULL,
   `rol` enum('cliente','camionero','admin') NOT NULL,
-  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp() -- Consistente con otras fechas
+  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -106,32 +110,28 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id`, `nombre`, `noDocumento`, `correo`, `telefono`, `contrasena`, `rol`, `fecha_registro`) VALUES
-(1, 'Luyer', '1234567890', 'luyerperez0@gmail.com', '3219423757', '1234', 'admin', '2025-08-11 00:00:00'),
-(2, 'Alison Ospina', '1234567890', 'alisonospinaariza0126@gmail.com', '3219423757', '1234', 'cliente', '2025-08-11 00:00:00'),
-(3, 'Dina', '1234567897', 'milaniamonroy0145@gmail.com', '321654977', '1234', 'camionero', '2025-08-11 00:00:00'),
-(4, 'Dilan', '123592316', 'notificacionespackygo@gmail.com', '326549878', '1234', 'cliente', '2025-08-11 00:00:00');
+(1, 'Luyer Perez', '1025143367', 'luyerperez0@gmail.com', '3219423757', 'scrypt:32768:8:1$TrKOhZfElvinMohO$00f610cdc6258736a3523d156f7434fe15a59d4cc30b40de9d879fe11c5c76116a17300ee5f851277a386e3e713e0afd43acefdf3aa8905788ac43e2aa69da7c', 'cliente', '2025-08-25 22:33:30');
 
-
-
--- Volcado de datos para la tabla `vehiculo`
-INSERT INTO `vehiculo` (`id`, `camionero_id`, `tipo_vehiculo`, `placa`, `modelo`, `ano_modelo`, `imagen_url`, `tarifa_diaria`) VALUES
-(5, 3, 'Camionero', 'MXU484', 'Renold', 2015, '../uploads/SENA_LOGO.jpg', 120360.00);
+-- --------------------------------------------------------
 
 --
--- Índices para tablas volcadas
---
-
 -- Estructura de tabla para la tabla `vehiculo`
+--
+
 CREATE TABLE `vehiculo` (
   `id` int(11) NOT NULL,
   `camionero_id` int(11) NOT NULL,
   `tipo_vehiculo` varchar(50) DEFAULT NULL,
   `placa` varchar(20) NOT NULL,
   `modelo` varchar(50) DEFAULT NULL,
-  `ano_modelo` year(4) DEFAULT NULL, -- Usar ano_modelo en todo el script
+  `ano_modelo` year(4) DEFAULT NULL,
   `imagen_url` text DEFAULT NULL,
   `tarifa_diaria` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Índices para tablas volcadas
+--
 
 --
 -- Indices de la tabla `calificacion`
@@ -146,7 +146,7 @@ ALTER TABLE `calificacion`
 ALTER TABLE `notificacion`
   ADD PRIMARY KEY (`id`),
   ADD KEY `usuario_id` (`usuario_id`),
-  ADD KEY `reserva_id` (`reserva_id`); -- Nuevo índice
+  ADD KEY `reserva_id` (`reserva_id`);
 
 --
 -- Indices de la tabla `reporte`
@@ -211,7 +211,7 @@ ALTER TABLE `reserva`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `vehiculo`
@@ -234,7 +234,7 @@ ALTER TABLE `calificacion`
 --
 ALTER TABLE `notificacion`
   ADD CONSTRAINT `notificacion_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`),
-  ADD CONSTRAINT `notificacion_ibfk_2` FOREIGN KEY (`reserva_id`) REFERENCES `reserva` (`id`); -- Nueva FK
+  ADD CONSTRAINT `notificacion_ibfk_2` FOREIGN KEY (`reserva_id`) REFERENCES `reserva` (`id`);
 
 --
 -- Filtros para la tabla `reporte`
