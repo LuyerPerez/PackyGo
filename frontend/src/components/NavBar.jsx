@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useRef } from "react";
+
+import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faEnvelope, faLock, faEye, faEyeSlash, faHome, faTruck, faRightFromBracket} from "@fortawesome/free-solid-svg-icons";
+import { faUser, faHome, faTruck, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
 function NavBar() {
   const [user, setUser] = useState(null);
@@ -23,7 +24,7 @@ function NavBar() {
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [dropdownRef]);
 
   return (
     <nav className="navbar">

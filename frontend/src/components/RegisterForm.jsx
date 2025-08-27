@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom'
 import { Register } from '../api'
 import VerificationForm from './VerificationForm'
 
-// Función para validar características de la contraseña
 function validarContrasena(str) {
   return (
     str.length >= 8 &&
@@ -30,6 +29,7 @@ export default function RegisterForm() {
   const [showVerification, setShowVerification] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [passwordError, setPasswordError] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -40,11 +40,14 @@ export default function RegisterForm() {
       setPasswordError("La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.")
       return
     }
+    setLoading(true)
     try {
       await Register({ nombre, noDocumento, correo, telefono, contrasena, rol })
       setShowVerification(true)
     } catch (e) {
       setError(e.response?.data?.error || "Error al registrar. Intenta de nuevo.")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -63,11 +66,18 @@ export default function RegisterForm() {
         <FontAwesomeIcon icon={faUser} />
         Registro
       </h2>
+
       {success && (
         <p style={{ color: "green", fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>
           {success}
         </p>
       )}
+      {error && (
+        <p style={{ color: "red", fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>
+          {error}
+        </p>
+      )}
+
       <form onSubmit={handleSubmit} className="login-form">
         <div className="input-group">
           <FontAwesomeIcon icon={faUser} />
@@ -152,10 +162,11 @@ export default function RegisterForm() {
             <option value="camionero">Camionero</option>
           </select>
         </div>
-        <button type="submit" className="btn-submit">
-          Registrarse
+        <button type="submit" className="btn-submit" disabled={loading}>
+          {loading ? <span className="spinner"></span> : "Registrarse"}
         </button>
       </form>
+
       <div className="extra-links">
         <span>¿YA TIENES CUENTA?</span>
         <Link to="/login">Iniciar Sesión</Link>

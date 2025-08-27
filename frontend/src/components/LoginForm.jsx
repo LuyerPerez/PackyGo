@@ -25,6 +25,7 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [showVerification, setShowVerification] = useState(false)
   const [passwordError, setPasswordError] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -34,6 +35,7 @@ export default function LoginForm() {
       setPasswordError("La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.")
       return
     }
+    setLoading(true)
     try {
       await Login(correo, contrasena)
       setShowVerification(true)
@@ -43,6 +45,8 @@ export default function LoginForm() {
         error.message ||
         "Error de conexión"
       )
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -61,7 +65,7 @@ export default function LoginForm() {
         <FontAwesomeIcon icon={faUser} />
         Inicio de Sesion
       </h2>
-      {error && <p className="error">{error}</p>}
+      {error && <p style={{ color: "red", fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>{error}</p>}
       <form onSubmit={handleSubmit} className="login-form">
         <div className="input-group">
           <FontAwesomeIcon icon={faEnvelope} />
@@ -99,8 +103,8 @@ export default function LoginForm() {
         </div>
         {passwordError && <p className="error">{passwordError}</p>}
 
-        <button type="submit" className="btn-submit">
-          Ingresar
+        <button type="submit" className="btn-submit" disabled={loading}>
+          {loading ? <span className="spinner"></span> : "Ingresar"}
         </button>
       </form>
 

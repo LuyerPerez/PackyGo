@@ -6,6 +6,7 @@ export default function VerificationForm({ correo, tipo, onVerified, onCancel })
   const [code, setCode] = useState(["", "", "", "", "", ""])
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
+  const [loading, setLoading] = useState(false) // <-- Nuevo estado
   const inputs = useRef([])
 
   const handleChange = (e, index) => {
@@ -27,12 +28,15 @@ export default function VerificationForm({ correo, tipo, onVerified, onCancel })
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError(null)
+    setLoading(true)
     try {
       const data = await Verify({ correo, code: code.join(""), tipo })
       setSuccess(data.message || "Verificado correctamente")
       if (onVerified) onVerified(data)
     } catch (e) {
       setError(e.response?.data?.error || "Código incorrecto")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -53,13 +57,14 @@ export default function VerificationForm({ correo, tipo, onVerified, onCancel })
               ref={(el) => (inputs.current[index] = el)}
               onChange={(e) => handleChange(e, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
+              disabled={loading} // <-- Deshabilitar mientras carga
             />
           ))}
         </div>
-        <button type="submit" className="btn-verify">
-          Verificar
+        <button type="submit" className="btn-verify" disabled={loading}>
+          {loading ? <span className="spinner"></span> : "Verificar"}
         </button>
-        <button type="button" className="btn-cancel" onClick={onCancel}>
+        <button type="button" className="btn-cancel" onClick={onCancel} disabled={loading}>
           Cancelar
         </button>
         {error && <p className="error">{error}</p>}
