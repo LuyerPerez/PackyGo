@@ -10,14 +10,24 @@ export default function VerificationForm({ correo, tipo, onVerified, onCancel })
   const inputs = useRef([])
 
   const handleChange = (e, index) => {
-    const value = e.target.value.replace(/[^0-9]/g, "")
-    const newCode = [...code]
-    newCode[index] = value
-    setCode(newCode)
+    const value = e.target.value.replace(/[^0-9]/g, "");
+    const newCode = [...code];
+    newCode[index] = value;
+    setCode(newCode);
     if (value && index < code.length - 1) {
-      inputs.current[index + 1].focus()
+      inputs.current[index + 1].focus();
     }
-  }
+  };
+
+  const handlePaste = (e) => {
+    const paste = e.clipboardData.getData("text").replace(/[^0-9]/g, "");
+    if (paste.length === code.length) {
+      setCode(paste.split("").slice(0, code.length));
+      // Opcional: enfocar el último input
+      inputs.current[code.length - 1].focus();
+      e.preventDefault();
+    }
+  };
 
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace" && !code[index] && index > 0) {
@@ -57,6 +67,7 @@ export default function VerificationForm({ correo, tipo, onVerified, onCancel })
               ref={(el) => (inputs.current[index] = el)}
               onChange={(e) => handleChange(e, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
+              onPaste={handlePaste}
               disabled={loading} // <-- Deshabilitar mientras carga
             />
           ))}
