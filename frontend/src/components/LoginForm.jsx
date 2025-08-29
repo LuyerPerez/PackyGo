@@ -7,7 +7,6 @@ import { faGoogle, faFacebook } from "@fortawesome/free-brands-svg-icons"
 import { Link } from 'react-router-dom'
 import VerificationForm from './VerificationForm'
 
-// Función para validar características de la contraseña
 function validarContrasena(str) {
   return (
     str.length >= 8 &&

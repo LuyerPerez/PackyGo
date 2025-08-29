@@ -4,9 +4,11 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faHome, faTruck, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
+
 function NavBar() {
   const [user, setUser] = useState(null);
   const [open, setOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -26,6 +28,12 @@ function NavBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [dropdownRef]);
 
+  useEffect(() => {
+    const closeMenu = () => setMenuOpen(false);
+    window.addEventListener("popstate", closeMenu);
+    return () => window.removeEventListener("popstate", closeMenu);
+  }, []);
+
   return (
     <nav className="navbar">
       <div className="navbar-logo">
@@ -36,16 +44,25 @@ function NavBar() {
             className="logo-img"
           />
         </Link>
+        <button
+          className="navbar-toggle"
+          aria-label="Abrir menú"
+          onClick={() => setMenuOpen((prev) => !prev)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </div>
-      <ul className="navbar-links">
+      <ul className={`navbar-links${menuOpen ? " open" : ""}`}>
         <li>
-          <Link to="/">
+          <Link to="/" onClick={() => setMenuOpen(false)}>
             <FontAwesomeIcon icon={faHome} style={{ marginRight: "6px" }} />
             Inicio
           </Link>
         </li>
         <li>
-          <Link to="/explorar">
+          <Link to="/explorar" onClick={() => setMenuOpen(false)}>
             <FontAwesomeIcon icon={faTruck} style={{ marginRight: "6px" }} />
             Explorar Camiones
           </Link>
@@ -91,7 +108,7 @@ function NavBar() {
                     textDecoration: "none",
                     fontWeight: "500",
                   }}
-                  onClick={() => setOpen(false)}
+                  onClick={() => { setOpen(false); setMenuOpen(false); }}
                 >
                   <FontAwesomeIcon icon={faUser} style={{ marginRight: "6px" }} />
                   Perfil
@@ -105,7 +122,7 @@ function NavBar() {
                     textDecoration: "none",
                     fontWeight: "500",
                   }}
-                  onClick={() => setOpen(false)}
+                  onClick={() => { setOpen(false); setMenuOpen(false); }}
                 >
                   <FontAwesomeIcon icon={faRightFromBracket} style={{ marginRight: "6px" }} />
                   Cerrar sesión
@@ -115,7 +132,7 @@ function NavBar() {
           </li>
         ) : (
           <li>
-            <Link to="/login">
+            <Link to="/login" onClick={() => setMenuOpen(false)}>
               <FontAwesomeIcon icon={faUser} style={{ marginRight: "6px" }} />
               Iniciar Sesion
             </Link>

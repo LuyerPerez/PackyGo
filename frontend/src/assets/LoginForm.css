@@ -9,6 +9,58 @@
   box-shadow: 0 4px 24px rgba(8, 60, 93, 0.12);
 }
 
+@media (max-width: 600px) {
+  .login-container {
+    max-width: 98vw;
+    margin: 18px auto;
+    padding: 16px 6px;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(8, 60, 93, 0.10);
+  }
+  .login-title {
+    font-size: 22px;
+    margin-bottom: 18px;
+  }
+  .login-form {
+    gap: 14px;
+  }
+  .input-group {
+    font-size: 16px;
+    padding: 8px 10px;
+    border-radius: 16px;
+  }
+  .input-group input {
+    font-size: 16px;
+  }
+  .btn-submit {
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 16px;
+  }
+  .extra-links {
+    font-size: 12px;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+  .divider {
+    font-size: 11px;
+  }
+  .social-login {
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .google-btn, .facebook-btn {
+    font-size: 14px;
+    padding: 6px 8px;
+    border-radius: 4px;
+  }
+  .back-link {
+    font-size: 12px;
+    margin-top: 6px;
+  }
+}
+
 .login-title {
   font-size: 28px;
   font-weight: bold;

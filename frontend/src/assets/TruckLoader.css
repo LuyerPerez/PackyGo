@@ -1,0 +1,57 @@
+.truck-loader-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #0097a7;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.truck-animation {
+  position: relative;
+  width: 300px;
+  height: 80px;
+  margin-bottom: 10px;
+  background: #e0e0e0;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.truck {
+  position: absolute;
+  left: 0;
+  top: 20px;
+  width: 80px;
+  height: 40px;
+  z-index: 2;
+  animation: truck-move 2s linear infinite;
+}
+
+.truck-icon {
+  margin-bottom: 20px;
+  position: relative;
+  width: 240px;
+  height: 80px;
+  overflow: visible;
+}
+
+.truck-icon .fa-truck {
+  position: absolute;
+  left: 0;
+  top: 10px;
+  animation: truck-drive 2s linear infinite;
+}
+
+@keyframes truck-drive {
+  0% { left: 0; }
+  50% { left: 150px; }
+  100% { left: 0; }
+}
+
+.truck-text {
+  font-size: 2em;
+  color: #fff;
+  text-align: center;
+  font-weight: bold;
+}

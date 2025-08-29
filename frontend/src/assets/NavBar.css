@@ -10,6 +10,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 24px;
+  position: relative;
 }
 
 .navbar-logo {
@@ -33,6 +34,112 @@
   gap: 24px;
   margin: 0;
   padding: 0;
+}
+
+/* Botón hamburguesa */
+.navbar-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 20;
+}
+.navbar-toggle span {
+  width: 28px;
+  height: 4px;
+  background: #fff;
+  margin: 4px 0;
+  border-radius: 2px;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .logo-img {
+    width: 140px;
+  }
+  .navbar {
+    padding: 10px 12px;
+  }
+  .navbar-links {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 650px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 8px 8px;
+  }
+  .navbar-logo {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .logo-img {
+    width: 110px;
+  }
+  .navbar-toggle {
+    display: flex;
+  }
+  .navbar-links {
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    background: #0097a7;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-radius: 0 0 12px 12px;
+    padding: 12px 0;
+    display: none;
+    z-index: 10;
+  }
+  .navbar-links.open {
+    display: flex;
+  }
+  .navbar-links li {
+    width: 100%;
+    text-align: left;
+    padding: 10px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .navbar-links li:last-child {
+    border-bottom: none;
+  }
+  .navbar-links a, .navbar-link {
+    font-size: 1em;
+    color: #fff !important;
+  }
+
+  /* Dropdown de perfil en móvil */
+  .navbar-links li > div {
+    background: #0097a7 !important;
+    color: #fff !important;
+    border-radius: 8px;
+    box-shadow: none;
+    min-width: 140px;
+    position: static !important;
+    padding: 0;
+  }
+  .navbar-links li > div a {
+    color: #fff !important;
+    padding: 10px 16px;
+    display: block;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .navbar-links li > div a:hover {
+    background: rgba(255,255,255,0.08);
+    color: #fff !important;
+  }
 }
 
 .navbar-links a {
