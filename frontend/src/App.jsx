@@ -6,6 +6,7 @@ import LoginPage from "./pages/Login";
 import Logout from "./pages/Logout";
 import NavBar from "./components/NavBar";
 import RegisterPage from "./pages/Register";
+import NotFound from "./components/NotFound";
 import TruckLoader from "./components/TruckLoader";
 import { useEffect, useState } from "react";
 
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   );
