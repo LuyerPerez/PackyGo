@@ -18,6 +18,52 @@ app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 verification_codes = {}
+reset_codes = {}
+@app.route("/api/request-reset", methods=["POST"])
+def request_reset():
+    data = request.json
+    correo = data.get("correo")
+    if not correo:
+        return {"error": "Correo es obligatorio"}, 400
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM usuario WHERE correo=%s", (correo,))
+    user = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    if not user:
+        return {"error": "No existe usuario con ese correo"}, 404
+    codigo = str(random.randint(100000, 999999))
+    reset_codes[correo] = codigo
+    enviarCorreo(correo, codigo)
+    return {"message": "Código de recuperación enviado al correo."}, 200
+
+@app.route("/api/reset-password", methods=["POST"])
+def reset_password():
+    data = request.json
+    correo = data.get("correo")
+    code = data.get("code")
+    nueva = data.get("nueva")
+    if not all([correo, code, nueva]):
+        return {"error": "Todos los campos son obligatorios"}, 400
+    codigo = reset_codes.get(correo)
+    if not codigo or codigo != code:
+        return {"error": "Código incorrecto"}, 400
+    hashed_password = generate_password_hash(nueva)
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE usuario SET contrasena=%s WHERE correo=%s", (hashed_password, correo))
+        conn.commit()
+        reset_codes.pop(correo)
+        enviarCorreoCambio(correo)
+        return {"message": "Contraseña actualizada exitosamente."}, 200
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 400
+    finally:
+        cursor.close()
+        conn.close()
 
 def enviarCorreo(correo, codigoVerificacion):
     try:
@@ -34,6 +80,22 @@ def enviarCorreo(correo, codigoVerificacion):
         print("Correo enviado correctamente")
     except Exception as e:
         print("Error al enviar correo:", e)
+
+def enviarCorreoCambio(correo):
+    try:
+        em = EmailMessage()
+        em["From"] = email_sender
+        em["To"] = correo
+        em["Subject"] = "Contraseña actualizada"
+        em.set_content("Tu contraseña ha sido cambiada exitosamente. Si no fuiste tú, contacta soporte de inmediato.")
+
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
+            smtp.login(email_sender, password)
+            smtp.send_message(em)
+        print("Correo de cambio de contraseña enviado")
+    except Exception as e:
+        print("Error al enviar correo de cambio:", e)
 
 @app.route("/api/register", methods=["POST"])
 def register():
@@ -100,6 +162,13 @@ def verify():
     correo = data.get("correo")
     code = data.get("code")
     tipo = data.get("tipo")
+
+    if tipo == "reset":
+        codigo = reset_codes.get(correo)
+        if not codigo or codigo != code:
+            return {"error": "Código incorrecto"}, 400
+        # No elimines el código aquí, solo verifica
+        return {"code": code, "message": "Código verificado"}, 200
 
     verif = verification_codes.get(correo)
     if not verif or verif["code"] != code:
