@@ -90,7 +90,7 @@ CREATE TABLE notificacion (
 INSERT INTO usuario (nombre, noDocumento, correo, telefono, contrasena, rol) VALUES
 ('Luyer Perez', '1025143367', 'luyerperez0@gmail.com', '3219423757', 'pass1', 'admin'),
 ('Alison Ospina', '1034289794', 'alisonospinaariza0126@gmail.com', '3145975921', 'pass10', 'cliente'),
-('Dina Monroy', '1031423129', 'milaniamalaver94@gmail.com', '3145975921', 'pass2', 'camionero');
+('Dina Monroy', '1031423129', 'milaniamalaver94@gmail.com', '3019122987', 'pass2', 'camionero');
 
 -- Vehículos (asignados a los usuarios tipo camionero)
 INSERT INTO vehiculo (camionero_id, tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria) VALUES
