@@ -76,11 +76,43 @@ PASSWORD=tu_contraseña_de_aplicacion_gmail
 
 ## Funcionalidades principales
 
-- Registro y login de usuarios con verificación por correo electrónico.
-- Encriptación de contraseñas (Werkzeug).
-- Gestión de roles (cliente, camionero, admin).
-- Conexión segura con MySQL.
-- Interfaz moderna y responsiva con React.
+
+Las funcionalidades principales de PackyGo son:
+
+- **Registro y autenticación de usuarios:**
+   - Registro de nuevos usuarios con verificación por correo electrónico.
+   - Login seguro y recuperación de contraseña.
+   - Encriptación de contraseñas usando Werkzeug.
+
+- **Gestión de roles:**
+   - Roles diferenciados: cliente, camionero y administrador.
+   - Permisos y vistas específicas según el tipo de usuario.
+
+- **Registro y gestión de vehículos:**
+   - Los camioneros pueden registrar sus vehículos (camión, camioneta, etc.) con detalles como placa, modelo, año, imagen y tarifa diaria.
+   - Edición y eliminación de vehículos propios.
+
+- **Reservación y alquiler de vehículos:**
+   - Los clientes pueden buscar y reservar vehículos disponibles según fechas y tarifas.
+   - Visualización de detalles del vehículo y del camionero.
+   - Gestión del estado de la reserva (activa, finalizada, cancelada).
+   - Cálculo automático del total a pagar según la tarifa y duración.
+
+- **Calificaciones y comentarios:**
+   - Los usuarios pueden calificar y dejar comentarios tanto a camioneros como a vehículos.
+   - Visualización de reputación y comentarios en los perfiles.
+
+- **Reportes y notificaciones:**
+   - Los usuarios pueden reportar incidencias relacionadas con reservas.
+   - El sistema gestiona el estado de los reportes (abierto, en revisión, resuelto).
+   - Notificaciones automáticas sobre reservas, calificaciones y reportes.
+
+- **Administración y seguridad:**
+   - El administrador puede gestionar usuarios, vehículos, reservas y reportes.
+   - Conexión segura con MySQL y validaciones de datos.
+
+- **Interfaz moderna y responsiva:**
+   - Frontend desarrollado con React + Vite, adaptado a dispositivos móviles y escritorio.
 
 ---
 
@@ -97,4 +129,3 @@ PASSWORD=tu_contraseña_de_aplicacion_gmail
 - Python 3.10+
 - Node.js 18+
 - MySQL Server
-- Contraseña de aplicación de Gmail para envío de correos
