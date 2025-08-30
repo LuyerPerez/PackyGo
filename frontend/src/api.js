@@ -34,3 +34,13 @@ export async function Verify({ correo, code, tipo }) {
   })
   return data
 }
+
+export async function requestPasswordReset(correo) {
+  const { data } = await axios.post('http://localhost:5000/api/request-reset', { correo });
+  return data;
+}
+
+export async function resetPassword({ correo, code, nueva }) {
+  const { data } = await axios.post('http://localhost:5000/api/reset-password', { correo, code, nueva });
+  return data;
+}

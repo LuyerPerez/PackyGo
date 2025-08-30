@@ -39,7 +39,7 @@ function NavBar() {
       <div className="navbar-logo">
         <Link to="/">
           <img
-            src="../../public/logo.png"
+            src="../../public/logo.svg"
             alt="logo"
             className="logo-img"
           />

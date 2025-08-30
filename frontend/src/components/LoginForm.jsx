@@ -108,8 +108,13 @@ export default function LoginForm() {
       </form>
 
       <div className="extra-links">
-        <span>¿NO TIENES CUENTA?</span>
+        <span>¿Olvidaste tu contraseña?</span>
+        <a href="/recuperar-contrasena">Recuperar</a>
+      </div>
+
+      <div className="extra-links">
         <a href="/register">Registrate</a>
+        <a href="/">Volver</a>
       </div>
 
       <p className="divider">o continuar con</p>
@@ -124,7 +129,6 @@ export default function LoginForm() {
           Facebook
         </Link>
       </div>
-      <a href="/" className="back-link">Volver</a>
     </div>
   )
 }
