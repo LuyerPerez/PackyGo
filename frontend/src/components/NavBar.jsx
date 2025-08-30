@@ -75,7 +75,7 @@ function NavBar() {
                 background: "none",
                 border: "none",
                 fontWeight: "600",
-                color: "black",
+                color: "white",
                 cursor: "pointer",
                 fontFamily: "inherit",
                 fontSize: "inherit", 
@@ -92,8 +92,7 @@ function NavBar() {
                   position: "absolute",
                   top: "calc(100% + 8px)",
                   right: 0,
-                  background: "#fff",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                  background: "#083c5d",
                   borderRadius: "6px",
                   minWidth: "140px",
                   zIndex: 10,
@@ -104,7 +103,7 @@ function NavBar() {
                   style={{
                     display: "block",
                     padding: "10px 16px",
-                    color: "#0097a7",
+                    color: "#fff",
                     textDecoration: "none",
                     fontWeight: "500",
                   }}
@@ -118,7 +117,7 @@ function NavBar() {
                   style={{
                     display: "block",
                     padding: "10px 16px",
-                    color: "#0097a7",
+                    color: "#fff",
                     textDecoration: "none",
                     fontWeight: "500",
                   }}

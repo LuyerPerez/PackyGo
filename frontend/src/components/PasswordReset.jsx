@@ -66,14 +66,14 @@ export default function PasswordReset() {
 
   return (
     <div className="login-container" style={{ maxWidth: "500px", width: "100%" }}>
-      <h2 className="login-title" style={{ marginBottom: "20px" }}>
-        Recuperar Contraseña
-      </h2>
       {error && <p style={{ color: 'red', fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>{error}</p>}
       {success && <p style={{ color: 'green', fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>{success}</p>}
 
       {step === 1 && (
         <form onSubmit={handleRequest} className="login-form">
+          <h2 className="login-title" style={{ marginBottom: "20px" }}>
+            Recuperar Contraseña
+          </h2>
           <div className="input-group">
             <input
               type="email"
@@ -103,7 +103,11 @@ export default function PasswordReset() {
       )}
 
       {step === 3 && (
+        
         <form onSubmit={handleReset} className="login-form">
+          <h2 className="login-title" style={{ marginBottom: "20px" }}>
+            Recuperar Contraseña
+          </h2>
           <div className="input-group">
             <input
               type={showPassword ? "text" : "password"}

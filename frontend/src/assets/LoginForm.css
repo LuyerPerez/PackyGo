@@ -1,260 +1,184 @@
-
+body {
+  background: #ffffff;
+}
 
 .login-container {
+  width: 100%;
   max-width: 420px;
-  margin: 60px auto;
-  padding: 32px 28px;
+  padding: 36px 28px;
   background: #e6f0f2;
   text-align: center;
-  border-radius: 16px;
-  font-family: Arial, sans-serif;
-  box-shadow: 0 4px 24px rgba(8, 60, 93, 0.12);
-}
-
-@media (max-width: 900px) {
-  .login-container {
-    max-width: 98vw;
-    margin: 32px auto;
-    padding: 18px 18px;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(8, 60, 93, 0.10);
-  }
-  .login-title {
-    font-size: 22px;
-    margin-bottom: 18px;
-  }
-  .login-form {
-    gap: 12px;
-  }
-  .input-group {
-    font-size: 15px;
-    padding: 7px 8px;
-    border-radius: 12px;
-  }
-  .input-group input {
-    font-size: 15px;
-  }
-  .btn-submit {
-    font-size: 15px;
-    padding: 10px 0;
-    border-radius: 12px;
-  }
-  .extra-links {
-    font-size: 12px;
-    flex-direction: column;
-    gap: 4px;
-    align-items: flex-start;
-  }
-  .divider {
-    font-size: 11px;
-  }
-  .social-login {
-    gap: 6px;
-    margin-bottom: 10px;
-  }
-  .google-btn, .facebook-btn {
-    font-size: 13px;
-    padding: 6px 8px;
-    border-radius: 4px;
-  }
-  .back-link {
-    font-size: 12px;
-    margin-top: 6px;
-  }
-}
-
-@media (max-width: 500px) {
-  .login-container {
-    max-width: 100vw;
-    margin: 10px auto;
-    padding: 8px 12px;
-    border-radius: 8px;
-    box-shadow: 0 1px 6px rgba(8, 60, 93, 0.08);
-  }
-  .login-title {
-    font-size: 18px;
-    margin-bottom: 10px;
-  }
-  .input-group {
-    font-size: 13px;
-    padding: 5px 4px;
-    border-radius: 8px;
-  }
-  .input-group input {
-    font-size: 13px;
-  }
-  .btn-submit {
-    font-size: 13px;
-    padding: 8px 0;
-    border-radius: 8px;
-  }
-}
-
-
-@media (max-width: 600px) {
-  .login-container {
-    max-width: 98vw;
-    margin: 18px auto;
-    padding: 16px 16px;
-    border-radius: 10px;
-    box-shadow: 0 2px 12px rgba(8, 60, 93, 0.10);
-  }
-  .login-title {
-    font-size: 22px;
-    margin-bottom: 18px;
-  }
-  .login-form {
-    gap: 14px;
-  }
-  .input-group {
-    font-size: 16px;
-    padding: 8px 10px;
-    border-radius: 16px;
-  }
-  .input-group input {
-    font-size: 16px;
-  }
-  .btn-submit {
-    font-size: 16px;
-    padding: 10px;
-    border-radius: 16px;
-  }
-  .extra-links {
-    font-size: 12px;
-    flex-direction: column;
-    gap: 4px;
-    align-items: flex-start;
-  }
-  .divider {
-    font-size: 11px;
-  }
-  .social-login {
-    gap: 6px;
-    margin-bottom: 10px;
-  }
-  .google-btn, .facebook-btn {
-    font-size: 14px;
-    padding: 6px 8px;
-    border-radius: 4px;
-  }
-  .back-link {
-    font-size: 12px;
-    margin-top: 6px;
-  }
+  border-radius: 18px;
+  box-shadow: 0 8px 28px rgba(8, 60, 93, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeIn 0.6s ease-in-out;
+  margin: 48px auto;
 }
 
 .login-title {
-  font-size: 28px;
-  font-weight: bold;
+  font-size: 26px;
+  font-weight: 700;
   color: #083c5d;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px rgba(8, 60, 93, 0.1);
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 16px;
+  width: 100%;
 }
 
 .input-group {
   display: flex;
   align-items: center;
-  background: white;
-  border-radius: 24px;
-  padding: 12px 18px;
-  font-size: 18px;
+  background: #fdfdfd;
+  border-radius: 22px;
+  padding: 10px 16px;
+  font-size: 16px;
+  box-shadow: 0 2px 6px rgba(8, 60, 93, 0.07);
+  transition: box-shadow 0.2s;
 }
-
+.input-group:hover {
+  box-shadow: 0 4px 12px rgba(8, 60, 93, 0.1);
+}
 .input-group .icon {
   margin-right: 12px;
-  font-size: 22px;
+  font-size: 20px;
+  color: #0097a7;
 }
-
 .input-group input {
   border: none;
   outline: none;
   flex: 1;
-  font-size: 18px;
+  font-size: 16px;
   color: #333;
   background: transparent;
+  min-width: 0;
 }
 
 .btn-submit {
-  background: #083c5d;
-  color: white;
+  background: linear-gradient(90deg, #083c5d 0%, #0097a7 100%);
+  color: #fff;
   border: none;
-  border-radius: 24px;
-  padding: 14px;
-  font-size: 18px;
-  font-weight: bold;
+  border-radius: 22px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.25s ease-in-out;
+  box-shadow: 0 3px 10px rgba(8, 60, 93, 0.15);
 }
-
 .btn-submit:hover {
-  background: #062c47;
+  background: linear-gradient(90deg, #062c47 0%, #007c91 100%);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(8, 60, 93, 0.2);
+}
+.btn-submit:active {
+  transform: scale(0.98);
 }
 
 .error {
-  color: red;
+  color: #db4437;
   font-size: 13px;
+  margin-top: 4px;
+  text-align: left;
+  width: 100%;
 }
 
 .extra-links {
   display: flex;
   justify-content: space-between;
   font-size: 13px;
-  margin-top: 10px;
+  margin-top: 14px;
+  gap: 10px;
+  width: 100%;
 }
 
-.extra-links a {
-  font-weight: bold;
+.extra-links a,
+.back-link {
+  font-weight: 600;
   color: #083c5d;
   text-decoration: none;
+  position: relative;
+  transition: color 0.2s;
 }
 
-.divider {
-  margin: 15px 0 5px;
-  font-size: 12px;
-  color: #333;
+.extra-links a::after,
+.back-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0%;
+  height: 2px;
+  .extra-links a,
+  .back-link {
+    font-weight: 600;
+    color: #083c5d;
+    text-decoration: none;
+    transition: color 0.2s;
+    padding: 0 2px;
+  }
+  .extra-links a:hover,
+  .back-link:hover {
+    color: #0097a7;
+    text-decoration: underline;
+  }
+  position: absolute;
+  top: 50%;
+  width: 35%;
+  height: 1px;
+  background: #ccc;
 }
+.divider::before { left: 0; }
+.divider::after { right: 0; }
 
 .social-login {
   display: flex;
   justify-content: center;
-  gap: 10px;
-  margin-bottom: 15px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
-
+.google-btn,
+.facebook-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #fff;
+  border: none;
+  font-size: 14px;
+  transition: transform 0.2s, background 0.2s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-decoration: none;
+}
 .google-btn {
   background: #db4437;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(219, 68, 55, 0.2);
 }
-
+.google-btn:hover {
+  background: #c23321;
+  transform: scale(1.03);
+}
 .facebook-btn {
   background: #3b5998;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(59, 89, 152, 0.2);
 }
-
-.back-link {
-  display: block;
-  margin-top: 10px;
-  font-size: 13px;
-  color: #083c5d;
-  text-decoration: none;
-  font-weight: bold;
+.facebook-btn:hover {
+  background: #2d4373;
+  transform: scale(1.03);
 }
-
 
 .spinner {
   display: inline-block;
@@ -266,8 +190,50 @@
   animation: spin 0.8s linear infinite;
   vertical-align: middle;
 }
-
 @keyframes spin {
   0% { transform: rotate(0deg);}
   100% { transform: rotate(360deg);}
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 900px) {
+  .login-container {
+    max-width: 420px;
+    width: 100%;
+    padding: 36px 28px;
+    border-radius: 18px;
+    margin: 48px auto;
+    box-shadow: 0 8px 28px rgba(8, 60, 93, 0.15);
+  }
+  .login-title { font-size: 26px; }
+}
+@media (max-width: 600px) {
+  .login-container {
+      max-width: 420px;
+      width: 100%;
+      padding: 36px 18px;
+      border-radius: 18px;
+      margin: 48px auto;
+      box-shadow: 0 8px 28px rgba(8, 60, 93, 0.15);
+  }
+  .login-title { font-size: 26px; }
+  .input-group { font-size: 14px; padding: 8px 12px; }
+  .btn-submit { font-size: 14px; padding: 10px; }
+    .extra-links { font-size: 13px; flex-direction: row; align-items: center; justify-content: space-between; gap: 0; margin-top: 14px; }
+  .divider { font-size: 11px; }
+  .google-btn, .facebook-btn { font-size: 12px; padding: 6px 10px; }
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+  margin: 16px 0;
+  position: relative;
 }
