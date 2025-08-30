@@ -1,12 +1,3 @@
-  function validarContrasena(str) {
-    return (
-      str.length >= 8 &&
-      /[A-Z]/.test(str) &&
-      /[a-z]/.test(str) &&
-      /\d/.test(str) &&
-      /[^A-Za-z0-9]/.test(str)
-    );
-  }
 import { useState } from 'react';
 import { requestPasswordReset, resetPassword } from '../api';
 import VerificationForm from './VerificationForm';
@@ -39,6 +30,16 @@ export default function PasswordReset() {
       setLoading(false);
     }
   };
+
+  function validarContrasena(str) {
+    return (
+      str.length >= 8 &&
+      /[A-Z]/.test(str) &&
+      /[a-z]/.test(str) &&
+      /\d/.test(str) &&
+      /[^A-Za-z0-9]/.test(str)
+    );
+  }
 
   const handleReset = async (e) => {
     e.preventDefault();
@@ -157,7 +158,7 @@ export default function PasswordReset() {
 
       {step === 4 && (
         <a href="/login" className="btn-submit" style={{ textAlign: "center", textDecoration: "none", display: "inline-block" }}>
-          Ir a iniciar sesión
+          Ir a Iniciar Sesión
         </a>
       )}
     </div>
