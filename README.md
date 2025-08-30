@@ -1,6 +1,6 @@
 # PackyGo
 
-PackyGo es una plataforma web para gestión de usuarios y envíos, desarrollada con **React + Vite** en el frontend y **Flask** en el backend. Incluye autenticación con verificación por correo y conexión a base de datos MySQL.
+PackyGo es una plataforma web para gestión de usuarios y envíos, desarrollada con **React + Vite** en el frontend y **Flask** en el backend.
 
 ---
 
@@ -98,9 +98,3 @@ PASSWORD=tu_contraseña_de_aplicacion_gmail
 - Node.js 18+
 - MySQL Server
 - Contraseña de aplicación de Gmail para envío de correos
-
----
-
-## Contacto
-
-Para dudas o soporte, contacta al equipo de desarrollo.
