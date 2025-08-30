@@ -174,14 +174,14 @@ export default function RegisterForm() {
 
       <p className="divider">o continuar con</p>
       <div className="social-login">
-        <button className="google-btn">
+        <Link className="google-btn">
           <FontAwesomeIcon icon={faGoogle} />
           Google
-        </button>
-        <button className="facebook-btn">
+        </Link>
+        <Link className="facebook-btn">
           <FontAwesomeIcon icon={faFacebook} />
           Facebook
-        </button>
+        </Link>
       </div>
 
       <a href="/" className="back-link">Volver</a>

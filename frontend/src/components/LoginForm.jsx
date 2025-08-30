@@ -115,17 +115,15 @@ export default function LoginForm() {
       <p className="divider">o continuar con</p>
 
       <div className="social-login">
-        <button className="google-btn">
+        <Link to="/" className="google-btn">
           <FontAwesomeIcon icon={faGoogle} />
           Google
-        </button>
-        <button className="facebook-btn">
+        </Link>
+        <Link to="/" className="facebook-btn">
           <FontAwesomeIcon icon={faFacebook} />
           Facebook
-        </button>
+        </Link>
       </div>
-
-
       <a href="/" className="back-link">Volver</a>
     </div>
   )

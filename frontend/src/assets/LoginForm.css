@@ -151,6 +151,7 @@
   padding: 8px 12px;
   border-radius: 5px;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .facebook-btn {
@@ -160,6 +161,7 @@
   padding: 8px 12px;
   border-radius: 5px;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .back-link {
