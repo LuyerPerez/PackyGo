@@ -4,6 +4,7 @@ import VerificationForm from './VerificationForm';
 import "../assets/LoginForm.css";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Link } from "react-router-dom";
 
 export default function PasswordReset() {
   const [step, setStep] = useState(1);
@@ -87,6 +88,7 @@ export default function PasswordReset() {
           <button type="submit" className="btn-submit" disabled={loading}>
             {loading ? <span className="spinner"></span> : 'Solicitar código'}
           </button>
+          <Link to="/login" style={{ color: "#007BFF", textDecoration: "none", fontSize: "15px" }}>Volver</Link>
         </form>
       )}
 

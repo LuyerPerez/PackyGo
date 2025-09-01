@@ -34,6 +34,7 @@
   width: 240px;
   height: 80px;
   overflow: visible;
+  z-index: 1;
 }
 
 .truck-icon .fa-truck {
@@ -45,7 +46,7 @@
 
 @keyframes truck-drive {
   0% { left: 0; }
-  50% { left: 150px; }
+  50% { left: 120px; }
   100% { left: 0; }
 }
 
@@ -54,4 +55,7 @@
   color: #fff;
   text-align: center;
   font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  animation: text-pulse 2s ease-in-out infinite;
+  margin-top: 10px;
 }
