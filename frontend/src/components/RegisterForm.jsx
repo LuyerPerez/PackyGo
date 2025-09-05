@@ -2,10 +2,11 @@ import { useState } from 'react'
 import "../assets/LoginForm.css"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faEnvelope, faLock, faIdCard, faPhone, faUserShield, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
-import { faGoogle, faFacebook } from "@fortawesome/free-brands-svg-icons"
 import { Link } from 'react-router-dom'
 import { Register } from '../api'
 import VerificationForm from './VerificationForm'
+import { GoogleLogin } from '@react-oauth/google'
+import { GoogleRegister as GoogleRegisterAPI } from '../api'
 
 function validarContrasena(str) {
   return (
@@ -45,7 +46,11 @@ export default function RegisterForm() {
       await Register({ nombre, noDocumento, correo, telefono, contrasena, rol })
       setShowVerification(true)
     } catch (e) {
-      setError(e.response?.data?.error || "Error al registrar. Intenta de nuevo.")
+      setError(
+        e.response?.data?.error ||
+        e.message ||
+        JSON.stringify(e)
+      )
     } finally {
       setLoading(false)
     }
@@ -54,6 +59,26 @@ export default function RegisterForm() {
   const handleVerified = () => {
     setSuccess("Registro exitoso. ¡Ahora puedes iniciar sesión!")
     setShowVerification(false)
+  }
+
+  const handleGoogleRegister = async (credentialResponse) => {
+    setError(null)
+    setLoading(true)
+    try {
+      const token = credentialResponse.credential
+      const res = await GoogleRegisterAPI(token, rol)
+      setSuccess("Registro exitoso con Google. ¡Ahora puedes iniciar sesión!")
+      localStorage.setItem("user", JSON.stringify(res.user))
+      window.location.href = "/"
+    } catch (e) {
+      setError(
+        e.response?.data?.error ||
+        e.message ||
+        JSON.stringify(e)
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (showVerification) {
@@ -174,14 +199,10 @@ export default function RegisterForm() {
 
       <p className="divider">o continuar con</p>
       <div className="social-login">
-        <Link className="google-btn">
-          <FontAwesomeIcon icon={faGoogle} />
-          Google
-        </Link>
-        <Link className="facebook-btn">
-          <FontAwesomeIcon icon={faFacebook} />
-          Facebook
-        </Link>
+        <GoogleLogin
+          onSuccess={handleGoogleRegister}
+          onError={() => setError("Error al registrar con Google")}
+        />
       </div>
 
       <a href="/" className="back-link">Volver</a>

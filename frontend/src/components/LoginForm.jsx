@@ -3,9 +3,10 @@ import { Login } from '../api'
 import "../assets/LoginForm.css"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faUser, faEnvelope, faLock, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons"
-import { faGoogle, faFacebook } from "@fortawesome/free-brands-svg-icons"
-import { Link } from 'react-router-dom'
+import { GoogleLogin } from '@react-oauth/google'
+import { GoogleLogin as GoogleLoginAPI } from '../api'
 import VerificationForm from './VerificationForm'
+import { Link } from 'react-router-dom'
 
 function validarContrasena(str) {
   return (
@@ -52,6 +53,21 @@ export default function LoginForm() {
   const handleVerified = (user) => {
     localStorage.setItem("user", JSON.stringify(user))
     window.location.href = "/"
+  }
+
+  const handleGoogleLogin = async (credentialResponse) => {
+    setError(null)
+    setLoading(true)
+    try {
+      const token = credentialResponse.credential
+      const res = await GoogleLoginAPI(token)
+      localStorage.setItem("user", JSON.stringify(res.user))
+      window.location.href = "/"
+    } catch (e) {
+      setError(e.response?.data?.error || "Error con Google Login")
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (showVerification) {
@@ -118,16 +134,12 @@ export default function LoginForm() {
       </div>
 
       <p className="divider">o continuar con</p>
-
       <div className="social-login">
-        <Link to="/" className="google-btn">
-          <FontAwesomeIcon icon={faGoogle} />
-          Google
-        </Link>
-        <Link to="/" className="facebook-btn">
-          <FontAwesomeIcon icon={faFacebook} />
-          Facebook
-        </Link>
+        <GoogleLogin
+          onSuccess={handleGoogleLogin}
+          onError={() => setError("Error al iniciar con Google")}
+        />
+        {/* Botón de Facebook eliminado */}
       </div>
     </div>
   )

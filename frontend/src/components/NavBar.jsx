@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,9 +12,25 @@ function NavBar() {
 
   useEffect(() => {
     const userStorage = localStorage.getItem("user");
-    if (userStorage) {
-      setUser(JSON.parse(userStorage));
-    }
+    setUser(userStorage ? JSON.parse(userStorage) : null);
+
+    const handleStorageChange = () => {
+      const updatedUser = localStorage.getItem("user");
+      setUser(updatedUser ? JSON.parse(updatedUser) : null);
+    };
+    window.addEventListener("storage", handleStorageChange);
+
+    // Actualiza el usuario cada vez que cambie la ruta
+    const handleRouteChange = () => {
+      const updatedUser = localStorage.getItem("user");
+      setUser(updatedUser ? JSON.parse(updatedUser) : null);
+    };
+    window.addEventListener("popstate", handleRouteChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("popstate", handleRouteChange);
+    };
   }, []);
 
   useEffect(() => {

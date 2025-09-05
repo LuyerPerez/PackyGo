@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 from email.message import EmailMessage
 import ssl
 import smtplib
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 
 load_dotenv()
 email_sender = "packygonotificaciones@gmail.com"
@@ -19,6 +21,7 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 verification_codes = {}
 reset_codes = {}
+
 @app.route("/api/request-reset", methods=["POST"])
 def request_reset():
     data = request.json
@@ -167,7 +170,6 @@ def verify():
         codigo = reset_codes.get(correo)
         if not codigo or codigo != code:
             return {"error": "Código incorrecto"}, 400
-        # No elimines el código aquí, solo verifica
         return {"code": code, "message": "Código verificado"}, 200
 
     verif = verification_codes.get(correo)
@@ -205,6 +207,69 @@ def verify():
         return user, 200
 
     return {"error": "Tipo de verificación inválido"}, 400
+
+@app.route("/api/google-login", methods=["POST"])
+def google_login():
+    token = request.json.get("token")
+    if not token:
+        return {"error": "Token requerido"}, 400
+    try:
+        idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), os.getenv("GOOGLE_CLIENT_ID"))
+        correo = idinfo["email"]
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM usuario WHERE correo=%s", (correo,))
+        user = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        if not user:
+            return {"error": "No existe usuario con ese correo"}, 404
+        return {"user": {
+            "id": user[0],
+            "nombre": user[1],
+            "correo": user[3]
+        }}, 200
+    except Exception as e:
+        return {"error": str(e)}, 400
+
+@app.route("/api/google-register", methods=["POST"])
+def google_register():
+    token = request.json.get("token")
+    rol = request.json.get("rol", "cliente")
+    if not token:
+        return {"error": "Token requerido"}, 400
+    try:
+        idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), os.getenv("GOOGLE_CLIENT_ID"))
+        nombre = idinfo.get("name", "")
+        correo = idinfo["email"]
+        noDocumento = ""
+        telefono = ""
+        contrasena = os.urandom(16).hex()
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM usuario WHERE correo=%s", (correo,))
+        user = cursor.fetchone()
+        if user:
+            cursor.close()
+            conn.close()
+            return {"error": "El correo ya está registrado."}, 400
+        hashed_password = generate_password_hash(contrasena)
+        cursor.execute(
+            "INSERT INTO usuario (nombre, noDocumento, correo, telefono, contrasena, rol) VALUES (%s, %s, %s, %s, %s, %s)",
+            (nombre, noDocumento, correo, telefono, hashed_password, rol)
+        )
+        conn.commit()
+        cursor.execute("SELECT * FROM usuario WHERE correo=%s", (correo,))
+        user = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return {"user": {
+            "id": user[0],
+            "nombre": user[1],
+            "correo": user[3]
+        }}, 201
+    except Exception as e:
+        return {"error": str(e)}, 400
 
 if __name__ == "__main__":
     port = int(os.getenv("FLASK_PORT", "5000"))

@@ -48,3 +48,13 @@ export async function resetPassword({ correo, code, nueva }) {
     nueva });
   return data;
 }
+
+export async function GoogleLogin(token) {
+  const { data } = await api.post('/google-login', { token });
+  return data;
+}
+
+export async function GoogleRegister(token, rol) {
+  const { data } = await api.post('/google-register', { token, rol });
+  return data;
+}

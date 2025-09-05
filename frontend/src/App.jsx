@@ -9,6 +9,9 @@ import NotFound from "./components/NotFound";
 import TruckLoader from "./components/TruckLoader";
 import { useEffect, useState } from "react";
 import PasswordReset from "./components/PasswordReset";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
+const GOOGLE_CLIENT_ID = "710600040256-60ttnabd8kjbr1051o2giq3gubd0ab4g.apps.googleusercontent.com";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -27,16 +30,18 @@ export default function App() {
   }
 
   return (
-    <div>
-      <NavBar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/logout" element={<Logout />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/recuperar-contrasena" element={<PasswordReset />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </div>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <div>
+        <NavBar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/logout" element={<Logout />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/recuperar-contrasena" element={<PasswordReset />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+    </GoogleOAuthProvider>
   );
 }
