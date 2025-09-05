@@ -243,7 +243,7 @@ def google_register():
         nombre = idinfo.get("name", "")
         correo = idinfo["email"]
         noDocumento = None
-        telefono = ""
+        telefono = None
         contrasena = os.urandom(16).hex()
         conn = get_connection()
         cursor = conn.cursor()
