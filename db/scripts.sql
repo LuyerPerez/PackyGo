@@ -6,7 +6,7 @@ USE packygo;
 CREATE TABLE usuario (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nombre VARCHAR(100) NOT NULL,
-  noDocumento VARCHAR(20) UNIQUE,
+  noDocumento VARCHAR(10) UNIQUE NULL,
   correo VARCHAR(100) NOT NULL UNIQUE,
   telefono VARCHAR(15),
   contrasena VARCHAR(255) NOT NULL,
