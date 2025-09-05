@@ -242,7 +242,7 @@ def google_register():
         idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), os.getenv("GOOGLE_CLIENT_ID"))
         nombre = idinfo.get("name", "")
         correo = idinfo["email"]
-        noDocumento = ""
+        noDocumento = None
         telefono = ""
         contrasena = os.urandom(16).hex()
         conn = get_connection()
