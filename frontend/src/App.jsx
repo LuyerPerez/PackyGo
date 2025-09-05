@@ -1,4 +1,4 @@
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
 import "./assets/NavBar.css";
 import Home from "./pages/home";
 import LoginPage from "./pages/Login";
@@ -15,6 +15,7 @@ const GOOGLE_CLIENT_ID = "710600040256-60ttnabd8kjbr1051o2giq3gubd0ab4g.apps.goo
 
 export default function App() {
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     if (window.location.pathname === "/") {
@@ -29,10 +30,12 @@ export default function App() {
     return <TruckLoader />;
   }
 
+  const hideNavBar = ["/login", "/register", "/recuperar-contrasena"].includes(location.pathname);
+
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <div>
-        <NavBar />
+        {!hideNavBar && <NavBar />}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<LoginPage />} />

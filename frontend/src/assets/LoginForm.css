@@ -1,15 +1,96 @@
 body {
   background: #ffffff;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.login-page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+}
+
+.login-left-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100vh;
+  width: 100%;
+  max-width: 540px;
+  min-width: 320px;
+  background: #e6f0f2;
+  padding: 48px 36px;
+  border-radius: 18px 0 0 18px;
+  box-shadow: 0 8px 28px rgba(8, 60, 93, 0.15);
+  z-index: 2;
+}
+
+.login-right-panel {
+  flex: 1;
+  min-width: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 18px 18px 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.login-right-panel img {
+  width: 100%;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(0 8px 28px rgba(8, 60, 93, 0.15));
+}
+
+@media (max-width: 900px) {
+  .login-page-wrapper {
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  .login-left-panel, .login-right-panel {
+    border-radius: 18px 18px 0 0;
+    max-width: 100vw;
+    min-width: 0;
+  }
+  .login-right-panel {
+    border-radius: 0 0 18px 18px;
+    min-height: 180px;
+    padding: 24px 0;
+    display: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .login-page-wrapper {
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  .login-left-panel, .login-right-panel {
+    border-radius: 0;
+    max-width: 100vw;
+    min-width: 0;
+    padding: 24px 8px;
+  }
+  .login-right-panel {
+    min-height: 120px;
+    padding: 12px 0;
+  }
+}
+
+body {
+  background: #ffffff;
 }
  
 .login-container {
   width: 100%;
-  max-width: 420px;
-  padding: 36px 28px;
   background: #e6f0f2;
   text-align: center;
-  border-radius: 18px;
-  box-shadow: 0 8px 28px rgba(8, 60, 93, 0.15);
+  border-radius: 18px;  
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -160,7 +241,6 @@ body {
   border: none;
   font-size: 14px;
   transition: transform 0.2s, background 0.2s;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   text-decoration: none;
 }
 .google-btn {
@@ -207,7 +287,6 @@ body {
     padding: 36px 28px;
     border-radius: 18px;
     margin: 48px auto;
-    box-shadow: 0 8px 28px rgba(8, 60, 93, 0.15);
   }
   .login-title { font-size: 26px; }
 }
@@ -216,9 +295,8 @@ body {
       max-width: 420px;
       width: 100%;
       padding: 36px 18px;
-      border-radius: 18px;
+      border-radius: 18px;  
       margin: 48px auto;
-      box-shadow: 0 8px 28px rgba(8, 60, 93, 0.15);
   }
   .login-title { font-size: 26px; }
   .input-group { font-size: 14px; padding: 8px 12px; }

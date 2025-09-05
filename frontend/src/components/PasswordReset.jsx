@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { requestPasswordReset, resetPassword } from '../api';
 import VerificationForm from './VerificationForm';
+import "../assets/PasswordReset.css";
 import "../assets/LoginForm.css";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -66,107 +67,98 @@ export default function PasswordReset() {
   };
 
   return (
-    <div className="login-container" style={{ maxWidth: "500px", width: "100%" }}>
-      {error && <p style={{ color: 'red', fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>{error}</p>}
-      {success && <p style={{ color: 'green', fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>{success}</p>}
+    <div className="login-page-wrapper">
+      <div className="login-left-panel">
+        <div className="reset-container">
+          {error && <p className="reset-error">{error}</p>}
+          {success && <p className="reset-success">{success}</p>}
 
-      {step === 1 && (
-        <form onSubmit={handleRequest} className="login-form">
-          <h2 className="login-title" style={{ marginBottom: "20px" }}>
-            Recuperar Contraseña
-          </h2>
-          <div className="input-group">
-            <input
-              type="email"
-              placeholder="Correo electrónico"
-              value={correo}
-              onChange={e => setCorreo(e.target.value)}
-              required
-              style={{ fontSize: "18px" }}
-            />
-          </div>
-          <button type="submit" className="btn-submit" disabled={loading}>
-            {loading ? <span className="spinner"></span> : 'Solicitar código'}
-          </button>
-          <Link to="/login" style={{ color: "#007BFF", textDecoration: "none", fontSize: "15px" }}>Volver</Link>
-        </form>
-      )}
+          {step === 1 && (
+            <form onSubmit={handleRequest} className="reset-form">
+              <h2 className="reset-title">Recuperar Contraseña</h2>
+              <div className="reset-input-group">
+                <input
+                  type="email"
+                  placeholder="Correo electrónico"
+                  value={correo}
+                  onChange={e => setCorreo(e.target.value)}
+                  required
+                />
+              </div>
+              <button type="submit" className="reset-btn" disabled={loading}>
+                {loading ? <span className="reset-spinner"></span> : 'Solicitar código'}
+              </button>
+              <Link to="/login" className="reset-link">Volver</Link>
+            </form>
+          )}
 
-      {step === 2 && (
-        <VerificationForm
-          correo={correo}
-          tipo="reset"
-          onVerified={(data) => {
-            setCode(data.code || code);
-            setStep(3);
-          }}
-          onCancel={() => setStep(1)}
-        />
-      )}
-
-      {step === 3 && (
-        
-        <form onSubmit={handleReset} className="login-form">
-          <h2 className="login-title" style={{ marginBottom: "20px" }}>
-            Recuperar Contraseña
-          </h2>
-          <div className="input-group">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Nueva contraseña"
-              value={nueva}
-              onChange={e => setNueva(e.target.value)}
-              required
-              style={{ fontSize: "18px" }}
-            />
-            <button
-              type="button"
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                marginLeft: "8px"
+          {step === 2 && (
+            <VerificationForm
+              correo={correo}
+              tipo="reset"
+              onVerified={(data) => {
+                setCode(data.code || code);
+                setStep(3);
               }}
-              onClick={() => setShowPassword((prev) => !prev)}
-              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-            >
-              <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-            </button>
-          </div>
-          <div className="input-group">
-            <input
-              type={showConfirm ? "text" : "password"}
-              placeholder="Confirmar contraseña"
-              value={confirmar}
-              onChange={e => setConfirmar(e.target.value)}
-              required
-              style={{ fontSize: "18px" }}
+              onCancel={() => setStep(1)}
             />
-            <button
-              type="button"
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                marginLeft: "8px"
-              }}
-              onClick={() => setShowConfirm((prev) => !prev)}
-              aria-label={showConfirm ? "Ocultar contraseña" : "Mostrar contraseña"}
-            >
-              <FontAwesomeIcon icon={showConfirm ? faEyeSlash : faEye} />
-            </button>
-          </div>
-          <button type="submit" className="btn-submit" disabled={loading}>
-            {loading ? <span className="spinner"></span> : 'Cambiar contraseña'}
-          </button>
-        </form>
-      )}
+          )}
 
-      {step === 4 && (
-        <a href="/login" className="btn-submit" style={{ textAlign: "center", textDecoration: "none", display: "inline-block" }}>
-          Ir a Iniciar Sesión
-        </a>
-      )}
+          {step === 3 && (
+            <form onSubmit={handleReset} className="reset-form">
+              <h2 className="reset-title">Nueva Contraseña</h2>
+              <div className="reset-input-group">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Nueva contraseña"
+                  value={nueva}
+                  onChange={e => setNueva(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="reset-eye-btn"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  tabIndex={-1}
+                >
+                  <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                </button>
+              </div>
+              <div className="reset-input-group">
+                <input
+                  type={showConfirm ? "text" : "password"}
+                  placeholder="Confirmar contraseña"
+                  value={confirmar}
+                  onChange={e => setConfirmar(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="reset-eye-btn"
+                  onClick={() => setShowConfirm((prev) => !prev)}
+                  aria-label={showConfirm ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  tabIndex={-1}
+                >
+                  <FontAwesomeIcon icon={showConfirm ? faEyeSlash : faEye} />
+                </button>
+              </div>
+              <button type="submit" className="reset-btn" disabled={loading}>
+                {loading ? <span className="reset-spinner"></span> : 'Cambiar contraseña'}
+              </button>
+            </form>
+          )}
+
+          {step === 4 && (
+            <a href="/login" className="reset-btn" style={{ textAlign: "center", textDecoration: "none", display: "inline-block" }}>
+              Ir a Iniciar Sesión
+            </a>
+          )}
+        </div>
+      </div>
+      <div className="login-right-panel">
+        <img src="../../public/rocket-login.png" alt="Rocket Illustration" />
+      </div>
     </div>
   );
 }
