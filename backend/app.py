@@ -151,7 +151,8 @@ def login():
             "user": {
                 "id": user[0],
                 "nombre": user[1],
-                "correo": user[3]
+                "correo": user[3],
+                "rol": user[6]  # <-- Agrega esto
             }
         }
         enviarCorreo(correo, codigo)
@@ -227,7 +228,8 @@ def google_login():
         return {"user": {
             "id": user[0],
             "nombre": user[1],
-            "correo": user[3]
+            "correo": user[3],
+            "rol": user[6] 
         }}, 200
     except Exception as e:
         return {"error": str(e)}, 400
@@ -266,7 +268,8 @@ def google_register():
         return {"user": {
             "id": user[0],
             "nombre": user[1],
-            "correo": user[3]
+            "correo": user[3],
+            "rol": user[6]  # <-- Agrega esto
         }}, 201
     except Exception as e:
         return {"error": str(e)}, 400

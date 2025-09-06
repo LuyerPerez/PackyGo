@@ -10,7 +10,7 @@ CREATE TABLE usuario (
   correo VARCHAR(100) NOT NULL UNIQUE,
   telefono VARCHAR(15),
   contrasena VARCHAR(255) NOT NULL,
-  rol VARCHAR(20) NOT NULL,
+  rol ENUM('admin', 'cliente', 'camionero') NOT NULL,
   fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 

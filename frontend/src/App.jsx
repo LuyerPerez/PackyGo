@@ -1,4 +1,4 @@
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import "./assets/NavBar.css";
 import Home from "./pages/home";
 import LoginPage from "./pages/Login";
@@ -18,15 +18,15 @@ export default function App() {
   const location = useLocation();
 
   useEffect(() => {
-    if (window.location.pathname === "/") {
+    if (location.pathname === "/") {
       const timer = setTimeout(() => setLoading(false), 2500);
       return () => clearTimeout(timer);
     } else {
       setLoading(false);
     }
-  }, []);
+  }, [location.pathname]);
 
-  if (loading && window.location.pathname === "/") {
+  if (loading && location.pathname === "/") {
     return <TruckLoader />;
   }
 
@@ -34,17 +34,16 @@ export default function App() {
 
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      <div>
-        {!hideNavBar && <NavBar />}
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/logout" element={<Logout />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/recuperar-contrasena" element={<PasswordReset />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </div>
+      {!hideNavBar && <NavBar />}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/logout" element={<Logout />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/recuperar-contrasena" element={<PasswordReset />} />
+        <Route path="/administracion" />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </GoogleOAuthProvider>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faHome, faTruck, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faHome, faTruck, faRightFromBracket, faUserLock } from "@fortawesome/free-solid-svg-icons";
 
 
 function NavBar() {
@@ -20,7 +20,6 @@ function NavBar() {
     };
     window.addEventListener("storage", handleStorageChange);
 
-    // Actualiza el usuario cada vez que cambie la ruta
     const handleRouteChange = () => {
       const updatedUser = localStorage.getItem("user");
       setUser(updatedUser ? JSON.parse(updatedUser) : null);
@@ -77,10 +76,22 @@ function NavBar() {
           </Link>
         </li>
         <li>
-          <Link to="/explorar" onClick={() => setMenuOpen(false)}>
-            <FontAwesomeIcon icon={faTruck} style={{ marginRight: "6px" }} />
-            Explorar Camiones
-          </Link>
+          {user && user.rol === "camionero" ? (
+            <Link to="/reservas" onClick={() => setMenuOpen(false)}>
+              <FontAwesomeIcon icon={faTruck} style={{ marginRight: "6px" }} />
+              Reservas
+            </Link>
+          ) : user && user.rol === "admin" ? (
+            <Link to="/administracion" onClick={() => setMenuOpen(false)}>
+              <FontAwesomeIcon icon={faUserLock} style={{ marginRight: "6px" }} />
+              Administracion
+            </Link>
+          ) : (
+            <Link to="/explorar" onClick={() => setMenuOpen(false)}>
+              <FontAwesomeIcon icon={faTruck} style={{ marginRight: "6px" }} />
+              Explorar Camiones
+            </Link>
+          )}
         </li>
         {user ? (
           <li ref={dropdownRef} style={{ position: "relative" }}>
@@ -127,6 +138,23 @@ function NavBar() {
                   <FontAwesomeIcon icon={faUser} style={{ marginRight: "6px" }} />
                   Perfil
                 </Link>
+                {user.rol === "camionero" && (
+                  <Link
+                    to="/mis-vehiculos"
+                    style={{
+                      display: "block",
+                      padding: "10px 16px",
+                      color: "#fff",
+                      textDecoration: "none",
+                      fontWeight: "500",
+                    }}
+                    onClick={() => { setOpen(false); setMenuOpen(false); }}
+                  >
+                    <FontAwesomeIcon icon={faTruck} style={{ marginRight: "6px" }} />
+                    Mis Vehículos
+                  </Link>
+                )}
+
                 <Link
                   to="/logout"
                   style={{
