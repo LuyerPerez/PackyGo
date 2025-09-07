@@ -35,16 +35,19 @@ PackyGo/
 
 ## Instalación y ejecución
 
+## Base de datos 
+
+1. En la carpeta db esta el script de la base de datos, ejecutar en MySQL Workbench o PhpMyAdmin
+
 ### Backend
 
-1. Instala dependencias:
+1. Ejecutar o crear su entorno virtual:
+
    ```
+   cd backend
+   python -m venv venv
+   source venv/bin/activate
    pip install -r requirements.txt
-   ```
-2. Configura el archivo `.env` con tus credenciales de MySQL y correo.
-3. Ejecuta el servidor:
-   ```
-   python app.py
    ```
 
 #### Ejemplo de archivo `.env` para el backend
@@ -59,6 +62,8 @@ FLASK_DEBUG=1
 FLASK_PORT=5000
 
 PASSWORD=tu_contraseña_de_aplicacion_gmail
+SECRET_KEY=tu_clave_secreta_google
+GOOGLE_CLIENT_ID=tu_client_id_google
 ```
 
 ### Frontend
@@ -128,4 +133,5 @@ Las funcionalidades principales de PackyGo son:
 
 - Python 3.10+
 - Node.js 18+
-- MySQL Server
+- XAMPP o MySQL SERVER
+- Git Bash
