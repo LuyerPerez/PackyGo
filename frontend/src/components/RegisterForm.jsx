@@ -31,12 +31,17 @@ export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [passwordError, setPasswordError] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [aceptaTerminos, setAceptaTerminos] = useState(false)
 
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError(null)
     setSuccess(null)
     setPasswordError(null)
+    if (!aceptaTerminos) {
+      setError("Debes aceptar los términos y condiciones para registrarte.")
+      return
+    }
     if (!validarContrasena(contrasena)) {
       setPasswordError("La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.")
       return
@@ -189,7 +194,19 @@ export default function RegisterForm() {
                 <option value="camionero">Camionero</option>
               </select>
             </div>
-            <button type="submit" className="btn-submit" disabled={loading}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", margin: "8px 0" }}>
+              <input
+                type="checkbox"
+                id="terminos"
+                checked={aceptaTerminos}
+                onChange={(e) => setAceptaTerminos(e.target.checked)}
+                required
+              />
+              <label htmlFor="terminos" style={{ fontSize: "0.95em" }}>
+                Acepto los <a href="/terminos">Términos y Condiciones</a> y la <a href="/privacidad">Política de Privacidad</a>
+              </label>
+            </div>
+            <button type="submit" className="btn-submit" disabled={loading || !aceptaTerminos}>
               {loading ? <span className="spinner"></span> : "Registrarse"}
             </button>
           </form>

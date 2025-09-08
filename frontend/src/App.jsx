@@ -11,6 +11,8 @@ import NotFound from "./components/NotFound";
 import TruckLoader from "./components/TruckLoader";
 import PasswordReset from "./components/PasswordReset";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import TerminosCondiciones from "./pages/TerminosCondiciones";
+import PoliticaPrivacidad from "./pages/PoliticaPrivacidad";
 
 const GOOGLE_CLIENT_ID = "710600040256-60ttnabd8kjbr1051o2giq3gubd0ab4g.apps.googleusercontent.com";
 
@@ -45,6 +47,8 @@ export default function App() {
         <Route path="/administracion" />
         <Route path="/mis-vehiculos" element={<Vehiculos />}></Route>
         <Route path="/pedidos"></Route>
+        <Route path="/terminos" element={<TerminosCondiciones />} />
+        <Route path="/privacidad" element={<PoliticaPrivacidad />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </GoogleOAuthProvider>
