@@ -18,11 +18,11 @@ CREATE TABLE usuario (
 CREATE TABLE vehiculo (
   id INT AUTO_INCREMENT PRIMARY KEY,
   camionero_id INT NOT NULL,
-  tipo_vehiculo VARCHAR(50),
-  placa VARCHAR(20) NOT NULL UNIQUE,
-  modelo VARCHAR(50),
-  ano_modelo SMALLINT,
-  imagen_url TEXT,
+  tipo_vehiculo VARCHAR(50) NOT NULL,
+  placa VARCHAR(20) NOT NULL,
+  modelo VARCHAR(50) NOT NULL,
+  ano_modelo INT NOT NULL,
+  imagen_url VARCHAR(255),
   tarifa_diaria DECIMAL(10,2) NOT NULL,
   FOREIGN KEY (camionero_id) REFERENCES usuario(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
