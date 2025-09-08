@@ -54,13 +54,12 @@
 .registro-btn:hover:not(:disabled) {
   background: #0a4c7a;
 }
-  
+
 .modal-content {
   max-height: 90vh;
   overflow-y: auto;
 }
 
-/* En pantallas pequeñas, ajusta el alto y permite scroll */
 @media (max-width: 700px) {
   .modal-content {
     max-height: 95vh;
