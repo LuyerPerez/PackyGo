@@ -152,7 +152,7 @@ def login():
                 "id": user[0],
                 "nombre": user[1],
                 "correo": user[3],
-                "rol": user[6]  # <-- Agrega esto
+                "rol": user[6] 
             }
         }
         enviarCorreo(correo, codigo)
