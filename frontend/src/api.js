@@ -58,3 +58,23 @@ export async function GoogleRegister(token, rol) {
   const { data } = await api.post('/google-register', { token, rol });
   return data;
 }
+
+export async function registrarVehiculo(data) {
+  const res = await api.post("/vehiculos", data);
+  return res.data;
+}
+
+export async function obtenerVehiculosPorCamionero(camionero_id) {
+  const res = await api.get(`/vehiculos?camionero_id=${camionero_id}`);
+  return res.data;
+}
+
+export async function editarVehiculo(id, data) {
+  const res = await api.put(`/vehiculos/${id}`, data);
+  return res.data;
+}
+
+export async function eliminarVehiculo(id) {
+  const res = await api.delete(`/vehiculos/${id}`);
+  return res.data;
+}

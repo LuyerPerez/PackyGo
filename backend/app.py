@@ -274,6 +274,112 @@ def google_register():
     except Exception as e:
         return {"error": str(e)}, 400
 
+@app.route("/api/vehiculos", methods=["POST"])
+def registrar_vehiculo():
+    data = request.json
+    camionero_id = data.get("camionero_id")
+    tipo_vehiculo = data.get("tipo_vehiculo")
+    placa = data.get("placa")
+    modelo = data.get("modelo")
+    ano_modelo = data.get("ano_modelo")
+    imagen_url = data.get("imagen_url")
+    tarifa_diaria = data.get("tarifa_diaria")
+
+    if not all([camionero_id, tipo_vehiculo, placa, modelo, ano_modelo, tarifa_diaria]):
+        return {"error": "Todos los campos son obligatorios."}, 400
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            INSERT INTO vehiculo (camionero_id, tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            (camionero_id, tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria)
+        )
+        conn.commit()
+        return {"message": "Vehículo registrado correctamente."}, 201
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/vehiculos", methods=["GET"])
+def listar_vehiculos():
+    camionero_id = request.args.get("camionero_id")
+    if not camionero_id:
+        return {"error": "camionero_id es obligatorio"}, 400
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT id, tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria FROM vehiculo WHERE camionero_id=%s",
+        (camionero_id,)
+    )
+    vehiculos = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    lista = [
+        {
+            "id": v[0],
+            "tipo_vehiculo": v[1],
+            "placa": v[2],
+            "modelo": v[3],
+            "ano_modelo": v[4],
+            "imagen_url": v[5],
+            "tarifa_diaria": float(v[6]),
+        }
+        for v in vehiculos
+    ]
+    return {"vehiculos": lista}, 200
+
+@app.route("/api/vehiculos/<int:vehiculo_id>", methods=["PUT"])
+def editar_vehiculo(vehiculo_id):
+    data = request.json
+    tipo_vehiculo = data.get("tipo_vehiculo")
+    placa = data.get("placa")
+    modelo = data.get("modelo")
+    ano_modelo = data.get("ano_modelo")
+    imagen_url = data.get("imagen_url")
+    tarifa_diaria = data.get("tarifa_diaria")
+    if not all([tipo_vehiculo, placa, modelo, ano_modelo, tarifa_diaria]):
+        return {"error": "Todos los campos son obligatorios."}, 400
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            UPDATE vehiculo SET tipo_vehiculo=%s, placa=%s, modelo=%s, ano_modelo=%s, imagen_url=%s, tarifa_diaria=%s
+            WHERE id=%s
+            """,
+            (tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria, vehiculo_id)
+        )
+        conn.commit()
+        return {"message": "Vehículo actualizado correctamente."}, 200
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/vehiculos/<int:vehiculo_id>", methods=["DELETE"])
+def eliminar_vehiculo(vehiculo_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM vehiculo WHERE id=%s", (vehiculo_id,))
+        conn.commit()
+        return {"message": "Vehículo eliminado correctamente."}, 200
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+
 if __name__ == "__main__":
     port = int(os.getenv("FLASK_PORT", "5000"))
     app.run(host="0.0.0.0", port=port, debug=True)

@@ -1,13 +1,14 @@
 import { Routes, Route, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import "./assets/NavBar.css";
 import Home from "./pages/home";
 import LoginPage from "./pages/Login";
 import Logout from "./pages/Logout";
 import NavBar from "./components/NavBar";
 import RegisterPage from "./pages/Register";
+import Vehiculos from "./pages/Vehiculos";
 import NotFound from "./components/NotFound";
 import TruckLoader from "./components/TruckLoader";
-import { useEffect, useState } from "react";
 import PasswordReset from "./components/PasswordReset";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
@@ -42,6 +43,8 @@ export default function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/recuperar-contrasena" element={<PasswordReset />} />
         <Route path="/administracion" />
+        <Route path="/mis-vehiculos" element={<Vehiculos />}></Route>
+        <Route path="/pedidos"></Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
     </GoogleOAuthProvider>

@@ -77,9 +77,9 @@ function NavBar() {
         </li>
         <li>
           {user && user.rol === "camionero" ? (
-            <Link to="/reservas" onClick={() => setMenuOpen(false)}>
+            <Link to="/pedidos" onClick={() => setMenuOpen(false)}>
               <FontAwesomeIcon icon={faTruck} style={{ marginRight: "6px" }} />
-              Reservas
+              Pedidos
             </Link>
           ) : user && user.rol === "admin" ? (
             <Link to="/administracion" onClick={() => setMenuOpen(false)}>
