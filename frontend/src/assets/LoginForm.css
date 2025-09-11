@@ -192,33 +192,11 @@ body {
   transition: color 0.2s;
 }
 
-.extra-links a::after,
-.back-link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -2px;
-  width: 0%;
-  height: 2px;
-  .extra-links a,
-  .back-link {
-    font-weight: 600;
-    color: #083c5d;
-    text-decoration: none;
-    transition: color 0.2s;
-    padding: 0 2px;
-  }
-  .extra-links a:hover,
-  .back-link:hover {
-    color: #0097a7;
-    text-decoration: underline;
-  }
-  position: absolute;
-  top: 50%;
-  width: 35%;
-  height: 1px;
-  background: #ccc;
+.extra-links a:hover,
+.back-link:hover {
+  color: #0097a7;
 }
+
 .divider::before { left: 0; }
 .divider::after { right: 0; }
 
