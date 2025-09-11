@@ -1,0 +1,55 @@
+.explorar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 10px;
+  background: #fff;
+}
+
+.explorar-title {
+  font-size: 2em;
+  color: #222;
+  margin-bottom: 24px;
+  font-weight: bold;
+}
+
+.vehiculos-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 24px;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 32px;
+  min-height: 200px;
+}
+
+.no-vehiculos {
+  color: #888;
+  font-size: 1.2em;
+  text-align: center;
+  margin: 40px 0;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.pagination button {
+  background: #fff;
+  color: #0097a7;
+  border: 1px solid #0097a7;
+  padding: 8px 16px;
+  margin: 0 4px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.pagination button.active,
+.pagination button:hover {
+  background: #0097a7;
+  color: #fff;
+}

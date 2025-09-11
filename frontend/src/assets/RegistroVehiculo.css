@@ -14,8 +14,14 @@
 }
 .form-group {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+.form-group label {
+  min-width: 130px;
+  text-align: right;
+  font-weight: 500;
 }
 .input {
   padding: 10px 12px;
@@ -24,6 +30,7 @@
   font-size: 1rem;
   background: #fff;
   transition: border 0.2s;
+  flex: 1;
 }
 .input:focus {
   border-color: #083c5d;
@@ -54,12 +61,10 @@
 .registro-btn:hover:not(:disabled) {
   background: #0a4c7a;
 }
-
 .modal-content {
   max-height: 90vh;
   overflow-y: auto;
 }
-
 @media (max-width: 700px) {
   .modal-content {
     max-height: 95vh;

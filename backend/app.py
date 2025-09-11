@@ -310,19 +310,27 @@ def registrar_vehiculo():
 @app.route("/api/vehiculos", methods=["GET"])
 def listar_vehiculos():
     camionero_id = request.args.get("camionero_id")
-    if not camionero_id:
-        return {"error": "camionero_id es obligatorio"}, 400
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute(
-        "SELECT id, tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria FROM vehiculo WHERE camionero_id=%s",
-        (camionero_id,)
-    )
+    if camionero_id:
+        cursor.execute(
+            "SELECT id, tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria FROM vehiculo WHERE camionero_id=%s",
+            (camionero_id,)
+        )
+    else:
+        cursor.execute(
+            "SELECT id, tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria FROM vehiculo"
+        )
     vehiculos = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    lista = [
-        {
+    lista = []
+    for v in vehiculos:
+        vehiculo_id = v[0]
+        # Obtener calificación promedio
+        cursor.execute(
+            "SELECT AVG(estrellas) FROM calificacion_vehiculo WHERE vehiculo_destino_id=%s", (vehiculo_id,)
+        )
+        calificacion = cursor.fetchone()[0]
+        lista.append({
             "id": v[0],
             "tipo_vehiculo": v[1],
             "placa": v[2],
@@ -330,9 +338,10 @@ def listar_vehiculos():
             "ano_modelo": v[4],
             "imagen_url": v[5],
             "tarifa_diaria": float(v[6]),
-        }
-        for v in vehiculos
-    ]
+            "calificacion": calificacion
+        })
+    cursor.close()
+    conn.close()
     return {"vehiculos": lista}, 200
 
 @app.route("/api/vehiculos/<int:vehiculo_id>", methods=["PUT"])

@@ -10,45 +10,43 @@ import Vehiculos from "./pages/Vehiculos";
 import NotFound from "./components/NotFound";
 import TruckLoader from "./components/TruckLoader";
 import PasswordReset from "./components/PasswordReset";
+import Explorar from "./pages/Explorar"; // Importar la página Explorar
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import TerminosCondiciones from "./pages/TerminosCondiciones";
 import PoliticaPrivacidad from "./pages/PoliticaPrivacidad";
 
 const GOOGLE_CLIENT_ID = "710600040256-60ttnabd8kjbr1051o2giq3gubd0ab4g.apps.googleusercontent.com";
+const NAVBAR_HIDDEN_ROUTES = ["/login", "/register", "/recuperar-contrasena"];
 
 export default function App() {
   const [loading, setLoading] = useState(true);
-  const location = useLocation();
+  const { pathname } = useLocation();
 
   useEffect(() => {
-    if (location.pathname === "/") {
+    if (pathname === "/") {
       const timer = setTimeout(() => setLoading(false), 2500);
       return () => clearTimeout(timer);
-    } else {
-      setLoading(false);
     }
-  }, [location.pathname]);
+    setLoading(false);
+  }, [pathname]);
 
-  if (loading && location.pathname === "/") {
-    return <TruckLoader />;
-  }
+  if (loading && pathname === "/") return <TruckLoader />;
 
-  const hideNavBar = ["/login", "/register", "/recuperar-contrasena"].includes(location.pathname);
+  const showNavBar = !NAVBAR_HIDDEN_ROUTES.includes(pathname);
 
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      {!hideNavBar && <NavBar />}
+      {showNavBar && <NavBar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/recuperar-contrasena" element={<PasswordReset />} />
-        <Route path="/administracion" />
-        <Route path="/mis-vehiculos" element={<Vehiculos />}></Route>
-        <Route path="/pedidos"></Route>
+        <Route path="/mis-vehiculos" element={<Vehiculos />} />
         <Route path="/terminos" element={<TerminosCondiciones />} />
         <Route path="/privacidad" element={<PoliticaPrivacidad />} />
+        <Route path="/explorar" element={<Explorar />} /> {/* Ruta para la página Explorar */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </GoogleOAuthProvider>

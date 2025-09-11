@@ -78,3 +78,8 @@ export async function eliminarVehiculo(id) {
   const res = await api.delete(`/vehiculos/${id}`);
   return res.data;
 }
+
+export async function obtenerTodosLosVehiculos() {
+  const res = await api.get('/vehiculos');
+  return res.data.vehiculos;
+}

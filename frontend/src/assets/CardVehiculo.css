@@ -1,0 +1,94 @@
+.card-vehiculo {
+  background: #f7f9fa;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+  overflow: hidden;
+  margin: 12px;
+  transition: box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-vehiculo:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.vehiculo-imagen {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border-bottom: 1px solid #eee;
+}
+
+.vehiculo-info {
+  padding: 16px;
+  width: 100%;
+  text-align: left;
+}
+
+.vehiculo-info h3 {
+  font-size: 1.2em;
+  margin: 0 0 6px 0;
+  color: #222;
+}
+
+.vehiculo-ano {
+  color: #888;
+  font-size: 0.9em;
+}
+
+.vehiculo-tipo {
+  font-weight: bold;
+  color: #007bff;
+  margin-bottom: 6px;
+}
+
+.tarifa {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.rating {
+  margin: 8px 0;
+}
+
+.star {
+  color: #ccc;
+  font-size: 1.2em;
+  margin-right: 2px;
+  display: inline-block;
+}
+
+.star.filled {
+  color: gold;
+}
+
+.star.half {
+  background: linear-gradient(90deg, gold 50%, #ccc 50%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.promedio {
+  margin-left: 6px;
+  color: #888;
+  font-size: 0.95em;
+}
+
+.button-more-info {
+  background: linear-gradient(90deg,#0097a7 60%,#083c5d 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+  transition: background 0.2s;
+}
+
+.button-more-info:hover {
+  background: linear-gradient(90deg,#083c5d 60%,#0097a7 100%);
+}
