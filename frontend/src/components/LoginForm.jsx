@@ -70,73 +70,80 @@ export default function LoginForm() {
     }
   }
 
-  if (showVerification) {
-    return <VerificationForm correo={correo} tipo="login" onVerified={handleVerified} onCancel={() => setShowVerification(false)} />
-  }
-
   return (
     <div className="login-page-wrapper">
       <div className="login-left-panel">
         <div className="login-container">
-          <h2 className="login-title">
-            <FontAwesomeIcon icon={faUser} />
-            Inicio de Sesion
-          </h2>
-          {error && <p style={{ color: "red", fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>{error}</p>}
-          <form onSubmit={handleSubmit} className="login-form">
-            <div className="input-group">
-              <FontAwesomeIcon icon={faEnvelope} />
-              <input
-                type="email"
-                placeholder="Correo Electronico"
-                value={correo}
-                onChange={(e) => setCorreo(e.target.value)}
-                required
-              />
-            </div>
-            <div className="input-group">
-              <FontAwesomeIcon icon={faLock} />
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Contraseña"
-                value={contrasena}
-                onChange={(e) => setContrasena(e.target.value)}
-                required
-              />
-              <button
-                type="button"
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  marginLeft: "8px"
-                }}
-                onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-              >
-                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-              </button>
-            </div>
-            {passwordError && <p className="error">{passwordError}</p>}
-            <button type="submit" className="btn-submit" disabled={loading}>
-              {loading ? <span className="spinner"></span> : "Ingresar"}
-            </button>
-          </form>
-          <div className="extra-links">
-            <span>¿Olvidaste tu contraseña?</span>
-            <a href="/recuperar-contrasena">Recuperar</a>
-          </div>
-          <div className="extra-links">
-            <a href="/register">Registrate</a>
-            <a href="/">Volver</a>
-          </div>
-          <p className="divider">o continuar con</p>
-          <div className="social-login">
-            <GoogleLogin
-              onSuccess={handleGoogleLogin}
-              onError={() => setError("Error al iniciar con Google")}
+          {!showVerification ? (
+            <>
+              <h2 className="login-title">
+                <FontAwesomeIcon icon={faUser} />
+                Inicio de Sesion
+              </h2>
+              {error && <p style={{ color: "red", fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>{error}</p>}
+              <form onSubmit={handleSubmit} className="login-form">
+                <div className="input-group">
+                  <FontAwesomeIcon icon={faEnvelope} />
+                  <input
+                    type="email"
+                    placeholder="Correo Electronico"
+                    value={correo}
+                    onChange={(e) => setCorreo(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="input-group">
+                  <FontAwesomeIcon icon={faLock} />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Contraseña"
+                    value={contrasena}
+                    onChange={(e) => setContrasena(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      marginLeft: "8px"
+                    }}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  >
+                    <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                  </button>
+                </div>
+                {passwordError && <p className="error">{passwordError}</p>}
+                <button type="submit" className="btn-submit" disabled={loading}>
+                  {loading ? <span className="spinner"></span> : "Ingresar"}
+                </button>
+              </form>
+              <div className="extra-links">
+                <span>¿Olvidaste tu contraseña?</span>
+                <a href="/recuperar-contrasena">Recuperar</a>
+              </div>
+              <div className="extra-links">
+                <a href="/register">Registrate</a>
+                <a href="/">Volver</a>
+              </div>
+              <p className="divider">o continuar con</p>
+              <div className="social-login">
+                <GoogleLogin
+                  onSuccess={handleGoogleLogin}
+                  onError={() => setError("Error al iniciar con Google")}
+                />
+              </div>
+            </>
+          ) : (
+            <VerificationForm
+              correo={correo}
+              tipo="login"
+              onVerified={handleVerified}
+              onCancel={() => setShowVerification(false)}
             />
-          </div>
+          )}
         </div>
       </div>
       <div className="login-right-panel">

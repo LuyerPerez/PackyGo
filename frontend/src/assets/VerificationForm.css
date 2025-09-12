@@ -1,12 +1,33 @@
-
 .verification-container {
   max-width: 500px;
+  width: 100%;
   margin: 48px auto;
-  padding: 32px 28px;
-  background: #e6f0f2;
+  padding: 36px 28px;
   text-align: center;
-  border-radius: 16px;
+  border-radius: 18px;
   font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  animation: fadeIn 0.6s cubic-bezier(.4,0,.2,1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+
+@media (max-width: 900px) {
+  .verification-container {
+    max-width: 450px;
+    width: 100%;
+    padding: 36px 18px;
+    border-radius: 18px;
+    margin: 48px auto;
+  }
 }
 
 @media (max-width: 600px) {
@@ -76,6 +97,11 @@
   border: 2px solid #0097a7;
 }
 
+.code-inputs input.error {
+  border: 2px solid #db4437;
+  background: #fff0f0;
+}
+
 .btn-verify {
   background: white;
   color: black;
@@ -143,4 +169,51 @@
 @keyframes spin {
   0% { transform: rotate(0deg);}
   100% { transform: rotate(360deg);}
+}
+
+.verification-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+.verification-progress .step {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #0097a7;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+  z-index: 2;
+  transition: background 0.3s;
+}
+.verification-progress .step:not(.active) {
+  background: #b0bec5;
+}
+.verification-progress .progress-line {
+  width: 40px;
+  height: 4px;
+  background: #0097a7;
+  margin: 0 8px;
+  border-radius: 2px;
+}
+
+.verification-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(8, 60, 93, 0.18);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s;
+}
+
+.verification-container {
+  min-height: unset !important;
+  box-shadow: none !important;
 }

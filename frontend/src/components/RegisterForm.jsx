@@ -86,142 +86,149 @@ export default function RegisterForm() {
     }
   }
 
-  if (showVerification) {
-    return <VerificationForm correo={correo} tipo="register" onVerified={handleVerified} onCancel={() => setShowVerification(false)} />
-  }
-
   return (
     <div className="login-page-wrapper">
       <div className="login-left-panel">
         <div className="login-container">
-          <h2 className="login-title">
-            <FontAwesomeIcon icon={faUser} />
-            Registro
-          </h2>
+          {!showVerification ? (
+            <>
+              <h2 className="login-title">
+                <FontAwesomeIcon icon={faUser} />
+                <span>Registro</span>
+              </h2>
 
-          {success && (
-            <p style={{ color: "green", fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>
-              {success}
-            </p>
-          )}
-          {error && (
-            <p style={{ color: "red", fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>
-              {error}
-            </p>
-          )}
+              {success && (
+                <p style={{ color: "green", fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>
+                  {success}
+                </p>
+              )}
+              {error && (
+                <p style={{ color: "red", fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>
+                  {error}
+                </p>
+              )}
 
-          <form onSubmit={handleSubmit} className="login-form">
-            <div className="input-group">
-              <FontAwesomeIcon icon={faUser} />
-              <input
-                type="text"
-                placeholder="Nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                required
-              />
-            </div>
-            <div className="input-group">
-              <FontAwesomeIcon icon={faIdCard} />
-              <input
-                type="text"
-                placeholder="No. Documento"
-                value={noDocumento}
-                onChange={(e) => setNoDocumento(e.target.value)}
-                required
-              />
-            </div>
-            <div className="input-group">
-              <FontAwesomeIcon icon={faEnvelope} />
-              <input
-                type="email"
-                placeholder="Correo Electrónico"
-                value={correo}
-                onChange={(e) => setCorreo(e.target.value)}
-                required
-              />
-            </div>
-            <div className="input-group">
-              <FontAwesomeIcon icon={faPhone} />
-              <input
-                type="text"
-                placeholder="Teléfono"
-                value={telefono}
-                onChange={(e) => setTelefono(e.target.value)}
-                required
-              />
-            </div>
-            <div className="input-group">
-              <FontAwesomeIcon icon={faLock} />
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Contraseña"
-                value={contrasena}
-                onChange={(e) => setContrasena(e.target.value)}
-                required
-              />
-              <button
-                type="button"
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  marginLeft: "8px"
-                }}
-                onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-              >
-                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-              </button>
-            </div>
-            {passwordError && <p className="error">{passwordError}</p>}
-            <div className="input-group">
-              <FontAwesomeIcon icon={faUserShield} />
-              <select
-                value={rol}
-                onChange={(e) => setRol(e.target.value)}
-                required
-                style={{
-                  border: "none",
-                  outline: "none",
-                  flex: 1,
-                  fontSize: "18px",
-                  color: "#333",
-                  background: "transparent"
-                }}
-              >
-                <option value="cliente">Cliente</option>
-                <option value="camionero">Camionero</option>
-              </select>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", margin: "8px 0" }}>
-              <input
-                type="checkbox"
-                id="terminos"
-                checked={aceptaTerminos}
-                onChange={(e) => setAceptaTerminos(e.target.checked)}
-                required
-              />
-              <label htmlFor="terminos" style={{ fontSize: "0.95em" }}>
-                Acepto los <a href="/terminos">Términos y Condiciones</a> y la <a href="/privacidad">Política de Privacidad</a>
-              </label>
-            </div>
-            <button type="submit" className="btn-submit" disabled={loading || !aceptaTerminos}>
-              {loading ? <span className="spinner"></span> : "Registrarse"}
-            </button>
-          </form>
+              <form onSubmit={handleSubmit} className="login-form">
+                <div className="input-group">
+                  <FontAwesomeIcon icon={faUser} />
+                  <input
+                    type="text"
+                    placeholder="Nombre"
+                    value={nombre}
+                    onChange={(e) => setNombre(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="input-group">
+                  <FontAwesomeIcon icon={faIdCard} />
+                  <input
+                    type="text"
+                    placeholder="No. Documento"
+                    value={noDocumento}
+                    onChange={(e) => setNoDocumento(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="input-group">
+                  <FontAwesomeIcon icon={faEnvelope} />
+                  <input
+                    type="email"
+                    placeholder="Correo Electrónico"
+                    value={correo}
+                    onChange={(e) => setCorreo(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="input-group">
+                  <FontAwesomeIcon icon={faPhone} />
+                  <input
+                    type="text"
+                    placeholder="Teléfono"
+                    value={telefono}
+                    onChange={(e) => setTelefono(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="input-group">
+                  <FontAwesomeIcon icon={faLock} />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Contraseña"
+                    value={contrasena}
+                    onChange={(e) => setContrasena(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      marginLeft: "8px"
+                    }}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  >
+                    <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                  </button>
+                </div>
+                {passwordError && <p className="error">{passwordError}</p>}
+                <div className="input-group">
+                  <FontAwesomeIcon icon={faUserShield} />
+                  <select
+                    value={rol}
+                    onChange={(e) => setRol(e.target.value)}
+                    required
+                    style={{
+                      border: "none",
+                      outline: "none",
+                      flex: 1,
+                      fontSize: "18px",
+                      color: "#333",
+                      background: "transparent"
+                    }}
+                  >
+                    <option value="cliente">Cliente</option>
+                    <option value="camionero">Camionero</option>
+                  </select>
+                </div>
+                <div className="terms-container">
+                  <input
+                    type="checkbox"
+                    id="terminos"
+                    checked={aceptaTerminos}
+                    onChange={e => setAceptaTerminos(e.target.checked)}
+                    required
+                  />
+                  <label htmlFor="terminos" className="terms-label">
+                    Acepto los <a href="/terminos" target="_blank" rel="noopener noreferrer">Términos y Condiciones</a> y la <a href="/privacidad" target="_blank" rel="noopener noreferrer">Política de Privacidad</a>
+                  </label>
+                </div>
+                <button type="submit" className="btn-submit" disabled={loading || !aceptaTerminos}>
+                  {loading ? <span className="spinner"></span> : "Registrarse"}
+                </button>
+              </form>
 
-          <div className="extra-links">
-            <span>¿YA TIENES CUENTA?</span>
-            <Link to="/login">Iniciar Sesión</Link>
-          </div>
-          <p className="divider">o continuar con</p>
-          <div className="social-login">
-            <GoogleLogin
-              onSuccess={handleGoogleRegister}
-              onError={() => setError("Error al registrar con Google")}
+              <div className="extra-links">
+                <span>¿YA TIENES CUENTA?</span>
+                <Link to="/login">Iniciar Sesión</Link>
+              </div>
+              <p className="divider">o continuar con</p>
+              <div className="social-login">
+                <GoogleLogin
+                  onSuccess={handleGoogleRegister}
+                  onError={() => setError("Error al registrar con Google")}
+                />
+              </div>
+            </>
+          ) : (
+            <VerificationForm
+              correo={correo}
+              tipo="register"
+              onVerified={handleVerified}
+              onCancel={() => setShowVerification(false)}
             />
-          </div>
+          )}
         </div>
       </div>
       <div className="login-right-panel">
