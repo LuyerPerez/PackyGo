@@ -5,66 +5,121 @@
   align-items: center;
   justify-content: center;
   padding: 32px 0;
+  transition: background 0.3s;
 }
 
 .terminos-container {
   background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(8, 60, 93, 0.12);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(8, 60, 93, 0.15);
   max-width: 700px;
   width: 100%;
-  padding: 40px 32px;
+  padding: 48px 40px;
   color: #083c5d;
   font-family: 'Segoe UI', Arial, sans-serif;
+  animation: fadeIn 0.7s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px);}
+  to { opacity: 1; transform: translateY(0);}
 }
 
 .terminos-title {
-  font-size: 2.2rem;
-  font-weight: 700;
-  margin-bottom: 12px;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 16px;
   text-align: center;
   color: #0a4c7a;
+  letter-spacing: 1px;
 }
 
 .terminos-date {
-  font-size: 1rem;
+  font-size: 1.05rem;
   color: #1976d2;
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 32px;
+  font-weight: 500;
 }
 
 section {
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 section h2 {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   color: #0a4c7a;
-  margin-bottom: 8px;
-  font-weight: 600;
+  margin-bottom: 10px;
+  font-weight: 700;
+  border-left: 4px solid #1976d2;
+  padding-left: 10px;
+  background: linear-gradient(90deg, #e3f2fd 60%, #fff 100%);
+  border-radius: 6px;
 }
 
 section ul {
-  padding-left: 20px;
+  padding-left: 24px;
+  margin-bottom: 0;
+}
+
+section li {
+  margin-bottom: 8px;
+  line-height: 1.7;
 }
 
 .terminos-footer {
   text-align: center;
-  margin-top: 32px;
+  margin-top: 40px;
+  font-size: 1rem;
+  color: #1976d2;
 }
 
 .terminos-img {
-  width: 80px;
-  margin-bottom: 8px;
-  opacity: 0.8;
+  width: 90px;
+  margin-bottom: 12px;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+
+.terminos-img:hover {
+  opacity: 1;
 }
 
 @media (max-width: 800px) {
   .terminos-container {
-    padding: 24px 8px;
+    padding: 24px 12px;
     max-width: 98vw;
+    border-radius: 14px;
   }
   .terminos-title {
-    font-size: 1.5rem;
+    font-size: 1.7rem;
+  }
+  .terminos-img {
+    width: 70px;
+  }
+}
+
+@media (max-width: 500px) {
+  .terminos-wrapper {
+    padding: 12px 0;
+  }
+  .terminos-container {
+    padding: 16px 4px;
+    border-radius: 10px;
+  }
+  .terminos-title {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+  .terminos-date {
+    font-size: 0.95rem;
+    margin-bottom: 18px;
+  }
+  section h2 {
+    font-size: 1rem;
+    padding-left: 6px;
+  }
+  .terminos-img {
+    width: 50px;
   }
 }

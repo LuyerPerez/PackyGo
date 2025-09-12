@@ -56,7 +56,7 @@ function TableVehiculos({ reload, setReload }) {
   return (
     <div className="table-container">
       <div className="table-header">
-        <h2>Vehículos</h2>
+        <h2>Mis Vehículos</h2>
         <button className="btn-crear" onClick={handleOpen}>
           + Registrar
         </button>

@@ -92,6 +92,7 @@ function RegistroVehiculo({ onSuccess, editVehiculo }) {
           required
           className="input"
         >
+          <option disabled>Seleccione un tipo</option>
           <option value="Camioneta pequeña">Camioneta pequeña</option>
           <option value="Furgón cerrado">Furgón cerrado</option>
           <option value="Camión ½ o 3/4 de carga">3/4 de carga</option>

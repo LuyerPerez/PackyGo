@@ -1,40 +1,52 @@
 .registro-form {
-  padding: 32px 24px 24px 24px;
-  max-width: 420px;
+  max-width: 480px;
+  width: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 0px;
 }
 .registro-title {
+  font-size: 28px;
+  font-weight: 800;
   color: #083c5d;
-  margin-bottom: 12px;
-  font-size: 1.5rem;
-  text-align: center;
+  margin-bottom: 24px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px rgba(8, 60, 93, 0.15);
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 }
 .form-group {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0px;
+  margin-bottom: 16px;
+  width: 100%;
 }
 .form-group label {
-  min-width: 130px;
-  text-align: right;
   font-weight: 500;
+  font-size: 1rem;
+  margin-bottom: 4px;
+  color: #083c5d;
+  text-align: left;
+  padding-left: 0;
 }
 .input {
   padding: 10px 12px;
   border: 1px solid #b3d1e6;
-  border-radius: 7px;
-  font-size: 1rem;
+  border-radius: 6px;
+  font-size: 1.05rem;
   background: #fff;
   transition: border 0.2s;
-  flex: 1;
-}
-.input:focus {
-  border-color: #083c5d;
-  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 0px;
 }
 .registro-error {
   color: #d32f2f;
@@ -46,13 +58,14 @@
   background: #083c5d;
   color: #fff;
   border: none;
-  border-radius: 7px;
+  border-radius: 6px;
   padding: 12px 0;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1.08rem;
   cursor: pointer;
-  margin-top: 8px;
+  margin-top: 14px;
   transition: background 0.2s;
+  width: 100%;
 }
 .registro-btn:disabled {
   background: #b3d1e6;
@@ -62,12 +75,22 @@
   background: #0a4c7a;
 }
 .modal-content {
+  min-width: 520px;
+  max-width: 98vw;
   max-height: 90vh;
   overflow-y: auto;
+  background: #fff;
+  box-shadow: 0 4px 32px #083c5d44;
+  border-radius: 0 !important;
 }
 @media (max-width: 700px) {
   .modal-content {
+    min-width: unset;
+    padding: 0 2px;
     max-height: 95vh;
-    overflow-y: auto;
+  }
+  .registro-form {
+    max-width: 98vw;
+    padding: 8px 2vw;
   }
 }

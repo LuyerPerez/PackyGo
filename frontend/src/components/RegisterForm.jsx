@@ -201,7 +201,7 @@ export default function RegisterForm() {
                     required
                   />
                   <label htmlFor="terminos" className="terms-label">
-                    Acepto los <a href="/terminos" target="_blank" rel="noopener noreferrer">Términos y Condiciones</a> y la <a href="/privacidad" target="_blank" rel="noopener noreferrer">Política de Privacidad</a>
+                    Acepto los <a href="/terminos">Términos y Condiciones</a> y la <a href="/privacidad">Política de Privacidad</a>
                   </label>
                 </div>
                 <button type="submit" className="btn-submit" disabled={loading || !aceptaTerminos}>
