@@ -154,8 +154,8 @@ body {
   -moz-user-select: none;
   display: flex;
   align-items: center;
-  justify-content: center; /* Centra el título */
-  gap: 12px; /* Espacio entre ícono y texto */
+  justify-content: center;
+  gap: 12px;
 }
 
 .login-form {
