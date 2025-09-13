@@ -41,6 +41,10 @@ CREATE TABLE reserva (
   FOREIGN KEY (vehiculo_id) REFERENCES vehiculo(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+ALTER TABLE reserva
+ADD COLUMN direccion_inicio VARCHAR(255) NOT NULL AFTER fecha_fin,
+ADD COLUMN direccion_destino VARCHAR(255) NOT NULL AFTER direccion_inicio;
+
 -- Tabla calificacion_usuario
 CREATE TABLE calificacion_usuario (
   id INT AUTO_INCREMENT PRIMARY KEY,
