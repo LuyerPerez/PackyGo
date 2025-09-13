@@ -10,10 +10,11 @@ import Vehiculos from "./pages/Vehiculos";
 import NotFound from "./components/NotFound";
 import TruckLoader from "./components/TruckLoader";
 import PasswordReset from "./components/PasswordReset";
-import Explorar from "./pages/Explorar"; // Importar la página Explorar
+import Explorar from "./pages/Explorar"; 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import TerminosCondiciones from "./pages/TerminosCondiciones";
 import PoliticaPrivacidad from "./pages/PoliticaPrivacidad";
+import Reserva from "./pages/Reserva"; 
 
 const GOOGLE_CLIENT_ID = "710600040256-60ttnabd8kjbr1051o2giq3gubd0ab4g.apps.googleusercontent.com";
 const NAVBAR_HIDDEN_ROUTES = ["/login", "/register", "/recuperar-contrasena"];
@@ -46,7 +47,8 @@ export default function App() {
         <Route path="/mis-vehiculos" element={<Vehiculos />} />
         <Route path="/terminos" element={<TerminosCondiciones />} />
         <Route path="/privacidad" element={<PoliticaPrivacidad />} />
-        <Route path="/explorar" element={<Explorar />} /> {/* Ruta para la página Explorar */}
+        <Route path="/explorar" element={<Explorar />} /> 
+        <Route path="/reserva" element={<Reserva />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </GoogleOAuthProvider>

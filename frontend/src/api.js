@@ -30,8 +30,9 @@ export async function Verify({ correo, code, tipo }) {
   const { data } = await api.post('/verify', {
     correo,
     code,
-    tipo
+    tipo: "login"
   })
+  localStorage.setItem("usuario", JSON.stringify(data));
   return data
 }
 
@@ -82,4 +83,14 @@ export async function eliminarVehiculo(id) {
 export async function obtenerTodosLosVehiculos() {
   const res = await api.get('/vehiculos');
   return res.data.vehiculos;
+}
+
+export async function crearReserva(data) {
+  const res = await api.post("/reservas", data);
+  return res.data;
+}
+
+export async function obtenerReservasPorVehiculo(vehiculo_id) {
+  const res = await api.get(`/reservas?vehiculo_id=${vehiculo_id}`);
+  return res.data.reservas;
 }

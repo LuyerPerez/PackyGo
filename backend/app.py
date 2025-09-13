@@ -4,6 +4,7 @@ from db import get_connection
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import random
+from datetime import datetime
 
 from dotenv import load_dotenv
 from email.message import EmailMessage
@@ -21,6 +22,10 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 verification_codes = {}
 reset_codes = {}
+
+def redondear_hora(dt_str):
+    dt = datetime.fromisoformat(dt_str)
+    return dt.replace(minute=0, second=0, microsecond=0)
 
 @app.route("/api/request-reset", methods=["POST"])
 def request_reset():
@@ -99,6 +104,38 @@ def enviarCorreoCambio(correo):
         print("Correo de cambio de contraseña enviado")
     except Exception as e:
         print("Error al enviar correo de cambio:", e)
+
+def enviarCorreoVerificacion(correo, codigoVerificacion):
+    try:
+        em = EmailMessage()
+        em["From"] = email_sender
+        em["To"] = correo
+        em["Subject"] = "Código de verificación"
+        em.set_content(f"Su código de verificación es: {codigoVerificacion}")
+
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
+            smtp.login(email_sender, password)
+            smtp.send_message(em)
+        print("Correo de verificación enviado correctamente")
+    except Exception as e:
+        print("Error al enviar correo de verificación:", e)
+
+def enviarCorreoReserva(correo, mensaje):
+    try:
+        em = EmailMessage()
+        em["From"] = email_sender
+        em["To"] = correo
+        em["Subject"] = "Nueva reserva recibida"
+        em.set_content(mensaje)
+
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
+            smtp.login(email_sender, password)
+            smtp.send_message(em)
+        print("Correo de reserva enviado correctamente")
+    except Exception as e:
+        print("Error al enviar correo de reserva:", e)
 
 @app.route("/api/register", methods=["POST"])
 def register():
@@ -314,18 +351,28 @@ def listar_vehiculos():
     cursor = conn.cursor()
     if camionero_id:
         cursor.execute(
-            "SELECT id, tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria FROM vehiculo WHERE camionero_id=%s",
+            """
+            SELECT v.id, v.tipo_vehiculo, v.placa, v.modelo, v.ano_modelo, v.imagen_url, v.tarifa_diaria,
+                   u.nombre, u.correo, u.telefono
+            FROM vehiculo v
+            JOIN usuario u ON v.camionero_id = u.id
+            WHERE v.camionero_id=%s
+            """,
             (camionero_id,)
         )
     else:
         cursor.execute(
-            "SELECT id, tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria FROM vehiculo"
+            """
+            SELECT v.id, v.tipo_vehiculo, v.placa, v.modelo, v.ano_modelo, v.imagen_url, v.tarifa_diaria,
+                   u.nombre, u.correo, u.telefono
+            FROM vehiculo v
+            JOIN usuario u ON v.camionero_id = u.id
+            """
         )
     vehiculos = cursor.fetchall()
     lista = []
     for v in vehiculos:
         vehiculo_id = v[0]
-        # Obtener calificación promedio
         cursor.execute(
             "SELECT AVG(estrellas) FROM calificacion_vehiculo WHERE vehiculo_destino_id=%s", (vehiculo_id,)
         )
@@ -338,7 +385,12 @@ def listar_vehiculos():
             "ano_modelo": v[4],
             "imagen_url": v[5],
             "tarifa_diaria": float(v[6]),
-            "calificacion": calificacion
+            "calificacion": calificacion,
+            "conductor": {
+                "nombre": v[7],
+                "correo": v[8],
+                "telefono": v[9]
+            }
         })
     cursor.close()
     conn.close()
@@ -388,6 +440,87 @@ def eliminar_vehiculo(vehiculo_id):
     finally:
         cursor.close()
         conn.close()
+
+@app.route("/api/reservas", methods=["POST"])
+def crear_reserva():
+    data = request.json
+    cliente_id = data.get("cliente_id")
+    vehiculo_id = data.get("vehiculo_id")
+    fecha_inicio = data.get("fecha_inicio")
+    fecha_fin = data.get("fecha_fin")
+    direccion_inicio = data.get("direccion_inicio")
+    direccion_destino = data.get("direccion_destino")
+    if not all([cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino]):
+        return {"error": "Todos los campos son obligatorios."}, 400
+
+    fecha_inicio = redondear_hora(fecha_inicio)
+    fecha_fin = redondear_hora(fecha_fin)
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            SELECT COUNT(*) FROM reserva
+            WHERE vehiculo_id=%s AND (
+                (fecha_inicio <= %s AND fecha_fin >= %s) OR
+                (fecha_inicio <= %s AND fecha_fin >= %s) OR
+                (fecha_inicio >= %s AND fecha_fin <= %s)
+            ) AND estado_reserva='activa'
+        """, (vehiculo_id, fecha_inicio, fecha_inicio, fecha_fin, fecha_fin, fecha_inicio, fecha_fin))
+        if cursor.fetchone()[0] > 0:
+            return {"error": "El vehículo no está disponible en ese rango de fechas."}, 400
+
+        cursor.execute("""
+            INSERT INTO reserva (cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva)
+            VALUES (%s, %s, %s, %s, %s, %s, 'activa')
+        """, (cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino))
+        conn.commit()
+
+        cursor.execute("""
+            SELECT u.nombre, u.correo FROM usuario u
+            JOIN vehiculo v ON v.camionero_id = u.id
+            WHERE v.id=%s
+        """, (vehiculo_id,))
+        conductor = cursor.fetchone()
+        cursor.execute("SELECT nombre FROM usuario WHERE id=%s", (cliente_id,))
+        cliente = cursor.fetchone()
+        if conductor and cliente:
+            mensaje = (
+                f"Hola {conductor[0]},\n\n"
+                f"{cliente[0]} te hizo una reserva para el vehículo {vehiculo_id} "
+                f"del {fecha_inicio} al {fecha_fin}.\n"
+                f"Dirección de inicio: {direccion_inicio}\n"
+                f"Dirección de destino: {direccion_destino}\n\n"
+                "Por favor, revisa tu panel para más detalles."
+            )
+            enviarCorreoReserva(conductor[1], mensaje)
+        return {"message": "Reserva realizada y correo enviado."}, 201
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/reservas", methods=["GET"])
+def listar_reservas():
+    vehiculo_id = request.args.get("vehiculo_id")
+    conn = get_connection()
+    cursor = conn.cursor()
+    if vehiculo_id:
+        cursor.execute("SELECT fecha_inicio, fecha_fin FROM reserva WHERE vehiculo_id=%s AND estado_reserva='activa'", (vehiculo_id,))
+        reservas = [
+            {
+                "fecha_inicio": r[0].isoformat(sep='T'),
+                "fecha_fin": r[1].isoformat(sep='T')
+            }
+            for r in cursor.fetchall()
+        ]
+    else:
+        reservas = []
+    cursor.close()
+    conn.close()
+    return {"reservas": reservas}, 200
 
 if __name__ == "__main__":
     port = int(os.getenv("FLASK_PORT", "5000"))

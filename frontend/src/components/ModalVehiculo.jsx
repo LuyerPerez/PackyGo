@@ -1,13 +1,17 @@
 import React from 'react';
+import { useNavigate } from "react-router-dom";
 import '../assets/ModalVehiculo.css';
 
 const ModalVehiculo = ({ vehiculo, onClose }) => {
   if (!vehiculo) return null;
 
   const calificacion = vehiculo.calificacion ? Number(vehiculo.calificacion) : null;
+  const navigate = useNavigate();
 
   const handleReservar = () => {
-    alert('¡Reserva realizada!');
+    localStorage.setItem("vehiculoSeleccionado", JSON.stringify(vehiculo));
+    onClose && onClose();
+    navigate("/reserva");
   };
 
   const renderStars = (calificacion) => {
@@ -32,32 +36,41 @@ const ModalVehiculo = ({ vehiculo, onClose }) => {
 
   return (
     <div className="modal-overlay" onClick={handleOverlayClick}>
-      <div className="modal-content">
+      <div className="modal-content vertical">
         <button className="close-modal" onClick={onClose} aria-label="Cerrar modal">×</button>
         <img
           src={vehiculo.imagen_url}
           alt={`Imagen de ${vehiculo.modelo} (${vehiculo.ano_modelo})`}
-          className="modal-img"
+          className="modal-img-top"
         />
-        <div className="modal-info">
-          <h1>{vehiculo.modelo} <span className="modal-ano">({vehiculo.ano_modelo})</span></h1>
-          <h2 className="info-title">Información del vehículo</h2>
-          <p><strong>Tipo:</strong> {vehiculo.tipo_vehiculo}</p>
-          <p><strong>Placa:</strong> {vehiculo.placa}</p>
-          <p><strong>Tarifa diaria:</strong> {
-            new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(vehiculo.tarifa_diaria)
-          }</p>
-          <div className="rating">
-            <strong>Calificación:</strong>&nbsp;
-            {calificacion !== null
-              ? <>
-                  {renderStars(calificacion)}
-                  <span className="promedio">({calificacion.toFixed(1)})</span>
-                </>
-              : <span className="no-rating">No tiene calificación</span>
-            }
+        <div className="modal-info-row">
+          <div className="modal-info modal-info-col">
+            <h1>{vehiculo.modelo} <span className="modal-ano">({vehiculo.ano_modelo})</span></h1>
+            <p><strong>Tipo:</strong> {vehiculo.tipo_vehiculo}</p>
+            <p><strong>Placa:</strong> {vehiculo.placa}</p>
+            <p><strong>Tarifa diaria:</strong> {
+              new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(vehiculo.tarifa_diaria)
+            }</p>
+            <div className="rating">
+              <strong>Calificación:</strong>&nbsp;
+              {calificacion !== null
+                ? <>
+                    {renderStars(calificacion)}
+                    <span className="promedio">({calificacion.toFixed(1)})</span>
+                  </>
+                : <span className="no-rating">No tiene calificación</span>
+              }
+            </div>
           </div>
-          <button onClick={handleReservar} className="button-reservar">Reservar</button>
+          <div className="conductor-info modal-info-col">
+            <h1>Conductor</h1>
+            <p><strong>Nombre:</strong> {vehiculo.conductor?.nombre}</p>
+            <p><strong>Correo:</strong> {vehiculo.conductor?.correo}</p>
+            <p><strong>Teléfono:</strong> {vehiculo.conductor?.telefono}</p>
+            <div className="reservar-wrapper">
+              <button onClick={handleReservar} className="button-reservar">Reservar</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
