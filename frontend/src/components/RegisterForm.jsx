@@ -218,6 +218,7 @@ export default function RegisterForm() {
                 <GoogleLogin
                   onSuccess={handleGoogleRegister}
                   onError={() => setError("Error al registrar con Google")}
+                  text="continue_with"
                 />
               </div>
             </>

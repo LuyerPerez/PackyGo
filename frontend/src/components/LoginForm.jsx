@@ -133,6 +133,7 @@ export default function LoginForm() {
                 <GoogleLogin
                   onSuccess={handleGoogleLogin}
                   onError={() => setError("Error al iniciar con Google")}
+                  text="continue_with"
                 />
               </div>
             </>
