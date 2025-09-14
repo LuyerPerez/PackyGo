@@ -34,7 +34,7 @@ CREATE TABLE reserva (
   vehiculo_id INT NOT NULL,
   fecha_inicio DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   fecha_fin DATETIME,
-  estado_reserva VARCHAR(20) DEFAULT 'activa',
+  estado_reserva ENUM('activa', 'cancelada', 'finalizada') DEFAULT 'activa',
   total_pago DECIMAL(10,2),
   fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (cliente_id) REFERENCES usuario(id) ON DELETE CASCADE,
