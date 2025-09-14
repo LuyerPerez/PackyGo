@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import '../assets/ModalVehiculo.css';
 
 const ModalVehiculo = ({ vehiculo, onClose }) => {
+  const navigate = useNavigate();
+
   if (!vehiculo) return null;
 
   const calificacion = vehiculo.calificacion ? Number(vehiculo.calificacion) : null;
-  const navigate = useNavigate();
 
   const handleReservar = () => {
     localStorage.setItem("vehiculoSeleccionado", JSON.stringify(vehiculo));
@@ -72,6 +73,13 @@ const ModalVehiculo = ({ vehiculo, onClose }) => {
             </div>
           </div>
         </div>
+        <button
+          className="close-modal-mobile"
+          onClick={onClose}
+          aria-label="Cerrar modal"
+        >
+          Cerrar
+        </button>
       </div>
     </div>
   );

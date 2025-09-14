@@ -41,7 +41,7 @@ export default function Reserva() {
   const [direccionInicio, setDireccionInicio] = useState("");
   const [direccionDestino, setDireccionDestino] = useState("");
   const [mensaje, setMensaje] = useState("");
-  const [mensajeTipo, setMensajeTipo] = useState(""); // "error" o "exito"
+  const [mensajeTipo, setMensajeTipo] = useState("");
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -309,7 +309,7 @@ export default function Reserva() {
           </button>
         </form>
         <div className="aviso-finalizacion" style={{ fontSize: "13px", color: "#666", margin: "12px 0 0 0" }}>
-          <b>Nota:</b> Al finalizar la reserva, podrás calificar al conductor y al vehículo.
+          <b>Nota:</b> Al finalizar tu mudanza, podrás calificar al conductor y al vehículo. Recuerda avisarle al conductor finalizar la reserva.
         </div>
         {mensaje && (
           <div
@@ -324,7 +324,7 @@ export default function Reserva() {
               textAlign: "center"
             }}
           >
-            {mensaje}
+            {mensaje} <a href="/" style={{ color: mensajeTipo === "exito" ? "#1b883a" : "#c0392b" }}>Regresar</a>
           </div>
         )}
       </div>

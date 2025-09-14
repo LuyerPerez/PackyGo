@@ -15,6 +15,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import TerminosCondiciones from "./pages/TerminosCondiciones";
 import PoliticaPrivacidad from "./pages/PoliticaPrivacidad";
 import Reserva from "./pages/Reserva"; 
+import MisReservas from "./pages/MisReservas";
 
 const GOOGLE_CLIENT_ID = "710600040256-60ttnabd8kjbr1051o2giq3gubd0ab4g.apps.googleusercontent.com";
 const NAVBAR_HIDDEN_ROUTES = ["/login", "/register", "/recuperar-contrasena"];
@@ -49,6 +50,7 @@ export default function App() {
         <Route path="/privacidad" element={<PoliticaPrivacidad />} />
         <Route path="/explorar" element={<Explorar />} /> 
         <Route path="/reserva" element={<Reserva />} />
+        <Route path="/mis-reservas" element={<MisReservas />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </GoogleOAuthProvider>

@@ -211,6 +211,15 @@
   letter-spacing: 1px;
 }
 
+.close-modal-mobile {
+  display: none;
+}
+
+.reservar-wrapper {
+  display: flex;
+  justify-content: flex-start;
+}
+
 @media (max-width: 700px) {
   .modal-content {
     flex-direction: column;
@@ -295,5 +304,28 @@
     width: 100%;
     display: flex;
     flex-wrap: wrap;
+  }
+
+  .close-modal-mobile {
+    display: block;
+    width: 100%;
+    padding: 14px 0;
+    background: #083c5d;
+    color: #fff;
+    border: none;
+    border-radius: 0 0 10px 10px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 0;
+    transition: background 0.2s;
+  }
+  .close-modal-mobile:hover {
+    background: #0097a7;
+  }
+
+  .reservar-wrapper {
+    justify-content: center;
+    width: 100%;
   }
 }

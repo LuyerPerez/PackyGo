@@ -154,7 +154,22 @@ function NavBar() {
                     Mis Vehículos
                   </Link>
                 )}
-
+                {user.rol === "cliente" && (
+                  <Link
+                    to="/mis-reservas"
+                    style={{
+                      display: "block",
+                      padding: "10px 16px",
+                      color: "#fff",
+                      textDecoration: "none",
+                      fontWeight: "500",
+                    }}
+                    onClick={() => { setOpen(false); setMenuOpen(false); }}
+                  >
+                    <FontAwesomeIcon icon={faTruck} style={{ marginRight: "6px" }} />
+                    Mis Reservas
+                  </Link>
+                )}
                 <Link
                   to="/logout"
                   style={{

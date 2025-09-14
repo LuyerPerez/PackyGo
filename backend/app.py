@@ -6,10 +6,15 @@ import os
 import random
 from datetime import datetime
 
+from envioCorreos import (
+    enviarCorreo,
+    enviarCorreoCambio,
+    enviarCorreoVerificacion,
+    enviarCorreoReserva,
+    enviarCorreoCancelacion  # <-- Agrega esto
+)
+
 from dotenv import load_dotenv
-from email.message import EmailMessage
-import ssl
-import smtplib
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
@@ -72,70 +77,6 @@ def reset_password():
     finally:
         cursor.close()
         conn.close()
-
-def enviarCorreo(correo, codigoVerificacion):
-    try:
-        em = EmailMessage()
-        em["From"] = email_sender
-        em["To"] = correo
-        em["Subject"] = "Código de verificación"
-        em.set_content(f"Su código de verificación es: {codigoVerificacion}")
-
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
-            smtp.login(email_sender, password)
-            smtp.send_message(em)
-        print("Correo enviado correctamente")
-    except Exception as e:
-        print("Error al enviar correo:", e)
-
-def enviarCorreoCambio(correo):
-    try:
-        em = EmailMessage()
-        em["From"] = email_sender
-        em["To"] = correo
-        em["Subject"] = "Contraseña actualizada"
-        em.set_content("Tu contraseña ha sido cambiada exitosamente. Si no fuiste tú, contacta soporte de inmediato.")
-
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
-            smtp.login(email_sender, password)
-            smtp.send_message(em)
-        print("Correo de cambio de contraseña enviado")
-    except Exception as e:
-        print("Error al enviar correo de cambio:", e)
-
-def enviarCorreoVerificacion(correo, codigoVerificacion):
-    try:
-        em = EmailMessage()
-        em["From"] = email_sender
-        em["To"] = correo
-        em["Subject"] = "Código de verificación"
-        em.set_content(f"Su código de verificación es: {codigoVerificacion}")
-
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
-            smtp.login(email_sender, password)
-            smtp.send_message(em)
-        print("Correo de verificación enviado correctamente")
-    except Exception as e:
-        print("Error al enviar correo de verificación:", e)
-
-def enviarCorreoReserva(correo, mensaje):
-    try:
-        em = EmailMessage()
-        em["From"] = email_sender
-        em["To"] = correo
-        em["Subject"] = "Nueva reserva recibida"
-        em.set_content(mensaje)
-
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
-            smtp.login(email_sender, password)
-            smtp.send_message(em)
-        print("Correo de reserva enviado correctamente")
-    except Exception as e:
-        print("Error al enviar correo de reserva:", e)
 
 @app.route("/api/register", methods=["POST"])
 def register():
@@ -517,6 +458,7 @@ def crear_reserva():
 @app.route("/api/reservas", methods=["GET"])
 def listar_reservas():
     vehiculo_id = request.args.get("vehiculo_id")
+    cliente_id = request.args.get("cliente_id")  
     conn = get_connection()
     cursor = conn.cursor()
     if vehiculo_id:
@@ -527,6 +469,16 @@ def listar_reservas():
             WHERE vehiculo_id=%s AND estado_reserva='activa'
             """,
             (vehiculo_id,)
+        )
+    elif cliente_id:
+        cursor.execute(
+            """
+            SELECT id, cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva
+            FROM reserva
+            WHERE cliente_id=%s
+            ORDER BY fecha_inicio DESC
+            """,
+            (cliente_id,)
         )
     else:
         cursor.execute(
@@ -552,6 +504,53 @@ def listar_reservas():
     cursor.close()
     conn.close()
     return {"reservas": lista}
+
+@app.route("/api/reservas/<int:reserva_id>/cancelar", methods=["PUT"])
+def cancelar_reserva(reserva_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "SELECT cliente_id, vehiculo_id, fecha_inicio, fecha_fin FROM reserva WHERE id=%s", (reserva_id,)
+        )
+        reserva = cursor.fetchone()
+        if not reserva:
+            return {"error": "Reserva no encontrada."}, 404
+        cliente_id, vehiculo_id, fecha_inicio, fecha_fin = reserva
+
+        cursor.execute("SELECT nombre, correo FROM usuario WHERE id=%s", (cliente_id,))
+        cliente = cursor.fetchone()
+
+        cursor.execute("""
+            SELECT u.nombre, u.correo FROM usuario u
+            JOIN vehiculo v ON v.camionero_id = u.id
+            WHERE v.id=%s
+        """, (vehiculo_id,))
+        conductor = cursor.fetchone()
+
+        cursor.execute(
+            "UPDATE reserva SET estado_reserva='cancelada' WHERE id=%s", (reserva_id,)
+        )
+        conn.commit()
+
+        if cliente:
+            mensaje_cliente = (
+                f"Tu reserva del {fecha_inicio} al {fecha_fin} ha sido cancelada."
+            )
+            enviarCorreoCancelacion(cliente[1], cliente[0], mensaje_cliente, es_cliente=True)
+        if conductor:
+            mensaje_conductor = (
+                f"Una reserva de tu vehículo del {fecha_inicio} al {fecha_fin} ha sido cancelada."
+            )
+            enviarCorreoCancelacion(conductor[1], conductor[0], mensaje_conductor, es_cliente=False)
+
+        return {"message": "Reserva cancelada correctamente."}, 200
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

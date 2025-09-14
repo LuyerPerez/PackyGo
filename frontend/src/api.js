@@ -94,3 +94,13 @@ export async function obtenerReservasPorVehiculo(vehiculo_id) {
   const res = await api.get(`/reservas?vehiculo_id=${vehiculo_id}`);
   return res.data.reservas;
 }
+
+export async function obtenerReservasPorCliente(cliente_id) {
+  const res = await api.get(`/reservas?cliente_id=${cliente_id}`);
+  return res.data.reservas;
+}
+
+export async function cancelarReserva(id) {
+  const res = await api.put(`/reservas/${id}/cancelar`);
+  return res.data;
+}
