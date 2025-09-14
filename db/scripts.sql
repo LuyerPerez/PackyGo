@@ -98,26 +98,10 @@ INSERT INTO usuario (nombre, noDocumento, correo, telefono, contrasena, rol) VAL
 
 -- Vehículos (20 vehículos asignados al camionero Dina Monroy)
 INSERT INTO `vehiculo` (`camionero_id`, `tipo_vehiculo`, `placa`, `modelo`, `ano_modelo`, `imagen_url`, `tarifa_diaria`) VALUES
-(3, 'Camion', 'ABC123', 'Volvo FH', 2020, 'https://www.volvotrucks.com/media/volvo-fh-gallery-01.jpg', 150.00),
-(3, 'Camioneta', 'DEF456', 'Chevrolet Express', 2019, 'https://www.chevrolet.com/content/dam/chevrolet/na/us/english/index/vehicles/2024/commercial/express-vans/01-images/2024-express-van-01.jpg', 120.00),
-(3, 'Camion', 'GHI789', 'Mercedes Actros', 2021, 'https://www.mercedes-benz-trucks.com/en_GB/models/actros/_jcr_content/root/slider/sliderchilditems/slideritem/image.component.damq5.338110.jpg/mercedes-benz-actros-gallery-01.jpg', 180.00),
-(3, 'Camioneta', 'JKL012', 'Toyota Hilux', 2022, 'https://toyota.com.co/wp-content/uploads/2022/03/hilux-gris.png', 130.00),
-(3, 'Camion', 'MNO345', 'Scania R500', 2018, 'https://www.scania.com/content/dam/scanianoe/market/master/home/products-and-services/trucks/r-series/r-series-gallery/r-series-gallery-01.jpg', 170.00),
-(3, 'Camioneta', 'PQR678', 'Ford Ranger', 2020, 'https://www.ford.com.co/content/dam/Ford/website-assets/latam/co/nameplate/ranger/2023/gallery/ford-ranger-2023-gallery-01.jpg', 125.00),
-(3, 'Camion', 'STU901', 'MAN TGX', 2019, 'https://www.man.eu/man/media_common/img/products/trucks/tgx_gallery/tgx_gallery_01.jpg', 160.00),
-(3, 'Camioneta', 'VWX234', 'Nissan Frontier', 2021, 'https://www.nissan.com.co/content/dam/Nissan/latam/vehicles/frontier/2022/gallery/nissan-frontier-2022-gallery-01.jpg', 128.00),
-(3, 'Camion', 'YZA567', 'Iveco Stralis', 2022, 'https://www.iveco.com/PublishingImages/stralis-gallery-01.jpg', 175.00),
-(3, 'Camioneta', 'BCD890', 'Mazda BT-50', 2020, 'https://mazda.com.co/assets/img/vehiculos/bt-50/galeria/mazda-bt-50-galeria-01.jpg', 122.00),
-(3, 'Camion', 'EFG123', 'Renault Trucks T', 2018, 'https://www.renault-trucks.com/sites/default/files/styles/gallery_image/public/2021-06/renault-trucks-t-gallery-01.jpg', 155.00),
-(3, 'Camioneta', 'HIJ456', 'Volkswagen Amarok', 2021, 'https://www.vw.com.co/media/Model_Image_Banner_Image_Component/root-new-cars/amarok/amarok-gallery-01.jpg', 135.00),
-(3, 'Camion', 'KLM789', 'DAF XF', 2019, 'https://www.daf.com/-/media/images/daf-trucks/gallery/xf-gallery-01.jpg', 165.00),
-(3, 'Camioneta', 'NOP012', 'Isuzu D-Max', 2022, 'https://www.isuzu.com.co/assets/img/dmax/galeria/isuzu-dmax-galeria-01.jpg', 127.00),
-(3, 'Camion', 'QRS345', 'Freightliner Cascadia', 2020, 'https://www.freightliner.com/-/media/freightliner/gallery/cascadia-gallery-01.jpg', 185.00),
-(3, 'Camioneta', 'TUV678', 'Ram 1500', 2021, 'https://www.ram.com.co/content/dam/ram/latam/vehicles/1500/2022/gallery/ram-1500-2022-gallery-01.jpg', 140.00),
-(3, 'Camion', 'WXY901', 'Kenworth T680', 2018, 'https://www.kenworth.com/media/kenworth-t680-gallery-01.jpg', 172.00),
-(3, 'Camioneta', 'ZAB234', 'Fiat Toro', 2020, 'https://www.fiat.com.co/content/dam/fiat/latam/vehicles/toro/2022/gallery/fiat-toro-2022-gallery-01.jpg', 124.00),
-(3, 'Camion', 'CDE567', 'Volvo FMX', 2021, 'https://www.volvotrucks.com/media/volvo-fmx-gallery-01.jpg', 178.00),
-(3, 'Camioneta', 'FGH890', 'Peugeot Landtrek', 2022, 'https://www.peugeot.com.co/content/dam/peugeot/latam/vehicles/landtrek/2022/gallery/peugeot-landtrek-2022-gallery-01.jpg', 138.00);
+(3, 'Camion', 'ABC123', 'Volvo FH', 2020, 'https://tractomulasdecolombia.com/wp-content/uploads/2020/08/volvo-FH-1.jpg', 150.00),
+(3, 'Camioneta', 'DEF456', 'Chevrolet Express', 2019, 'https://www.chevrolet.com/content/dam/chevrolet/na/us/english/index/vehicles/2025/commercial/express-vans/01-images/safety/2025-express-van-safety-01.png', 120.00),
+(3, 'Camion', 'GHI789', 'Mercedes Actros', 2021, 'https://i.ytimg.com/vi/7s_bLvlohHE/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLCB8HFGEc7_5V_wVlIJWurwj0y5sA', 180.00),
+(3, 'Camioneta', 'JKL012', 'Toyota Hilux', 2022, 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/2016_Toyota_HiLux_%28GUN136R%29_SR5_4-door_utility_%282018-09-03%29_01.jpg/1200px-2016_Toyota_HiLux_%28GUN136R%29_SR5_4-door_utility_%282018-09-03%29_01.jpg', 130.00);
 
 -- Reservas (clientes reservan vehículos)
 INSERT INTO reserva (cliente_id, vehiculo_id, fecha_fin, estado_reserva, total_pago) VALUES
