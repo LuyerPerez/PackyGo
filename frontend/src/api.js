@@ -104,3 +104,23 @@ export async function cancelarReserva(id) {
   const res = await api.put(`/reservas/${id}/cancelar`);
   return res.data;
 }
+
+export async function obtenerPedidosCamionero(camionero_id) {
+  const res = await api.get(`/pedidos-camionero/${camionero_id}`);
+  return res.data.pedidos;
+}
+
+export async function finalizarReserva(id) {
+  const res = await api.put(`/reservas/${id}/finalizar`);
+  return res.data;
+}
+
+export async function calificarCliente({ usuario_destino_id, usuario_origen_id, estrellas, comentario }) {
+  const res = await api.post(`/calificar-cliente`, {
+    usuario_destino_id,
+    usuario_origen_id,
+    estrellas,
+    comentario
+  });
+  return res.data;
+}

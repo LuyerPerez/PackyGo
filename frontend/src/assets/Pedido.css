@@ -1,0 +1,309 @@
+/* Fondo general con gradiente */
+body {
+  min-height: 100vh;
+}
+
+/* Contenedor principal */
+.pedidos-container {
+  padding: 40px 0 60px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Título */
+.pedidos-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #083c5d;
+  margin-bottom: 24px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px rgba(8, 60, 93, 0.15);
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* Lista de cards */
+.pedidos-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  justify-content: center;
+}
+
+/* Card con efecto glassmorphism */
+.card-pedido {
+  background: linear-gradient(120deg, #e0f7fa 0%, #ffffff 100%);
+  border-radius: 22px;
+  box-shadow: 0 8px 32px 0 rgba(0,151,167,0.13);
+  backdrop-filter: blur(6px);
+  border: 1.5px solid #b2ebf2;
+  padding: 28px 30px 22px 30px;
+  min-width: 340px;
+  max-width: 390px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  transition: box-shadow 0.25s, transform 0.18s;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-pedido:hover {
+  box-shadow: 0 12px 36px 0 rgba(0,151,167,0.18);
+  transform: translateY(-6px) scale(1.025);
+  border-color: #0097a7;
+}
+
+/* Separador visual entre secciones */
+.card-pedido > div:not(:last-child) {
+  border-bottom: 1px solid #b2ebf2;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+/* Imagen del vehículo */
+.card-pedido img {
+  width: 100%;
+  max-width: 130px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  object-fit: cover;
+  box-shadow: 0 2px 12px rgba(0,151,167,0.09);
+  border: 2px solid #b2ebf2;
+  background: #e0f7fa;
+}
+
+/* Modelo y año */
+.card-pedido h3 {
+  font-size: 1.18rem;
+  margin: 0 0 6px 0;
+  color: #0097a7;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Textos generales */
+.card-pedido p {
+  margin: 2px 0;
+  font-size: 1.01rem;
+  color: #222;
+  line-height: 1.4;
+}
+
+.card-pedido b {
+  color: #0097a7;
+  font-weight: 600;
+}
+
+/* Estado de la reserva con color */
+.card-pedido .estado-activa {
+  color: #388e3c;
+  font-weight: 700;
+  background: #e0f2f1;
+  border-radius: 6px;
+  padding: 2px 10px;
+  font-size: 0.98rem;
+  display: inline-block;
+}
+.card-pedido .estado-cancelada {
+  color: #c62828;
+  font-weight: 700;
+  background: #ffebee;
+  border-radius: 6px;
+  padding: 2px 10px;
+  font-size: 0.98rem;
+  display: inline-block;
+}
+.card-pedido .estado-finalizada {
+  color: #1565c0;
+  font-weight: 700;
+  background: #e3f2fd;
+  border-radius: 6px;
+  padding: 2px 10px;
+  font-size: 0.98rem;
+  display: inline-block;
+}
+
+/* Calificación con estrella */
+.card-pedido .calificacion {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  color: #ffb300;
+  font-size: 1.13rem;
+  margin-top: 4px;
+}
+
+.card-pedido .calificacion-num {
+  font-size: 1.25em;
+  font-weight: bold;
+  color: #ffb300;
+  margin-right: 4px;
+}
+
+.card-pedido .estrella {
+  width: 20px;
+  height: 20px;
+  margin-right: 1px;
+  vertical-align: middle;
+}
+
+.card-pedido .sin-calificacion {
+  color: #888;
+  font-weight: 400;
+  font-size: 1em;
+}
+
+.card-pedido .star {
+  color: #ccc;
+  font-size: 1em;
+  margin-right: 2px;
+  display: inline-block;
+}
+.card-pedido .star.filled {
+  color: gold;
+}
+.card-pedido .star.half {
+  background: linear-gradient(90deg, gold 50%, #ccc 50%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.card-pedido .promedio {
+  margin-left: 6px;
+  color: #888;
+  font-size: 0.95em;
+}
+
+.filtro-form {
+  background: #e0f7fa;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px #0097a722;
+  padding: 16px 28px;
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 32px;
+  border: 1.5px solid #b2ebf2;
+  min-width: 340px;
+  max-width: 390px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.filtro-form label {
+  font-weight: 600;
+  color: #0097a7;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.05rem;
+  gap: 4px;
+}
+
+.filtro-form select,
+.filtro-form input[type="text"] {
+  padding: 7px 12px;
+  border-radius: 7px;
+  border: 1.2px solid #0097a7;
+  background: #fff;
+  font-size: 1rem;
+  color: #0097a7;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.filtro-form select:focus,
+.filtro-form input[type="text"]:focus {
+  border-color: #0097a7;
+  background: #b2ebf2;
+}
+/* Centrar el filtro como las cards */
+.pedidos-container > .filtro-form {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+  gap: 4px;
+}
+
+.pagination button {
+  background: #fff;
+  color: #0097a7;
+  border: 1px solid #0097a7;
+  padding: 8px 16px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.pagination button.active,
+.pagination button:hover {
+  background: #0097a7;
+  color: #fff;
+}
+
+.btn-finalizar {
+  background: #1565c0;
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-finalizar:hover {
+  background: #1976d2;
+}
+.btn-cancelar {
+  background: #c62828;
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-cancelar:hover {
+  background: #b71c1c;
+}
+
+@media (max-width: 900px) {
+  .pedidos-list {
+    flex-direction: column;
+    gap: 22px;
+    align-items: center;
+  }
+  .card-pedido {
+    min-width: 0;
+  }
+  .filtro-form {
+    min-width: 0;
+    max-width: 100%;
+    width: 370px;
+  }
+}
+
+@media (max-width: 600px) {
+  .filtro-form {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 10px;
+  }
+  .filtro-form label {
+    width: 100%;
+  }
+}

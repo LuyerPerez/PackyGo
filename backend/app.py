@@ -552,5 +552,107 @@ def cancelar_reserva(reserva_id):
         cursor.close()
         conn.close()
 
+@app.route("/api/reservas/<int:reserva_id>/finalizar", methods=["PUT"])
+def finalizar_reserva(reserva_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "UPDATE reserva SET estado_reserva='finalizada' WHERE id=%s", (reserva_id,)
+        )
+        conn.commit()
+        return {"message": "Reserva finalizada correctamente."}, 200
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/pedidos-camionero/<int:camionero_id>", methods=["GET"])
+def pedidos_camionero(camionero_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(""" 
+            SELECT r.id, r.cliente_id, r.vehiculo_id, r.fecha_inicio, r.fecha_fin, r.direccion_inicio, r.direccion_destino, r.estado_reserva,
+                   v.tipo_vehiculo, v.placa, v.modelo, v.ano_modelo, v.imagen_url, v.tarifa_diaria,
+                   u.nombre, u.correo, u.telefono
+            FROM reserva r
+            JOIN vehiculo v ON r.vehiculo_id = v.id
+            JOIN usuario u ON r.cliente_id = u.id
+            WHERE v.camionero_id = %s
+            ORDER BY r.fecha_inicio DESC
+        """, (camionero_id,))
+        pedidos = []
+        for row in cursor.fetchall():
+            reserva = {
+                "id": row[0],
+                "cliente_id": row[1],
+                "vehiculo_id": row[2],
+                "fecha_inicio": row[3].isoformat() if hasattr(row[3], "isoformat") else str(row[3]),
+                "fecha_fin": row[4].isoformat() if hasattr(row[4], "isoformat") else str(row[4]),
+                "direccion_inicio": row[5],
+                "direccion_destino": row[6],
+                "estado_reserva": row[7]
+            }
+            vehiculo = {
+                "id": row[2],
+                "tipo_vehiculo": row[8],
+                "placa": row[9],
+                "modelo": row[10],
+                "ano_modelo": row[11],
+                "imagen_url": row[12],
+                "tarifa_diaria": float(row[13])
+            }
+            cliente = {
+                "id": row[1],
+                "nombre": row[14],
+                "correo": row[15],
+                "telefono": row[16]
+            }
+            # Calificación promedio del cliente
+            cursor.execute(
+                "SELECT AVG(estrellas) FROM calificacion_usuario WHERE usuario_destino_id=%s", (row[1],)
+            )
+            calif = cursor.fetchone()[0]
+            cliente["calificacion"] = float(calif) if calif is not None else None
+            pedidos.append({
+                "reserva": reserva,
+                "vehiculo": vehiculo,
+                "cliente": cliente
+            })
+        return {"pedidos": pedidos}, 200
+    except Exception as e:
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/calificar-cliente", methods=["POST"])
+def calificar_cliente():
+    data = request.json
+    usuario_destino_id = data.get("usuario_destino_id")
+    autor_id = data.get("usuario_origen_id")
+    estrellas = data.get("estrellas")
+    comentario = data.get("comentario", "")
+    if not all([usuario_destino_id, autor_id, estrellas]):
+        return {"error": "Datos incompletos"}, 400
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "INSERT INTO calificacion_usuario (usuario_destino_id, autor_id, estrellas, comentario) VALUES (%s, %s, %s, %s)",
+            (usuario_destino_id, autor_id, estrellas, comentario)
+        )
+        conn.commit()
+        return {"message": "Calificación registrada"}, 201
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
