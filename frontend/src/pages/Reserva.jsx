@@ -41,7 +41,9 @@ export default function Reserva() {
   const [direccionInicio, setDireccionInicio] = useState("");
   const [direccionDestino, setDireccionDestino] = useState("");
   const [mensaje, setMensaje] = useState("");
+  const [mensajeTipo, setMensajeTipo] = useState(""); // "error" o "exito"
   const [usuario, setUsuario] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,7 +55,7 @@ export default function Reserva() {
     }
     const u = localStorage.getItem("usuario");
     if (u) setUsuario(JSON.parse(u));
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     if (vehiculo) {
@@ -85,7 +87,6 @@ export default function Reserva() {
   let diasDisponibles = [];
   if (anio && mes !== "") {
     const monthIndex = Number(mes);
-    const firstDay = new Date(anio, monthIndex, 1);
     const lastDay = new Date(anio, monthIndex + 1, 0);
     let startDay = 1;
     if (
@@ -142,18 +143,24 @@ export default function Reserva() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMensaje("");
+    setMensajeTipo("");
     if (!usuario) {
       setMensaje("Debes iniciar sesión para reservar.");
+      setMensajeTipo("error");
       return;
     }
     if (!fechaInicio || !fechaFin) {
       setMensaje("Debes seleccionar fecha y hora.");
+      setMensajeTipo("error");
       return;
     }
     if (!direccionInicio || !direccionDestino) {
       setMensaje("Debes ingresar ambas direcciones.");
+      setMensajeTipo("error");
       return;
     }
+    setLoading(true);
     try {
       await crearReserva({
         cliente_id: usuario.id,
@@ -163,113 +170,189 @@ export default function Reserva() {
         direccion_inicio: direccionInicio,
         direccion_destino: direccionDestino,
       });
-      setMensaje("Reserva realizada con éxito. Se ha enviado un correo al conductor.");
+      setMensaje("¡Reserva realizada con éxito! Se ha enviado un correo al conductor.");
+      setMensajeTipo("exito");
+      setDireccionInicio("");
+      setDireccionDestino("");
+      setAnio("");
+      setMes("");
+      setDia("");
+      setHora("");
     } catch (err) {
       setMensaje("Error al reservar: " + (err.response?.data?.error || err.message));
+      setMensajeTipo("error");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="reserva-container">
-      <div className="reserva-form">
-        <h2>Reservar vehículo</h2>
-        <form onSubmit={handleSubmit}>
-          <label>Año:</label>
-          <select
-            value={anio}
-            onChange={e => { setAnio(e.target.value); setMes(""); setDia(""); setHora(""); }}
-            required
-          >
-            <option value="">Selecciona año</option>
-            {years.map(y => (
-              <option key={y} value={y}>{y}</option>
-            ))}
-          </select>
-          <label>Mes:</label>
-          <select
-            value={mes}
-            onChange={e => { setMes(e.target.value); setDia(""); setHora(""); }}
-            required
-            disabled={!anio}
-          >
-            <option value="">Selecciona mes</option>
-            {mesesDisponibles.map(m => (
-              <option key={m.value} value={m.value}>{m.label}</option>
-            ))}
-          </select>
-          <label>Día:</label>
-          <select
-            value={dia}
-            onChange={e => { setDia(e.target.value); setHora(""); }}
-            required
-            disabled={!anio || mes === ""}
-          >
-            <option value="">Selecciona día</option>
-            {diasDisponibles.map(dObj => (
-              <option key={dObj.dia} value={dObj.dia}>
-                {dObj.dia}
-              </option>
-            ))}
-          </select>
-          <label>Hora (bloques de 3 horas):</label>
-          <select
-            value={hora}
-            onChange={e => setHora(e.target.value)}
-            required
-            disabled={!anio || mes === "" || !dia}
-          >
-            <option value="">Selecciona un bloque</option>
-            {horasDisponibles.length === 0 && anio && mes !== "" && dia &&
-              <option value="" disabled>No hay bloques disponibles</option>
-            }
-            {horasDisponibles.map(h => (
-              <option key={h.value} value={h.value}>{h.label}</option>
-            ))}
-          </select>
-          <div className="fecha-fin-block">
-            <span>Fecha y hora fin:</span>
-            <span>{fechaFinObj ? fechaFinObj.toLocaleString() : "--"}</span>
+    <div className="reserva-container" style={{ display: "flex", gap: "32px", justifyContent: "center", alignItems: "flex-start", padding: "32px 0" }}>
+      <div className="reserva-form bloque-form" style={{
+        background: "#fff",
+        borderRadius: "16px",
+        boxShadow: "0 2px 16px #0002",
+        padding: "32px",
+        minWidth: "340px",
+        maxWidth: "400px"
+      }}>
+        <h2 style={{ textAlign: "center", marginBottom: "18px", color: "#083c5d" }}>Reservar vehículo</h2>
+        <form onSubmit={handleSubmit} autoComplete="off">
+          <div style={{ marginBottom: "12px" }}>
+            <label>Año:</label>
+            <select
+              value={anio}
+              onChange={e => { setAnio(e.target.value); setMes(""); setDia(""); setHora(""); }}
+              required
+            >
+              <option value="">Selecciona año</option>
+              {years.map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
           </div>
-          <label>Dirección de inicio:</label>
-          <input
-            type="text"
-            value={direccionInicio}
-            onChange={e => setDireccionInicio(e.target.value)}
-            required
-            placeholder="Ej: Calle 123 #45-67"
-          />
-          <label>Dirección de destino:</label>
-          <input
-            type="text"
-            value={direccionDestino}
-            onChange={e => setDireccionDestino(e.target.value)}
-            required
-            placeholder="Ej: Carrera 89 #12-34"
-          />
-          <button type="submit" disabled={
-            !fechaInicio ||
-            !fechaFin ||
-            !direccionInicio ||
-            !direccionDestino
-          }>
-            Confirmar reserva
+          <div style={{ marginBottom: "12px" }}>
+            <label>Mes:</label>
+            <select
+              value={mes}
+              onChange={e => { setMes(e.target.value); setDia(""); setHora(""); }}
+              required
+              disabled={!anio}
+            >
+              <option value="">Selecciona mes</option>
+              {mesesDisponibles.map(m => (
+                <option key={m.value} value={m.value}>{m.label}</option>
+              ))}
+            </select>
+          </div>
+          <div style={{ marginBottom: "12px" }}>
+            <label>Día:</label>
+            <select
+              value={dia}
+              onChange={e => { setDia(e.target.value); setHora(""); }}
+              required
+              disabled={!anio || mes === ""}
+            >
+              <option value="">Selecciona día</option>
+              {diasDisponibles.map(dObj => (
+                <option key={dObj.dia} value={dObj.dia}>
+                  {dObj.dia}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div style={{ marginBottom: "12px" }}>
+            <label>Hora (bloques de 3 horas):</label>
+            <select
+              value={hora}
+              onChange={e => setHora(e.target.value)}
+              required
+              disabled={!anio || mes === "" || !dia}
+            >
+              <option value="">Selecciona un bloque</option>
+              {horasDisponibles.length === 0 && anio && mes !== "" && dia &&
+                <option value="" disabled>No hay bloques disponibles</option>
+              }
+              {horasDisponibles.map(h => (
+                <option key={h.value} value={h.value}>{h.label}</option>
+              ))}
+            </select>
+          </div>
+          <div className="fecha-fin-block" style={{ marginBottom: "12px", fontSize: "14px", color: "#555" }}>
+            <span><b>Fecha y hora fin:</b> {fechaFinObj ? fechaFinObj.toLocaleString() : "--"}</span>
+          </div>
+          <div style={{ marginBottom: "12px" }}>
+            <label>Dirección de inicio:</label>
+            <input
+              type="text"
+              value={direccionInicio}
+              onChange={e => setDireccionInicio(e.target.value)}
+              required
+              placeholder="Ej: Calle 123 #45-67"
+              autoComplete="off"
+            />
+          </div>
+          <div style={{ marginBottom: "18px" }}>
+            <label>Dirección de destino:</label>
+            <input
+              type="text"
+              value={direccionDestino}
+              onChange={e => setDireccionDestino(e.target.value)}
+              required
+              placeholder="Ej: Carrera 89 #12-34"
+              autoComplete="off"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={
+              loading ||
+              !fechaInicio ||
+              !fechaFin ||
+              !direccionInicio ||
+              !direccionDestino
+            }
+            style={{
+              width: "100%",
+              padding: "10px",
+              background: loading ? "#b5c7d6" : "#083c5d",
+              color: "#fff",
+              border: "none",
+              borderRadius: "6px",
+              fontWeight: "bold",
+              fontSize: "16px",
+              cursor: loading ? "not-allowed" : "pointer",
+              marginBottom: "8px"
+            }}
+          >
+            {loading ? <span className="spinner"></span> : "Confirmar reserva"}
           </button>
         </form>
-        <div className="aviso-finalizacion">
+        <div className="aviso-finalizacion" style={{ fontSize: "13px", color: "#666", margin: "12px 0 0 0" }}>
           <b>Nota:</b> Al finalizar la reserva, podrás calificar al conductor y al vehículo.
         </div>
-        {mensaje && <div className="mensaje-reserva">{mensaje}</div>}
+        {mensaje && (
+          <div
+            className={mensajeTipo === "exito" ? "mensaje-exito" : "mensaje-error"}
+            style={{
+              marginTop: "16px",
+              color: mensajeTipo === "exito" ? "#1b883a" : "#c0392b",
+              background: mensajeTipo === "exito" ? "#eafaf1" : "#fdecea",
+              border: `1px solid ${mensajeTipo === "exito" ? "#b7e4c7" : "#f5c6cb"}`,
+              borderRadius: "6px",
+              padding: "10px",
+              textAlign: "center"
+            }}
+          >
+            {mensaje}
+          </div>
+        )}
       </div>
-      <div className="reserva-info">
+      <div className="reserva-info bloque-form" style={{
+        background: "#f8fafc",
+        borderRadius: "16px",
+        boxShadow: "0 2px 16px #0001",
+        padding: "28px 24px",
+        minWidth: "320px",
+        maxWidth: "350px"
+      }}>
         {vehiculo && (
           <>
-            <img src={vehiculo.imagen_url} alt={vehiculo.modelo} className="reserva-img" />
-            <h3>{vehiculo.modelo} <span>({vehiculo.ano_modelo})</span></h3>
+            <img src={vehiculo.imagen_url} alt={vehiculo.modelo} className="reserva-img" style={{
+              width: "100%",
+              borderRadius: "12px",
+              marginBottom: "16px",
+              objectFit: "cover",
+              maxHeight: "180px"
+            }} />
+            <h3 style={{ marginBottom: "6px", color: "#083c5d" }}>
+              {vehiculo.modelo} <span style={{ color: "#888", fontWeight: "normal" }}>({vehiculo.ano_modelo})</span>
+            </h3>
             <p><b>Tipo:</b> {vehiculo.tipo_vehiculo}</p>
             <p><b>Placa:</b> {vehiculo.placa}</p>
-            <p><b>Tarifa diaria:</b> ${vehiculo.tarifa_diaria}</p>
-            <hr />
-            <h4>Conductor</h4>
+            <p><b>Tarifa diaria:</b> <span style={{ color: "#1b883a" }}>${vehiculo.tarifa_diaria}</span></p>
+            <hr style={{ margin: "16px 0" }} />
+            <h4 style={{ color: "#083c5d", marginBottom: "6px" }}>Conductor</h4>
             <p><b>Nombre:</b> {vehiculo.conductor?.nombre}</p>
             <p><b>Correo:</b> {vehiculo.conductor?.correo}</p>
             <p><b>Teléfono:</b> {vehiculo.conductor?.telefono}</p>

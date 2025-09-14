@@ -476,16 +476,17 @@ def crear_reserva():
         """, (cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino))
         conn.commit()
 
+        # Obtener datos del conductor y cliente
         cursor.execute("""
             SELECT u.nombre, u.correo FROM usuario u
             JOIN vehiculo v ON v.camionero_id = u.id
             WHERE v.id=%s
         """, (vehiculo_id,))
         conductor = cursor.fetchone()
-        cursor.execute("SELECT nombre FROM usuario WHERE id=%s", (cliente_id,))
+        cursor.execute("SELECT nombre, correo FROM usuario WHERE id=%s", (cliente_id,))
         cliente = cursor.fetchone()
         if conductor and cliente:
-            mensaje = (
+            mensaje_conductor = (
                 f"Hola {conductor[0]},\n\n"
                 f"{cliente[0]} te hizo una reserva para el vehículo {vehiculo_id} "
                 f"del {fecha_inicio} al {fecha_fin}.\n"
@@ -493,8 +494,19 @@ def crear_reserva():
                 f"Dirección de destino: {direccion_destino}\n\n"
                 "Por favor, revisa tu panel para más detalles."
             )
-            enviarCorreoReserva(conductor[1], mensaje)
-        return {"message": "Reserva realizada y correo enviado."}, 201
+            enviarCorreoReserva(conductor[1], mensaje_conductor)
+
+            mensaje_cliente = (
+                f"Hola {cliente[0]},\n\n"
+                f"Tu reserva para el vehículo {vehiculo_id} fue realizada exitosamente.\n"
+                f"Del {fecha_inicio} al {fecha_fin}.\n"
+                f"Dirección de inicio: {direccion_inicio}\n"
+                f"Dirección de destino: {direccion_destino}\n\n"
+                f"El conductor es: {conductor[0]}, correo: {conductor[1]}.\n"
+                "¡Gracias por usar PackyGo!"
+            )
+            enviarCorreoReserva(cliente[1], mensaje_cliente)
+        return {"message": "Reserva realizada y correos enviados."}, 201
     except Exception as e:
         conn.rollback()
         return {"error": str(e)}, 500
@@ -508,20 +520,38 @@ def listar_reservas():
     conn = get_connection()
     cursor = conn.cursor()
     if vehiculo_id:
-        cursor.execute("SELECT fecha_inicio, fecha_fin FROM reserva WHERE vehiculo_id=%s AND estado_reserva='activa'", (vehiculo_id,))
-        reservas = [
-            {
-                "fecha_inicio": r[0].isoformat(sep='T'),
-                "fecha_fin": r[1].isoformat(sep='T')
-            }
-            for r in cursor.fetchall()
-        ]
+        cursor.execute(
+            """
+            SELECT id, cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva
+            FROM reserva
+            WHERE vehiculo_id=%s AND estado_reserva='activa'
+            """,
+            (vehiculo_id,)
+        )
     else:
-        reservas = []
+        cursor.execute(
+            """
+            SELECT id, cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva
+            FROM reserva
+            WHERE estado_reserva='activa'
+            """
+        )
+    reservas = cursor.fetchall()
+    lista = []
+    for r in reservas:
+        lista.append({
+            "id": r[0],
+            "cliente_id": r[1],
+            "vehiculo_id": r[2],
+            "fecha_inicio": r[3].isoformat() if hasattr(r[3], "isoformat") else str(r[3]),
+            "fecha_fin": r[4].isoformat() if hasattr(r[4], "isoformat") else str(r[4]),
+            "direccion_inicio": r[5],
+            "direccion_destino": r[6],
+            "estado_reserva": r[7]
+        })
     cursor.close()
     conn.close()
-    return {"reservas": reservas}, 200
+    return {"reservas": lista}
 
 if __name__ == "__main__":
-    port = int(os.getenv("FLASK_PORT", "5000"))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

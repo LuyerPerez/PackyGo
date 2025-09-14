@@ -1,10 +1,10 @@
 .reserva-container {
   display: flex;
-  gap: 56px;
+  gap: 64px;
   justify-content: center;
   align-items: flex-start;
   margin: 48px auto 32px auto;
-  max-width: 1100px;
+  max-width: 1400px;
   padding: 0 16px;
 }
 
@@ -14,8 +14,8 @@
   box-shadow: 0 8px 32px rgba(8,60,93,0.12), 0 1.5px 6px rgba(0,0,0,0.07);
   padding: 40px 32px 32px 32px;
   flex: 1.2;
-  min-width: 340px;
-  max-width: 440px;
+  min-width: 400px;
+  max-width: 800px;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -141,10 +141,10 @@
 .reserva-info {
   background: #f4f8fb;
   border-radius: 18px;
-  padding: 36px 24px 28px 24px;
+  padding: 36px 24px 36px 24px;
   flex: 1;
-  min-width: 280px;
-  max-width: 340px;
+  min-width: 400px;
+  max-width: 520px;
   text-align: center;
   box-shadow: 0 2px 12px rgba(0,151,167,0.07);
   display: flex;
@@ -197,6 +197,20 @@
   letter-spacing: 0.5px;
 }
 
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid #fff;
+  border-top: 3px solid #083c5d;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 @media (max-width: 900px) {
   .reserva-container {
     flex-direction: column;
@@ -206,7 +220,14 @@
     margin: 24px auto;
     padding: 0 4vw;
   }
-  .reserva-form, .reserva-info {
+  .reserva-info {
+    order: 1;
+    max-width: 100%;
+    min-width: 0;
+    border-radius: 14px;
+  }
+  .reserva-form {
+    order: 2;
     max-width: 100%;
     min-width: 0;
     border-radius: 14px;

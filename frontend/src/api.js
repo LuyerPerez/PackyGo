@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api'
+  baseURL: 'http://192.168.0.5:5000/api'
 })
 
 export default api
@@ -30,7 +30,7 @@ export async function Verify({ correo, code, tipo }) {
   const { data } = await api.post('/verify', {
     correo,
     code,
-    tipo: "login"
+    tipo
   })
   localStorage.setItem("usuario", JSON.stringify(data));
   return data
