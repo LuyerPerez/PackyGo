@@ -60,8 +60,9 @@ export async function GoogleRegister(token, rol) {
   return data;
 }
 
-export async function registrarVehiculo(data) {
-  const res = await api.post("/vehiculos", data);
+export async function registrarVehiculo(data, isFormData = false) {
+  const config = isFormData ? { headers: { "Content-Type": "multipart/form-data" } } : {};
+  const res = await api.post('/vehiculos', data, config);
   return res.data;
 }
 
@@ -70,8 +71,9 @@ export async function obtenerVehiculosPorCamionero(camionero_id) {
   return res.data;
 }
 
-export async function editarVehiculo(id, data) {
-  const res = await api.put(`/vehiculos/${id}`, data);
+export async function editarVehiculo(id, data, isFormData = false) {
+  const config = isFormData ? { headers: { "Content-Type": "multipart/form-data" } } : {};
+  const res = await api.put(`/vehiculos/${id}`, data, config);
   return res.data;
 }
 
@@ -123,4 +125,26 @@ export async function calificarCliente({ usuario_destino_id, usuario_origen_id, 
     comentario
   });
   return res.data;
+}
+
+export async function obtenerCalificacionesVehiculoPorUsuario({ usuario_id, vehiculo_id }) {
+  const res = await api.get(`/calificaciones-vehiculo?autor_id=${usuario_id}&vehiculo_id=${vehiculo_id}`);
+  return res.data.calificaciones;
+}
+
+export async function calificarVehiculo({ autor_id, vehiculo_destino_id, reserva_id, estrellas, comentario }) {
+  const res = await api.post(`/calificar-vehiculo`, {
+    autor_id,
+    vehiculo_destino_id,
+    reserva_id,
+    estrellas,
+    comentario
+  });
+  return res.data;
+}
+
+export function getImagenUrl(imagen_url) {
+  if (!imagen_url) return null;
+  const filename = imagen_url.split("/").pop();
+  return `http://192.168.0.5:5000/uploads/${filename}`;
 }

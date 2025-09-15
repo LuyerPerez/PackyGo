@@ -3,7 +3,7 @@ import ReservaCard from "./ReservaCard";
 
 const RESERVAS_POR_PAGINA = 4;
 
-export default function ListaReservas({ reservas }) {
+export default function ListaReservas({ reservas, onCalificar }) {
   const [pagina, setPagina] = useState(1);
 
   useEffect(() => {
@@ -29,6 +29,7 @@ export default function ListaReservas({ reservas }) {
             key={reserva.id}
             reserva={reserva}
             onCancel={handleCancel}
+            onCalificar={onCalificar}
           />
         ))}
       </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../assets/ReservaForm.css";
-import { crearReserva, obtenerReservasPorVehiculo } from "../api";
+import { crearReserva, obtenerReservasPorVehiculo, getImagenUrl } from "../api";
 import { useNavigate } from "react-router-dom";
 
 function addHours(date, h) {
@@ -338,7 +338,7 @@ export default function Reserva() {
       }}>
         {vehiculo && (
           <>
-            <img src={vehiculo.imagen_url} alt={vehiculo.modelo} className="reserva-img" style={{
+            <img src={getImagenUrl(vehiculo.imagen_url)} alt={vehiculo.modelo} className="reserva-img" style={{
               width: "100%",
               borderRadius: "12px",
               marginBottom: "16px",

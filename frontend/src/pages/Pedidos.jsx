@@ -4,6 +4,7 @@ import CardPedido from "../components/CardPedido";
 import ModalCalificarUsuario from "../components/ModalCalificarUsuario";
 import "../assets/Pedido.css";
 
+
 const PEDIDOS_POR_PAGINA = 10;
 
 export default function Pedidos() {
@@ -93,8 +94,22 @@ export default function Pedidos() {
     setLoading(false);
   };
 
-  if (loading) return <div>Cargando pedidos...</div>;
-  if (pedidos.length === 0) return <div>No tienes pedidos.</div>;
+  if (loading) return (
+    <div className="pedidos-loading">
+      <span className="pedidos-empty-icon" role="img" aria-label="Cargando">🚚</span>
+      Cargando pedidos...
+    </div>
+  );
+
+  if (pedidos.length === 0) return (
+    <div className="pedidos-empty">
+      <span className="pedidos-empty-icon" role="img" aria-label="Sin pedidos">📦</span>
+      <div>No tienes reservas.</div>
+      <div style={{fontSize: "1rem", color: "#1976d2", marginTop: 6}}>
+        Cuando recibas reservas aparecerán aquí
+      </div>
+    </div>
+  );
 
   return (
     <div className="pedidos-container">
@@ -133,7 +148,15 @@ export default function Pedidos() {
 
       <div className="pedidos-list">
         {pedidosPagina.length === 0 ? (
-          <div>No hay pedidos que coincidan con el filtro.</div>
+          <div className="pedidos-empty">
+            <span className="pedidos-empty-icon" role="img" aria-label="Sin resultados">
+              
+            </span>
+            <div>No hay reservas que coincidan con el filtro.</div>
+            <div style={{fontSize: "1rem", color: "#1976d2", marginTop: 6}}>
+              Prueba cambiando el estado o el nombre del cliente.
+            </div>
+          </div>
         ) : (
           pedidosPagina.map(pedido => (
             <CardPedido

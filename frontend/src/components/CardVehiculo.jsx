@@ -1,5 +1,6 @@
 import React from 'react';
 import '../assets/CardVehiculo.css';
+import { getImagenUrl } from "../api"; // o "../utils"
 
 const CardVehiculo = ({ vehiculo, onShowModal }) => {
   let calificacion = vehiculo.calificacion;
@@ -27,7 +28,15 @@ const CardVehiculo = ({ vehiculo, onShowModal }) => {
 
   return (
     <div className="card-vehiculo">
-      <img src={vehiculo.imagen_url} alt={vehiculo.modelo} className="vehiculo-imagen" />
+      {vehiculo.imagen_url ? (
+        <img
+          src={getImagenUrl(vehiculo.imagen_url)}
+          alt="Vehículo"
+          className="vehiculo-imagen"
+        />
+      ) : (
+        <div className="card-vehiculo-img-placeholder">Sin imagen</div>
+      )}
       <div className="vehiculo-info">
         <h3>{vehiculo.modelo} <span className="vehiculo-ano">({vehiculo.ano_modelo})</span></h3>
         <p className="vehiculo-tipo">{vehiculo.tipo_vehiculo}</p>

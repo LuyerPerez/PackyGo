@@ -1,4 +1,5 @@
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
+from werkzeug.utils import secure_filename
 from flask_cors import CORS
 from db import get_connection
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -11,7 +12,7 @@ from envioCorreos import (
     enviarCorreoCambio,
     enviarCorreoVerificacion,
     enviarCorreoReserva,
-    enviarCorreoCancelacion  # <-- Agrega esto
+    enviarCorreoCancelacion 
 )
 
 from dotenv import load_dotenv
@@ -24,6 +25,10 @@ password = os.getenv("PASSWORD")
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "uploads")
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 verification_codes = {}
 reset_codes = {}
@@ -247,21 +252,26 @@ def google_register():
             "id": user[0],
             "nombre": user[1],
             "correo": user[3],
-            "rol": user[6]  # <-- Agrega esto
+            "rol": user[6]
         }}, 201
     except Exception as e:
         return {"error": str(e)}, 400
 
 @app.route("/api/vehiculos", methods=["POST"])
 def registrar_vehiculo():
-    data = request.json
-    camionero_id = data.get("camionero_id")
-    tipo_vehiculo = data.get("tipo_vehiculo")
-    placa = data.get("placa")
-    modelo = data.get("modelo")
-    ano_modelo = data.get("ano_modelo")
-    imagen_url = data.get("imagen_url")
-    tarifa_diaria = data.get("tarifa_diaria")
+    camionero_id = request.form.get("camionero_id")
+    tipo_vehiculo = request.form.get("tipo_vehiculo")
+    placa = request.form.get("placa")
+    modelo = request.form.get("modelo")
+    ano_modelo = request.form.get("ano_modelo")
+    tarifa_diaria = request.form.get("tarifa_diaria")
+    imagen_url = None
+
+    imagen = request.files.get("imagen")
+    if imagen:
+        filename = secure_filename(imagen.filename)
+        imagen.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        imagen_url = f"/uploads/{filename}" 
 
     if not all([camionero_id, tipo_vehiculo, placa, modelo, ano_modelo, tarifa_diaria]):
         return {"error": "Todos los campos son obligatorios."}, 400
@@ -339,25 +349,41 @@ def listar_vehiculos():
 
 @app.route("/api/vehiculos/<int:vehiculo_id>", methods=["PUT"])
 def editar_vehiculo(vehiculo_id):
-    data = request.json
-    tipo_vehiculo = data.get("tipo_vehiculo")
-    placa = data.get("placa")
-    modelo = data.get("modelo")
-    ano_modelo = data.get("ano_modelo")
-    imagen_url = data.get("imagen_url")
-    tarifa_diaria = data.get("tarifa_diaria")
+    tipo_vehiculo = request.form.get("tipo_vehiculo")
+    placa = request.form.get("placa")
+    modelo = request.form.get("modelo")
+    ano_modelo = request.form.get("ano_modelo")
+    tarifa_diaria = request.form.get("tarifa_diaria")
+    imagen_url = None
+
+    imagen = request.files.get("imagen")
+    if imagen:
+        filename = secure_filename(imagen.filename)
+        imagen.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        imagen_url = f"../../backend/uploads/{filename}"  # <-- Cambia aquí
+
     if not all([tipo_vehiculo, placa, modelo, ano_modelo, tarifa_diaria]):
         return {"error": "Todos los campos son obligatorios."}, 400
+
     conn = get_connection()
     cursor = conn.cursor()
     try:
-        cursor.execute(
-            """
-            UPDATE vehiculo SET tipo_vehiculo=%s, placa=%s, modelo=%s, ano_modelo=%s, imagen_url=%s, tarifa_diaria=%s
-            WHERE id=%s
-            """,
-            (tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria, vehiculo_id)
-        )
+        if imagen_url:
+            cursor.execute(
+                """
+                UPDATE vehiculo SET tipo_vehiculo=%s, placa=%s, modelo=%s, ano_modelo=%s, imagen_url=%s, tarifa_diaria=%s
+                WHERE id=%s
+                """,
+                (tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria, vehiculo_id)
+            )
+        else:
+            cursor.execute(
+                """
+                UPDATE vehiculo SET tipo_vehiculo=%s, placa=%s, modelo=%s, ano_modelo=%s, tarifa_diaria=%s
+                WHERE id=%s
+                """,
+                (tipo_vehiculo, placa, modelo, ano_modelo, tarifa_diaria, vehiculo_id)
+            )
         conn.commit()
         return {"message": "Vehículo actualizado correctamente."}, 200
     except Exception as e:
@@ -653,6 +679,51 @@ def calificar_cliente():
     finally:
         cursor.close()
         conn.close()
+
+@app.route("/api/calificaciones-vehiculo", methods=["GET"])
+def calificaciones_vehiculo():
+    autor_id = request.args.get("autor_id")
+    vehiculo_id = request.args.get("vehiculo_id")
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT id, reserva_id FROM calificacion_vehiculo WHERE autor_id=%s AND vehiculo_destino_id=%s",
+        (autor_id, vehiculo_id)
+    )
+    calificaciones = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return {"calificaciones": [{"id": c[0], "reserva_id": c[1]} for c in calificaciones]}, 200
+
+@app.route("/api/calificar-vehiculo", methods=["POST"])
+def calificar_vehiculo():
+    data = request.json
+    autor_id = data.get("autor_id")
+    vehiculo_destino_id = data.get("vehiculo_destino_id")
+    reserva_id = data.get("reserva_id")
+    estrellas = data.get("estrellas")
+    comentario = data.get("comentario", "")
+    if not all([autor_id, vehiculo_destino_id, reserva_id, estrellas]):
+        return {"error": "Datos incompletos"}, 400
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "INSERT INTO calificacion_vehiculo (autor_id, vehiculo_destino_id, reserva_id, estrellas, comentario) VALUES (%s, %s, %s, %s, %s)",
+            (autor_id, vehiculo_destino_id, reserva_id, estrellas, comentario)
+        )
+        conn.commit()
+        return {"message": "Calificación registrada"}, 201
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

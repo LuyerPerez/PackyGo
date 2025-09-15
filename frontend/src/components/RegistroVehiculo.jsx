@@ -8,9 +8,9 @@ function RegistroVehiculo({ onSuccess, editVehiculo }) {
     placa: "",
     modelo: "",
     ano_modelo: "",
-    imagen_url: "",
     tarifa_diaria: "",
   });
+  const [imagenFile, setImagenFile] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -21,23 +21,27 @@ function RegistroVehiculo({ onSuccess, editVehiculo }) {
         placa: editVehiculo.placa || "",
         modelo: editVehiculo.modelo || "",
         ano_modelo: editVehiculo.ano_modelo || "",
-        imagen_url: editVehiculo.imagen_url || "",
         tarifa_diaria: editVehiculo.tarifa_diaria || "",
       });
+      setImagenFile(null);
     } else {
       setForm({
         tipo_vehiculo: "",
         placa: "",
         modelo: "",
         ano_modelo: "",
-        imagen_url: "",
         tarifa_diaria: "",
       });
+      setImagenFile(null);
     }
   }, [editVehiculo]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleFileChange = (e) => {
+    setImagenFile(e.target.files[0]);
   };
 
   const handleSubmit = async (e) => {
@@ -51,13 +55,15 @@ function RegistroVehiculo({ onSuccess, editVehiculo }) {
         setLoading(false);
         return;
       }
+      const data = new FormData();
+      data.append("camionero_id", user.id);
+      Object.entries(form).forEach(([key, value]) => data.append(key, value));
+      if (imagenFile) data.append("imagen", imagenFile);
+
       if (editVehiculo) {
-        await editarVehiculo(editVehiculo.id, form);
+        await editarVehiculo(editVehiculo.id, data, true); // true para indicar FormData
       } else {
-        await registrarVehiculo({
-          camionero_id: user.id,
-          ...form,
-        });
+        await registrarVehiculo(data, true);
       }
       setLoading(false);
       if (onSuccess) onSuccess();
@@ -66,9 +72,9 @@ function RegistroVehiculo({ onSuccess, editVehiculo }) {
         placa: "",
         modelo: "",
         ano_modelo: "",
-        imagen_url: "",
         tarifa_diaria: "",
       });
+      setImagenFile(null);
     } catch (err) {
       setError(
         err.response?.data?.error ||
@@ -79,7 +85,11 @@ function RegistroVehiculo({ onSuccess, editVehiculo }) {
   };
 
   return (
-    <form className="registro-form" onSubmit={handleSubmit}>
+    <form
+      className="registro-form"
+      onSubmit={handleSubmit}
+      encType="multipart/form-data"
+    >
       <h2 className="registro-title">
         {editVehiculo ? "Editar Vehículo" : "Registrar Vehículo"}
       </h2>
@@ -135,11 +145,11 @@ function RegistroVehiculo({ onSuccess, editVehiculo }) {
         />
       </div>
       <div className="form-group">
-        <label>Imagen (URL)</label>
+        <label>Imagen del vehículo</label>
         <input
-          name="imagen_url"
-          value={form.imagen_url}
-          onChange={handleChange}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
           className="input"
         />
       </div>
@@ -156,9 +166,7 @@ function RegistroVehiculo({ onSuccess, editVehiculo }) {
           className="input"
         />
       </div>
-      {error && (
-        <div className="registro-error">{error}</div>
-      )}
+      {error && <div className="registro-error">{error}</div>}
       <button
         type="submit"
         disabled={loading}

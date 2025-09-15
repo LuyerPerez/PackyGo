@@ -192,6 +192,27 @@
   color: #fff;
 }
 
+.reserva-card-calificar {
+  background: linear-gradient(90deg, #ffb300 0%, #ffea00 100%);
+  color: #083c5d;
+  border: none;
+  border-radius: 14px;
+  padding: 8px 22px;
+  font-size: 1em;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.13);
+  transition: background 0.2s, color 0.2s, transform 0.13s;
+  margin-left: 0;
+  margin-top: 0;
+  display: block;
+}
+.reserva-card-calificar:hover {
+  background: linear-gradient(90deg, #ffea00 0%, #ffb300 100%);
+  color: #1565c0;
+  transform: scale(1.07);
+}
+
 .reservas-paginacion {
   display: flex;
   justify-content: center;
@@ -247,6 +268,21 @@
 .filtro-reservas button:hover {
   background: #0097a7;
   color: #fff;
+}
+
+.btn-finalizar {
+  background: linear-gradient(90deg, #0097a7 0%, #00bcd4 100%);
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.13s;
+}
+.btn-finalizar:hover {
+  background: linear-gradient(90deg, #00bcd4 0%, #0097a7 100%);
+  transform: scale(1.06);
 }
 
 @media (max-width: 900px) {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 import '../assets/ModalVehiculo.css';
+import { getImagenUrl } from '../api';
 
 const ModalVehiculo = ({ vehiculo, onClose }) => {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ const ModalVehiculo = ({ vehiculo, onClose }) => {
       <div className="modal-content vertical">
         <button className="close-modal" onClick={onClose} aria-label="Cerrar modal">×</button>
         <img
-          src={vehiculo.imagen_url}
+          src={getImagenUrl(vehiculo.imagen_url)}
           alt={`Imagen de ${vehiculo.modelo} (${vehiculo.ano_modelo})`}
           className="modal-img-top"
         />

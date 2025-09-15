@@ -1,4 +1,5 @@
 import React from "react";
+import { getImagenUrl } from "../api";
 
 export default function CardPedido({ pedido, onFinalizar, onCancelar }) {
   const { reserva, vehiculo, cliente } = pedido;
@@ -12,7 +13,7 @@ export default function CardPedido({ pedido, onFinalizar, onCancelar }) {
   return (
     <div className="card-pedido">
       <div>
-        <img src={vehiculo.imagen_url} alt={vehiculo.modelo} />
+        <img src={getImagenUrl(vehiculo.imagen_url)} alt={vehiculo.modelo} />
         <h3>{vehiculo.modelo} ({vehiculo.ano_modelo})</h3>
         <p><b>Tipo:</b> {vehiculo.tipo_vehiculo}</p>
         <p><b>Placa:</b> {vehiculo.placa}</p>

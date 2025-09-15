@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import RegistroVehiculo from "./RegistroVehiculo";
-import { obtenerVehiculosPorCamionero, eliminarVehiculo } from "../api";
+import { obtenerVehiculosPorCamionero, eliminarVehiculo, getImagenUrl } from "../api";
 import "./../assets/TableVehiculos.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -91,7 +91,7 @@ function TableVehiculos({ reload, setReload }) {
                   <td>
                     {v.imagen_url ? (
                       <img
-                        src={v.imagen_url}
+                        src={getImagenUrl(v.imagen_url)}
                         alt="vehículo"
                         style={{ width: 100, borderRadius: 8 }}
                       />
