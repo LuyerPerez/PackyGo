@@ -69,6 +69,8 @@ CREATE TABLE calificacion_vehiculo (
   FOREIGN KEY (vehiculo_destino_id) REFERENCES vehiculo(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+ALTER TABLE calificacion_vehiculo ADD COLUMN reserva_id INT NULL AFTER id;
+
 -- Tabla reporte
 CREATE TABLE reporte (
   id INT AUTO_INCREMENT PRIMARY KEY,
