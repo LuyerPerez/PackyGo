@@ -328,3 +328,18 @@
     font-size: 0.98em;
   }
 }
+
+@media (max-width: 600px) {
+  .filtro-reservas {
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .filtro-reservas button {
+    flex: 1 1 120px;
+    min-width: 120px;
+    width: 100%;
+    padding: 10px 0;
+    font-size: 0.98em;
+  }
+}
