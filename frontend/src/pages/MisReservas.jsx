@@ -7,7 +7,8 @@ import "./../assets/MisReservas.css";
 const opcionesFiltro = [
   { label: "Todas", value: "todas" },
   { label: "Activas", value: "activa" },
-  { label: "Canceladas", value: "cancelada" }
+  { label: "Canceladas", value: "cancelada" },
+  { label: "Finalizadas", value: "finalizada" }
 ];
 
 export default function MisReservas() {
@@ -32,9 +33,7 @@ export default function MisReservas() {
       ? reservas
       : reservas.filter(r => r.estado_reserva === filtro);
 
-  // Función para abrir la modal desde la página
   const handleAbrirModalCalificar = async (reserva) => {
-    // Busca el vehículo de la reserva
     const vehiculos = await obtenerTodosLosVehiculos();
     const vehiculo = vehiculos.find(v => v.id === reserva.vehiculo_id);
     setReservaAcalificar(reserva);
@@ -42,12 +41,10 @@ export default function MisReservas() {
     setModalOpen(true);
   };
 
-  // Cuando se califica, refresca reservas y cierra modal
   const handleCalificado = () => {
     setModalOpen(false);
     setReservaAcalificar(null);
     setVehiculoAcalificar(null);
-    // Opcional: recargar reservas para actualizar el botón
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (!usuario) return;
     obtenerReservasPorCliente(usuario.id)
