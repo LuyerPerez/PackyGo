@@ -135,3 +135,26 @@ Las funcionalidades principales de PackyGo son:
 - Node.js 18+
 - XAMPP o MySQL SERVER
 - Git Bash
+
+---
+
+## Paleta de Colores
+
+| Nombre            | Color         | Código HEX   | Uso principal                                 |
+|-------------------|--------------|-------------|-----------------------------------------------|
+| Primario          | ![#0097a7](https://via.placeholder.com/18/0097a7/000000?text=+) | `#0097a7` | Botones, enlaces, fondos destacados           |
+| Secundario        | ![#083c5d](https://via.placeholder.com/18/083c5d/000000?text=+) | `#083c5d` | Fondos de navbar, títulos, gradientes         |
+| Fondo claro       | ![#f4f8fb](https://via.placeholder.com/18/f4f8fb/000000?text=+) | `#f4f8fb` | Fondos de tarjetas, formularios, secciones    |
+| Fondo general     | ![#e0f7fa](https://via.placeholder.com/18/e0f7fa/000000?text=+) | `#e0f7fa` | Fondos secundarios, glassmorphism             |
+| Fondo gris        | ![#e0e6ed](https://via.placeholder.com/18/e0e6ed/000000?text=+) | `#e0e6ed` | Bordes, separadores, badges                   |
+| Fondo azul claro  | ![#e3f2fd](https://via.placeholder.com/18/e3f2fd/000000?text=+) | `#e3f2fd` | Fondos de secciones, gradientes               |
+| Fondo blanco      | ![#ffffff](https://via.placeholder.com/18/ffffff/000000?text=+) | `#ffffff` | Fondos principales, tarjetas, formularios     |
+| Éxito             | ![#388e3c](https://via.placeholder.com/18/388e3c/000000?text=+) | `#388e3c` | Mensajes de éxito, badges de estado           |
+| Advertencia       | ![#ffb300](https://via.placeholder.com/18/ffb300/000000?text=+) | `#ffb300` | Estrellas, calificaciones                     |
+| Error             | ![#d32f2f](https://via.placeholder.com/18/d32f2f/000000?text=+) | `#d32f2f` | Mensajes de error, botones cancelar/eliminar  |
+| Azul oscuro       | ![#1565c0](https://via.placeholder.com/18/1565c0/000000?text=+) | `#1565c0` | Botones de finalizar, badges de estado        |
+| Azul intermedio   | ![#1976d2](https://via.placeholder.com/18/1976d2/000000?text=+) | `#1976d2` | Fechas, detalles secundarios                  |
+| Gris texto        | ![#888888](https://via.placeholder.com/18/888888/000000?text=+) | `#888888` | Textos secundarios, placeholders              |
+| Fondo error claro | ![#ffe0e0](https://via.placeholder.com/18/ffe0e0/000000?text=+) | `#ffe0e0` | Fondos de error, badges canceladas            |
+
+> **Nota:** Estos colores se usan en botones, fondos, textos, badges y elementos interactivos para mantener una identidad visual coherente en toda la plataforma.
