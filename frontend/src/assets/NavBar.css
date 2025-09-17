@@ -10,7 +10,19 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 24px;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  z-index: 100;
+  transition: box-shadow 0.3s, backdrop-filter 0.3s, background 0.3s;
+  box-shadow: none;
+}
+
+.navbar.scrolled {
+  box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+  backdrop-filter: blur(8px);
+  background: linear-gradient(90deg, #0097a7b3 0%, #083c5db3 100%);
 }
 
 .navbar-logo {
@@ -19,7 +31,7 @@
 }
 
 .logo-img {
-  width: 200px;
+  width: 135px;
 }
 
 .logo-text {

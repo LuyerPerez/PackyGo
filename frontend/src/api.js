@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://192.168.0.13:5000/api'
+  baseURL: 'http://10.90.41.208:5000/api'
 })
 
 export default api
@@ -144,8 +144,11 @@ export async function calificarVehiculo({ autor_id, vehiculo_destino_id, reserva
 
 export function getImagenUrl(imagen_url) {
   if (!imagen_url) return null;
-  const filename = imagen_url.split("/").pop();
-  return `http://192.168.0.13:5000/uploads/${filename}`;
+  if (imagen_url.startsWith("http")) return imagen_url;
+  if (imagen_url.startsWith("/uploads")) {
+    return `http://10.90.41.208:5000${imagen_url}`;
+  }
+  return `http://10.90.41.208:5000/uploads/${imagen_url}`;
 }
 
 export async function editarReserva(id, data) {

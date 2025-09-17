@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash, faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import "../assets/Administracion.css";
+import { getImagenUrl } from "../api";
 
 const TablaAdmin = ({
   titulo,
@@ -62,11 +63,7 @@ const TablaAdmin = ({
                     {col.key === "imagen_url" && item[col.key] ? (
                       <img
                         className="tabla-admin-img"
-                        src={
-                          item[col.key].startsWith("http")
-                            ? item[col.key]
-                            : `http://192.168.0.13:5000/uploads/${item[col.key].replace(/^.*[\\/]/, "")}`
-                        }
+                        src={getImagenUrl(item[col.key])}
                         alt="Vehículo"
                       />
                     ) : (

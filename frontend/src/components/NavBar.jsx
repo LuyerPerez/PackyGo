@@ -8,7 +8,15 @@ function NavBar() {
   const [user, setUser] = useState(null);
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef(null);
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     const userStorage = localStorage.getItem("user");
@@ -49,7 +57,7 @@ function NavBar() {
   }, []);
 
   return (
-    <nav className="navbar">
+    <nav className={`navbar${scrolled ? " scrolled" : ""}`}> 
       <div className="navbar-logo">
         <Link to="/">
           <img
