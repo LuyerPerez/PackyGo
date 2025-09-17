@@ -27,63 +27,66 @@ const TablaAdmin = ({
   return (
     <div className="tabla-admin">
       <div className="tabla-admin-header">
-        <h2>{titulo}</h2>
-        <button className="btn-crear" onClick={onCrear} style={{ color: 'white' }}>
+        <h2 className="tabla-admin-titulo">{titulo}</h2>
+        <button className="btn-crear" onClick={onCrear}>
           <FontAwesomeIcon icon={faPlus} /> Crear
         </button>
       </div>
       {buscador && (
         <div className="buscador">
-          <FontAwesomeIcon icon={faSearch} />
+          <FontAwesomeIcon icon={faSearch} className="buscador-icon" />
           <input
             type="text"
+            className="buscador-input"
             placeholder="Buscar..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
           />
         </div>
       )}
-      <table>
-        <thead>
-          <tr>
-            {columnasTabla.map((col) => (
-              <th key={col.key}>{col.label}</th>
-            ))}
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {datosFiltrados.map((item) => (
-            <tr key={item.id}>
+      <div className="tabla-scroll-wrapper">
+        <table>
+          <thead className="tabla-admin-thead">
+            <tr className="tabla-admin-tr">
               {columnasTabla.map((col) => (
-                <td key={col.key}>
-                  {col.key === "imagen_url" && item[col.key] ? (
-                    <img
-                      src={
-                        item[col.key].startsWith("http")
-                          ? item[col.key]
-                          : `http://192.168.0.13:5000/uploads/${item[col.key].replace(/^.*[\\/]/, "")}`
-                      }
-                      alt="Vehículo"
-                      style={{ width: 60, height: 40, objectFit: "cover", borderRadius: 6 }}
-                    />
-                  ) : (
-                    item[col.key]
-                  )}
-                </td>
+                <th className="tabla-admin-th" key={col.key}>{col.label}</th>
               ))}
-              <td>
-                <button className="btn-editar" onClick={() => onEditar(item)}>
-                  <FontAwesomeIcon icon={faEdit} />
-                </button>
-                <button className="btn-eliminar" onClick={() => onEliminar(item)}>
-                  <FontAwesomeIcon icon={faTrash} />
-                </button>
-              </td>
+              <th className="tabla-admin-th">Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="tabla-admin-tbody">
+            {datosFiltrados.map((item) => (
+              <tr className="tabla-admin-tr" key={item.id}>
+                {columnasTabla.map((col) => (
+                  <td className="tabla-admin-td" key={col.key}>
+                    {col.key === "imagen_url" && item[col.key] ? (
+                      <img
+                        className="tabla-admin-img"
+                        src={
+                          item[col.key].startsWith("http")
+                            ? item[col.key]
+                            : `http://192.168.0.13:5000/uploads/${item[col.key].replace(/^.*[\\/]/, "")}`
+                        }
+                        alt="Vehículo"
+                      />
+                    ) : (
+                      item[col.key]
+                    )}
+                  </td>
+                ))}
+                <td className="tabla-admin-td">
+                  <button className="btn-editar" onClick={() => onEditar(item)}>
+                    <FontAwesomeIcon icon={faEdit} />
+                  </button>
+                  <button className="btn-eliminar" onClick={() => onEliminar(item)}>
+                    <FontAwesomeIcon icon={faTrash} />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
