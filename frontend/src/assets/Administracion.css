@@ -1,0 +1,400 @@
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 240px;
+  height: 100vh;
+  background: linear-gradient(180deg, #0097a7 0%, #083c5d 100%);
+  color: #fff;
+  z-index: 2200;
+  display: flex;
+  flex-direction: column;
+  padding-top: 1rem;
+  box-shadow: 2px 0 16px rgba(8, 60, 93, 0.08);
+  transition: left 0.3s;
+}
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 1rem;
+}
+.sidebar nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.sidebar nav ul li {
+  margin: 0.5rem 0;
+}
+.sidebar nav ul li a {
+  color: #fff;
+  text-decoration: none;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 6px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: background 0.2s, color 0.2s;
+}
+.sidebar nav ul li a.active,
+.sidebar nav ul li a:hover {
+  background: #1976d2;
+  color: #fff;
+}
+
+/* Botón hamburguesa solo en móvil */
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #0097a7;
+  color: #fff;
+  border: none;
+  z-index: 2300;
+  padding: 0.5rem 0.5rem;
+  box-shadow: 0 2px 8px rgba(8, 60, 93, 0.13);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s, box-shadow 0.2s;
+  border-radius: 5px;
+}
+.sidebar-toggle:hover {
+  background: #1976d2;
+  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.18);
+}
+
+.sidebar-close {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #fff;
+  margin-left: auto;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+/* Drawer y backdrop en móvil */
+@media (max-width: 900px) {
+  .sidebar {
+    left: -260px;
+    transition: left 0.3s;
+  }
+  .sidebar.sidebar-open {
+    left: 0;
+  }
+  .sidebar-toggle {
+    display: block;
+  }
+  .sidebar-header {
+    display: flex;
+  }
+  .sidebar-close {
+    display: block;
+  }
+  .sidebar-backdrop {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(8, 60, 93, 0.35);
+    z-index: 2100;
+  }
+  .tabla-admin {
+    margin-left: 0;
+    padding: 1.2rem 0.5rem;
+  }
+}
+
+/* Elimina sidebar horizontal y fondo gris en otras media queries */
+@media (max-width: 1100px) {
+  .sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    width: 240px;
+    height: 100vh;
+    background: linear-gradient(180deg, #0097a7 0%, #083c5d 100%);
+    z-index: 2200;
+    transition: left 0.3s;
+    box-shadow: 2px 0 16px rgba(8, 60, 93, 0.18);
+  }
+  .sidebar.sidebar-open {
+    left: 0;
+  }
+}
+
+/* Panel principal */
+.tabla-admin {
+  margin-left: 240px;
+  padding: 2.5rem 2rem;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e3f2fd 0%, #fff 100%);
+  transition: background 0.3s;
+}
+.tabla-admin-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+.btn-crear {
+  background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.6rem;
+  border-radius: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.08rem;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.13);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+  letter-spacing: 0.5px;
+}
+.btn-crear .fa-spinner {
+  margin-right: 8px;
+}
+.btn-crear:hover {
+  background: linear-gradient(90deg, #1565c0 0%, #64b5f6 100%);
+  box-shadow: 0 8px 24px rgba(25, 118, 210, 0.18);
+  transform: translateY(-2px) scale(1.04);
+}
+.buscador {
+  margin: 1rem 0 1.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f1f1f1;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  width: 320px;
+  box-shadow: 0 1px 4px rgba(8, 60, 93, 0.07);
+}
+.buscador input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 1rem;
+  width: 100%;
+  color: #083c5d;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(8, 60, 93, 0.07);
+  font-size: 1rem;
+}
+th, td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #e3f2fd;
+  text-align: left;
+  font-size: 1rem;
+  vertical-align: middle;
+}
+th {
+  background: #e3f2fd;
+  color: #0a4c7a;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+tr:last-child td {
+  border-bottom: none;
+}
+td img {
+  max-width: 70px;
+  max-height: 45px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+}
+
+/* Botones de acciones */
+.btn-editar {
+  background: #fffbe6;
+  color: #f9a825;
+  border: none;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-right: 6px;
+  font-size: 1.05rem;
+  transition: background 0.2s, color 0.2s;
+  box-shadow: 0 2px 8px rgba(249, 168, 37, 0.08);
+}
+.btn-editar:hover {
+  background: #fff176;
+  color: #ff8f00;
+}
+
+.btn-eliminar {
+  background: #ffebee;
+  color: #d32f2f;
+  border: none;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.05rem;
+  transition: background 0.2s, color 0.2s;
+  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.08);
+}
+.btn-eliminar:hover {
+  background: #ffcdd2;
+  color: #b71c1c;
+}
+
+/* Tarjetas del dashboard */
+.admin-card {
+  display: block;
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.7rem 1.3rem;
+  min-width: 220px;
+  box-shadow: 0 2px 12px rgba(8, 60, 93, 0.10);
+  text-decoration: none;
+  color: #083c5d;
+  transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+.admin-card:hover {
+  box-shadow: 0 6px 24px rgba(25, 118, 210, 0.13);
+  transform: translateY(-6px) scale(1.04);
+  background: #e3f2fd;
+}
+.admin-card h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3rem;
+  color: #1976d2;
+  font-weight: 700;
+}
+.admin-card p {
+  margin: 0;
+  color: #083c5d;
+  font-size: 1rem;
+  opacity: 0.85;
+}
+
+/* Modal estilos */
+.modal-bg {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(8, 60, 93, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.modal-crear {
+  background: #fff;
+  box-shadow: 0 8px 32px rgba(25, 118, 210, 0.18);
+  padding: 2.2rem 2.5rem 1.5rem 2.5rem;
+  min-width: 440px;
+  max-width: 98vw;
+  max-height: 90vh;           
+  overflow-y: auto;           
+  animation: fadeIn 0.3s;
+}
+.modal-crear h2 {
+  margin-top: 0;
+  color: #1976d2;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+.modal-field {
+  margin-bottom: 1.1rem;
+  display: flex;
+  flex-direction: column;
+}
+.modal-field label {
+  font-weight: 600;
+  color: #083c5d;
+  margin-bottom: 0.3rem;
+}
+.modal-field input,
+.modal-field select {
+  padding: 0.55rem 0.8rem;
+  border-radius: 7px;
+  border: 1px solid #e3f2fd;
+  font-size: 1rem;
+  background: #f8fafc;
+  color: #083c5d;
+  outline: none;
+  transition: border 0.2s;
+}
+.modal-field input:focus,
+.modal-field select:focus {
+  border: 1.5px solid #1976d2;
+  background: #fff;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+.btn-cancelar {
+  background: #e3f2fd;
+  color: #1976d2;
+  border: none;
+  padding: 0.6rem 1.3rem;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-cancelar:hover {
+  background: #bbdefb;
+  color: #0a4c7a;
+}
+
+/* Responsive mejoras */
+@media (max-width: 1100px) {
+  .tabla-admin {
+    margin-left: 0;
+    padding: 1.2rem 0.5rem;
+  }
+  .sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    width: 240px;
+    height: 100vh;
+    background: linear-gradient(180deg, #0097a7 0%, #083c5d 100%);
+    z-index: 2200;
+    transition: left 0.3s;
+    box-shadow: 2px 0 16px rgba(8, 60, 93, 0.18);
+  }
+  .sidebar.sidebar-open {
+    left: 0;
+  }
+}
+
+/* ...resto de tus estilos... */
+
+/* Scroll para tablas grandes en móvil */
+@media (max-width: 700px) {
+  table {
+    display: block;
+    overflow-x: auto;
+    width: 100%;
+  }
+}
+
+/* Animación modal */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98);}
+  to { opacity: 1; transform: scale(1);}
+}

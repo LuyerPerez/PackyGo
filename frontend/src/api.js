@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://192.168.0.5:5000/api'
+  baseURL: 'http://192.168.0.13:5000/api'
 })
 
 export default api
@@ -35,7 +35,6 @@ export async function Verify({ correo, code, tipo }) {
   localStorage.setItem("usuario", JSON.stringify(data));
   return data
 }
-
 
 export async function requestPasswordReset(correo) {
   const { data } = await api.post('/request-reset', { correo });
@@ -146,5 +145,35 @@ export async function calificarVehiculo({ autor_id, vehiculo_destino_id, reserva
 export function getImagenUrl(imagen_url) {
   if (!imagen_url) return null;
   const filename = imagen_url.split("/").pop();
-  return `http://192.168.0.5:5000/uploads/${filename}`;
+  return `http://192.168.0.13:5000/uploads/${filename}`;
+}
+
+export async function editarReserva(id, data) {
+  const res = await api.put(`/reservas/${id}`, data);
+  return res.data;
+}
+
+export async function eliminarReserva(id) {
+  const res = await api.delete(`/reservas/${id}`);
+  return res.data;
+}
+
+export async function crearReporte(data) {
+  const res = await api.post("/reportes", data);
+  return res.data;
+}
+
+export async function obtenerReportes() {
+  const res = await api.get("/reportes");
+  return res.data.reportes;
+}
+
+export async function editarReporte(id, data) {
+  const res = await api.put(`/reportes/${id}`, data);
+  return res.data;
+}
+
+export async function eliminarReporte(id) {
+  const res = await api.delete(`/reportes/${id}`);
+  return res.data;
 }

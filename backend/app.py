@@ -1,4 +1,4 @@
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, send_from_directory, jsonify
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
 from db import get_connection
@@ -349,6 +349,7 @@ def listar_vehiculos():
 
 @app.route("/api/vehiculos/<int:vehiculo_id>", methods=["PUT"])
 def editar_vehiculo(vehiculo_id):
+    camionero_id = request.form.get("camionero_id")
     tipo_vehiculo = request.form.get("tipo_vehiculo")
     placa = request.form.get("placa")
     modelo = request.form.get("modelo")
@@ -360,9 +361,9 @@ def editar_vehiculo(vehiculo_id):
     if imagen:
         filename = secure_filename(imagen.filename)
         imagen.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        imagen_url = f"../../backend/uploads/{filename}"  # <-- Cambia aquí
+        imagen_url = f"/uploads/{filename}"
 
-    if not all([tipo_vehiculo, placa, modelo, ano_modelo, tarifa_diaria]):
+    if not all([camionero_id, tipo_vehiculo, placa, modelo, ano_modelo, tarifa_diaria]):
         return {"error": "Todos los campos son obligatorios."}, 400
 
     conn = get_connection()
@@ -371,18 +372,18 @@ def editar_vehiculo(vehiculo_id):
         if imagen_url:
             cursor.execute(
                 """
-                UPDATE vehiculo SET tipo_vehiculo=%s, placa=%s, modelo=%s, ano_modelo=%s, imagen_url=%s, tarifa_diaria=%s
+                UPDATE vehiculo SET camionero_id=%s, tipo_vehiculo=%s, placa=%s, modelo=%s, ano_modelo=%s, imagen_url=%s, tarifa_diaria=%s
                 WHERE id=%s
                 """,
-                (tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria, vehiculo_id)
+                (camionero_id, tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria, vehiculo_id)
             )
         else:
             cursor.execute(
                 """
-                UPDATE vehiculo SET tipo_vehiculo=%s, placa=%s, modelo=%s, ano_modelo=%s, tarifa_diaria=%s
+                UPDATE vehiculo SET camionero_id=%s, tipo_vehiculo=%s, placa=%s, modelo=%s, ano_modelo=%s, tarifa_diaria=%s
                 WHERE id=%s
                 """,
-                (tipo_vehiculo, placa, modelo, ano_modelo, tarifa_diaria, vehiculo_id)
+                (camionero_id, tipo_vehiculo, placa, modelo, ano_modelo, tarifa_diaria, vehiculo_id)
             )
         conn.commit()
         return {"message": "Vehículo actualizado correctamente."}, 200
@@ -443,7 +444,6 @@ def crear_reserva():
         """, (cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino))
         conn.commit()
 
-        # Obtener datos del conductor y cliente
         cursor.execute("""
             SELECT u.nombre, u.correo FROM usuario u
             JOIN vehiculo v ON v.camionero_id = u.id
@@ -530,6 +530,34 @@ def listar_reservas():
     cursor.close()
     conn.close()
     return {"reservas": lista}
+
+@app.route("/api/reservas-todas", methods=["GET"])
+def listar_todas_reservas():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT id, cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva
+        FROM reserva
+        ORDER BY fecha_inicio DESC
+        """
+    )
+    reservas = cursor.fetchall()
+    lista = []
+    for r in reservas:
+        lista.append({
+            "id": r[0],
+            "cliente_id": r[1],
+            "vehiculo_id": r[2],
+            "fecha_inicio": r[3].isoformat() if hasattr(r[3], "isoformat") else str(r[3]),
+            "fecha_fin": r[4].isoformat() if hasattr(r[4], "isoformat") else str(r[4]),
+            "direccion_inicio": r[5],
+            "direccion_destino": r[6],
+            "estado_reserva": r[7]
+        })
+    cursor.close()
+    conn.close()
+    return {"reservas": lista}, 200
 
 @app.route("/api/reservas/<int:reserva_id>/cancelar", methods=["PUT"])
 def cancelar_reserva(reserva_id):
@@ -637,7 +665,6 @@ def pedidos_camionero(camionero_id):
                 "correo": row[15],
                 "telefono": row[16]
             }
-            # Calificación promedio del cliente
             cursor.execute(
                 "SELECT AVG(estrellas) FROM calificacion_usuario WHERE usuario_destino_id=%s", (row[1],)
             )
@@ -724,6 +751,335 @@ def calificar_vehiculo():
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+@app.route("/api/usuarios", methods=["GET"])
+def listar_usuarios():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, nombre, noDocumento, correo, telefono, rol FROM usuario")
+    usuarios = cursor.fetchall()
+    lista = []
+    for u in usuarios:
+        lista.append({
+            "id": u[0],
+            "nombre": u[1],
+            "noDocumento": u[2],
+            "correo": u[3],
+            "telefono": u[4],
+            "rol": u[5]
+        })
+    cursor.close()
+    conn.close()
+    return jsonify(usuarios=lista), 200
+
+@app.route("/api/usuarios", methods=["POST"])
+def crear_usuario():
+    data = request.json
+    nombre = data.get("nombre")
+    correo = data.get("correo")
+    rol = data.get("rol")
+    if not all([nombre, correo, rol]):
+        return {"error": "Faltan datos"}, 400
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "INSERT INTO usuario (nombre, correo, rol, contrasena) VALUES (%s, %s, %s, %s)",
+            (nombre, correo, rol, generate_password_hash("123456"))
+        )
+        conn.commit()
+        return {"message": "Usuario creado"}, 201
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 400
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/usuarios/<int:usuario_id>", methods=["PUT"])
+def editar_usuario(usuario_id):
+    data = request.json
+    nombre = data.get("nombre")
+    correo = data.get("correo")
+    noDocumento = data.get("noDocumento")
+    telefono = data.get("telefono")
+    rol = data.get("rol")
+    if not all([nombre, correo, noDocumento, telefono, rol]):
+        return {"error": "Faltan datos"}, 400
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "UPDATE usuario SET nombre=%s, correo=%s, noDocumento=%s, telefono=%s, rol=%s WHERE id=%s",
+            (nombre, correo, noDocumento, telefono, rol, usuario_id)
+        )
+        conn.commit()
+        return {"message": "Usuario actualizado"}, 200
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 400
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/usuarios/<int:usuario_id>", methods=["DELETE"])
+def eliminar_usuario(usuario_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM usuario WHERE id=%s", (usuario_id,))
+        conn.commit()
+        return {"message": "Usuario eliminado"}, 200
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 400
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/usuarios-detallado", methods=["GET"])
+def usuarios_detallado():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT u.id, u.nombre, u.noDocumento, u.correo, u.telefono, u.rol,
+            COUNT(DISTINCT v.id) as vehiculos,
+            COUNT(DISTINCT r.id) as reservas
+        FROM usuario u
+        LEFT JOIN vehiculo v ON v.camionero_id = u.id
+        LEFT JOIN reserva r ON r.cliente_id = u.id
+        GROUP BY u.id
+    """)
+    usuarios = cursor.fetchall()
+    lista = []
+    for u in usuarios:
+        lista.append({
+            "id": u[0],
+            "nombre": u[1],
+            "noDocumento": u[2],
+            "correo": u[3],
+            "telefono": u[4],
+            "rol": u[5],
+            "vehiculos": u[6],
+            "reservas": u[7]
+        })
+    cursor.close()
+    conn.close()
+    return {"usuarios": lista}, 200
+
+@app.route("/api/reservas/<int:reserva_id>", methods=["PUT"])
+def editar_reserva(reserva_id):
+    data = request.json
+    cliente_id = data.get("cliente_id")
+    vehiculo_id = data.get("vehiculo_id")
+    fecha_inicio = data.get("fecha_inicio")
+    fecha_fin = data.get("fecha_fin")
+    direccion_inicio = data.get("direccion_inicio")
+    direccion_destino = data.get("direccion_destino")
+    estado_reserva = data.get("estado_reserva")
+    if not all([cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva]):
+        return {"error": "Todos los campos son obligatorios."}, 400
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            UPDATE reserva SET cliente_id=%s, vehiculo_id=%s, fecha_inicio=%s, fecha_fin=%s,
+            direccion_inicio=%s, direccion_destino=%s, estado_reserva=%s
+            WHERE id=%s
+        """, (cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva, reserva_id))
+        conn.commit()
+        return {"message": "Reserva actualizada correctamente."}, 200
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/reservas/<int:reserva_id>", methods=["DELETE"])
+def eliminar_reserva(reserva_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM reserva WHERE id=%s", (reserva_id,))
+        conn.commit()
+        return {"message": "Reserva eliminada correctamente."}, 200
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/reportes", methods=["POST"])
+def crear_reporte():
+    data = request.json
+    reserva_id = data.get("reserva_id")
+    usuario_id = data.get("usuario_id")
+    descripcion = data.get("descripcion")
+    estado_reporte = data.get("estado_reporte", "abierto")
+    fecha_reporte = data.get("fecha_reporte", datetime.now())
+    if not all([reserva_id, usuario_id, descripcion]):
+        return {"error": "Todos los campos son obligatorios."}, 400
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            INSERT INTO reporte (reserva_id, usuario_id, descripcion, estado_reporte, fecha_reporte)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (reserva_id, usuario_id, descripcion, estado_reporte, fecha_reporte))
+        conn.commit()
+        return {"message": "Reporte creado correctamente."}, 201
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/reportes", methods=["GET"])
+def listar_reportes():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT r.id, r.reserva_id, r.usuario_id, u.nombre, r.descripcion, r.estado_reporte, r.fecha_reporte
+        FROM reporte r
+        JOIN usuario u ON r.usuario_id = u.id
+        ORDER BY r.fecha_reporte DESC
+    """)
+    reportes = cursor.fetchall()
+    lista = []
+    for rep in reportes:
+        lista.append({
+            "id": rep[0],
+            "reserva_id": rep[1],
+            "usuario_id": rep[2],
+            "usuario_nombre": rep[3],
+            "descripcion": rep[4],
+            "estado_reporte": rep[5],
+            "fecha_reporte": rep[6].isoformat() if hasattr(rep[6], "isoformat") else str(rep[6])
+        })
+    cursor.close()
+    conn.close()
+    return {"reportes": lista}, 200
+
+@app.route("/api/reportes/<int:reporte_id>", methods=["PUT"])
+def editar_reporte(reporte_id):
+    data = request.json
+    reserva_id = data.get("reserva_id")
+    usuario_id = data.get("usuario_id")
+    descripcion = data.get("descripcion")
+    estado_reporte = data.get("estado_reporte")
+    fecha_reporte = data.get("fecha_reporte")
+    if not all([reserva_id, usuario_id, descripcion, estado_reporte, fecha_reporte]):
+        return {"error": "Todos los campos son obligatorios."}, 400
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            UPDATE reporte SET reserva_id=%s, usuario_id=%s, descripcion=%s, estado_reporte=%s, fecha_reporte=%s
+            WHERE id=%s
+        """, (reserva_id, usuario_id, descripcion, estado_reporte, fecha_reporte, reporte_id))
+        conn.commit()
+        return {"message": "Reporte actualizado correctamente."}, 200
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/reportes/<int:reporte_id>", methods=["DELETE"])
+def eliminar_reporte(reporte_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM reporte WHERE id=%s", (reporte_id,))
+        conn.commit()
+        return {"message": "Reporte eliminado correctamente."}, 200
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/reportes-detallado", methods=["GET"])
+def reportes_detallado():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT r.id, r.descripcion, r.estado_reporte, r.fecha_reporte,
+               u.id, u.nombre, u.correo,
+               res.id, res.fecha_inicio, res.fecha_fin,
+               v.id, v.placa
+        FROM reporte r
+        JOIN usuario u ON r.usuario_id = u.id
+        JOIN reserva res ON r.reserva_id = res.id
+        JOIN vehiculo v ON res.vehiculo_id = v.id
+        ORDER BY r.fecha_reporte DESC
+    """)
+    reportes = cursor.fetchall()
+    lista = []
+    for rep in reportes:
+        lista.append({
+            "id": rep[0],
+            "descripcion": rep[1],
+            "estado_reporte": rep[2],
+            "fecha_reporte": rep[3].isoformat() if hasattr(rep[3], "isoformat") else str(rep[3]),
+            "usuario_id": rep[4],
+            "usuario_nombre": rep[5],
+            "usuario_correo": rep[6],
+            "reserva_id": rep[7],
+            "reserva_fecha_inicio": rep[8].isoformat() if hasattr(rep[8], "isoformat") else str(rep[8]),
+            "reserva_fecha_fin": rep[9].isoformat() if hasattr(rep[9], "isoformat") else str(rep[9]),
+            "vehiculo_id": rep[10],
+            "vehiculo_placa": rep[11]
+        })
+    cursor.close()
+    conn.close()
+    return {"reportes": lista}, 200
+
+@app.route("/api/reservas-detallado", methods=["GET"])
+def reservas_detallado():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT r.id, r.fecha_inicio, r.fecha_fin, r.direccion_inicio, r.direccion_destino, r.estado_reserva,
+               c.id, c.nombre, c.correo,
+               v.id, v.tipo_vehiculo, v.placa,
+               u.id, u.nombre
+        FROM reserva r
+        JOIN usuario c ON r.cliente_id = c.id
+        JOIN vehiculo v ON r.vehiculo_id = v.id
+        JOIN usuario u ON v.camionero_id = u.id
+        ORDER BY r.fecha_inicio DESC
+    """)
+    reservas = cursor.fetchall()
+    lista = []
+    for r in reservas:
+        lista.append({
+            "id": r[0],
+            "fecha_inicio": r[1].isoformat() if hasattr(r[1], "isoformat") else str(r[1]),
+            "fecha_fin": r[2].isoformat() if hasattr(r[2], "isoformat") else str(r[2]),
+            "direccion_inicio": r[3],
+            "direccion_destino": r[4],
+            "estado_reserva": r[5],
+            "cliente_id": r[6],
+            "cliente_nombre": r[7],
+            "cliente_correo": r[8],
+            "vehiculo_id": r[9],
+            "vehiculo_tipo": r[10],
+            "vehiculo_placa": r[11],
+            "camionero_id": r[12],
+            "camionero_nombre": r[13]
+        })
+    cursor.close()
+    conn.close()
+    return {"reservas": lista}, 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

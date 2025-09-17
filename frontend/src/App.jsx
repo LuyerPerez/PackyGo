@@ -17,6 +17,8 @@ import PoliticaPrivacidad from "./pages/PoliticaPrivacidad";
 import Reserva from "./pages/Reserva"; 
 import MisReservas from "./pages/MisReservas";
 import Pedidos from "./pages/Pedidos";
+import Administracion from "./pages/Administracion";
+import AdminCrud from "./pages/AdminCrud";
 
 const GOOGLE_CLIENT_ID = "710600040256-60ttnabd8kjbr1051o2giq3gubd0ab4g.apps.googleusercontent.com";
 const NAVBAR_HIDDEN_ROUTES = ["/login", "/register", "/recuperar-contrasena"];
@@ -53,6 +55,8 @@ export default function App() {
         <Route path="/reserva" element={<Reserva />} />
         <Route path="/mis-reservas" element={<MisReservas />} />
         <Route path="/pedidos" element={<Pedidos />} />
+        <Route path="/administracion" element={<Administracion />} />
+        <Route path="/admin/:tabla" element={<AdminCrud />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </GoogleOAuthProvider>
