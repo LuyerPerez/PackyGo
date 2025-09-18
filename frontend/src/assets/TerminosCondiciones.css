@@ -42,11 +42,11 @@
   font-weight: 500;
 }
 
-section {
+ .terminos-section {
   margin-bottom: 28px;
 }
 
-section h2 {
+ .terminos-section h2 {
   font-size: 1.35rem;
   color: #0a4c7a;
   margin-bottom: 10px;
@@ -57,12 +57,12 @@ section h2 {
   border-radius: 6px;
 }
 
-section ul {
+ .terminos-section ul {
   padding-left: 24px;
   margin-bottom: 0;
 }
 
-section li {
+ .terminos-section li {
   margin-bottom: 8px;
   line-height: 1.7;
 }
@@ -115,7 +115,7 @@ section li {
     font-size: 0.95rem;
     margin-bottom: 18px;
   }
-  section h2 {
+  .terminos-section h2 {
     font-size: 1rem;
     padding-left: 6px;
   }
