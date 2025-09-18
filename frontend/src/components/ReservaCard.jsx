@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { obtenerTodosLosVehiculos, cancelarReserva, obtenerCalificacionesVehiculoPorUsuario } from "../api";
+import { obtenerTodosLosVehiculos, cancelarReserva } from "../api";
 import { getImagenUrl } from "../api"; // o "../utils"
 import ModalCalificarVehiculo from "./ModalCalificarVehiculo"; // crea este componente abajo
 
-export default function ReservaCard({ reserva, onCancel, onCalificar }) {
+export default function ReservaCard({ reserva, onCancel, onCalificar, yaCalificadoProp }) {
   const [vehiculo, setVehiculo] = useState(null);
   const [cancelando, setCancelando] = useState(false);
-  const [yaCalifico, setYaCalifico] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
+  // Solo usar la prop yaCalificadoProp, el padre controla el estado
+  const yaCalifico = !!yaCalificadoProp;
+  const handleCalificadoLocal = () => {};
 
   useEffect(() => {
     let mounted = true;
@@ -15,20 +16,9 @@ export default function ReservaCard({ reserva, onCancel, onCalificar }) {
       const v = vehiculos.find(v => v.id === reserva.vehiculo_id);
       if (mounted) setVehiculo(v);
     });
-    // Verificar si ya calificó este vehículo en esta reserva
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    if (usuario && reserva.estado_reserva === "finalizada") {
-      obtenerCalificacionesVehiculoPorUsuario({
-        usuario_id: usuario.id,
-        vehiculo_id: reserva.vehiculo_id
-      }).then(calificaciones => {
-        // Si alguna calificación tiene el mismo reserva_id, ya calificó
-        const ya = calificaciones.some(c => c.reserva_id === reserva.id);
-        setYaCalifico(ya);
-      });
-    }
+    // Ya no consulta calificaciones, el padre lo controla
     return () => { mounted = false; };
-  }, [reserva.vehiculo_id, reserva.id, reserva.estado_reserva]);
+  }, [reserva.vehiculo_id, reserva.id, reserva.estado_reserva, yaCalificadoProp]);
 
   const handleCancelar = async () => {
     if (!window.confirm("¿Seguro que deseas cancelar esta reserva?")) return;
@@ -92,27 +82,26 @@ export default function ReservaCard({ reserva, onCancel, onCalificar }) {
               {cancelando ? "Cancelando..." : "Cancelar"}
             </button>
           )}
-          {/* Botón calificar solo si está finalizada y no ha calificado */}
-          {reserva.estado_reserva === "finalizada" && !yaCalifico && (
+          {/* Botón calificar solo si está finalizada y NO ha calificado (yaCalifico=false) */}
+          {reserva.estado_reserva === "finalizada" && !yaCalifico ? (
             <button
               className="reserva-card-calificar"
-              onClick={() => onCalificar(reserva)}
+              onClick={async () => {
+                if (onCalificar) {
+                  await onCalificar(reserva, handleCalificadoLocal);
+                }
+              }}
             >
               Calificar
             </button>
-          )}
+          ) : reserva.estado_reserva === "finalizada" && yaCalifico ? (
+            <span className="reserva-card-calificado" style={{color:'#ffb300', fontWeight:'bold', marginLeft:8}}>
+              ★ Calificado
+            </span>
+          ) : null}
         </div>
       </div>
-      <ModalCalificarVehiculo
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        vehiculo={vehiculo}
-        reserva={reserva}
-        onCalificado={() => {
-          setYaCalifico(true);
-          setModalOpen(false);
-        }}
-      />
+      {/* El modal se despliega desde MisReservas.jsx */}
     </div>
   );
 }

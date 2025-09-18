@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../assets/ReservaForm.css";
-import { crearReserva, obtenerReservasPorVehiculo, getImagenUrl } from "../api";
+import { obtenerReservasPorVehiculo, getImagenUrl, debugReserva } from "../api";
 import { useNavigate } from "react-router-dom";
 
 function addHours(date, h) {
@@ -45,6 +45,7 @@ export default function Reserva() {
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  // Eliminado debugInfo
 
   useEffect(() => {
     const v = localStorage.getItem("vehiculoSeleccionado");
@@ -54,7 +55,15 @@ export default function Reserva() {
       navigate("/explorar", { replace: true });
     }
     const u = localStorage.getItem("usuario");
-    if (u) setUsuario(JSON.parse(u));
+    if (u) {
+      const usuarioObj = JSON.parse(u);
+      setUsuario(usuarioObj);
+      console.log("Usuario cargado desde localStorage:", usuarioObj);
+      console.log("Valor de usuario.user.id:", usuarioObj?.user?.id);
+    } else {
+      setUsuario(null);
+      console.log("No hay usuario en localStorage");
+    }
   }, [navigate]);
 
   useEffect(() => {
@@ -150,6 +159,8 @@ export default function Reserva() {
       setMensajeTipo("error");
       return;
     }
+  console.log("Usuario en handleSubmit:", usuario);
+  console.log("Valor de usuario.user.id:", usuario?.user?.id);
     if (!fechaInicio || !fechaFin) {
       setMensaje("Debes seleccionar fecha y hora.");
       setMensajeTipo("error");
@@ -162,8 +173,8 @@ export default function Reserva() {
     }
     setLoading(true);
     try {
-      await crearReserva({
-        cliente_id: usuario.id,
+      await debugReserva({
+        cliente_id: usuario.user.id,
         vehiculo_id: vehiculo.id,
         fecha_inicio: fechaInicio,
         fecha_fin: fechaFin,
@@ -185,7 +196,6 @@ export default function Reserva() {
       setLoading(false);
     }
   };
-
   return (
     <div className="reserva-container" style={{ display: "flex", gap: "32px", justifyContent: "center", alignItems: "flex-start", padding: "32px 0" }}>
       <div className="reserva-form bloque-form" style={{
@@ -308,6 +318,7 @@ export default function Reserva() {
             {loading ? <span className="spinner"></span> : "Confirmar reserva"}
           </button>
         </form>
+        {/* Eliminado bloque de debugInfo */}
         <div className="aviso-finalizacion" style={{ fontSize: "13px", color: "#666", margin: "12px 0 0 0" }}>
           <b>Nota:</b> Al finalizar tu mudanza, podrás calificar al conductor y al vehículo. Recuerda avisarle al conductor finalizar la reserva.
         </div>

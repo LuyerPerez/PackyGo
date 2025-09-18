@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://10.90.41.208:5000/api'
+  baseURL: 'http://192.168.0.13:5000/api'
 })
 
 export default api
@@ -91,6 +91,11 @@ export async function crearReserva(data) {
   return res.data;
 }
 
+export async function debugReserva(data) {
+  const res = await api.post("/debug-reserva", data);
+  return res.data;
+}
+
 export async function obtenerReservasPorVehiculo(vehiculo_id) {
   const res = await api.get(`/reservas?vehiculo_id=${vehiculo_id}`);
   return res.data.reservas;
@@ -114,6 +119,11 @@ export async function obtenerPedidosCamionero(camionero_id) {
 export async function finalizarReserva(id) {
   const res = await api.put(`/reservas/${id}/finalizar`);
   return res.data;
+}
+
+export async function obtenerReservasPorUsuario(usuario_id) {
+  const res = await api.get(`/reservas-usuario/${usuario_id}`);
+  return res.data.reservas;
 }
 
 export async function calificarCliente({ usuario_destino_id, usuario_origen_id, estrellas, comentario }) {
@@ -146,9 +156,9 @@ export function getImagenUrl(imagen_url) {
   if (!imagen_url) return null;
   if (imagen_url.startsWith("http")) return imagen_url;
   if (imagen_url.startsWith("/uploads")) {
-    return `http://10.90.41.208:5000${imagen_url}`;
+    return `http://192.168.0.13:5000${imagen_url}`;
   }
-  return `http://10.90.41.208:5000/uploads/${imagen_url}`;
+  return `http://192.168.0.13:5000/uploads/${imagen_url}`;
 }
 
 export async function editarReserva(id, data) {

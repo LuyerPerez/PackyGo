@@ -3,7 +3,7 @@ import ReservaCard from "./ReservaCard";
 
 const RESERVAS_POR_PAGINA = 4;
 
-export default function ListaReservas({ reservas, onCalificar }) {
+export default function ListaReservas({ reservas, onCalificar, calificadas }) {
   const [pagina, setPagina] = useState(1);
 
   useEffect(() => {
@@ -16,11 +16,6 @@ export default function ListaReservas({ reservas, onCalificar }) {
     pagina * RESERVAS_POR_PAGINA
   );
 
-  // eslint-disable-next-line no-unused-vars
-  const handleCancel = id => {
-    // No modificar aquí, el padre debe actualizar la lista si es necesario
-  };
-
   return (
     <div>
       <div className="lista-reservas">
@@ -28,8 +23,9 @@ export default function ListaReservas({ reservas, onCalificar }) {
           <ReservaCard
             key={reserva.id}
             reserva={reserva}
-            onCancel={handleCancel}
-            onCalificar={onCalificar}
+            // onCancel eliminado porque no está definido ni usado aquí
+            onCalificar={(res, cbLocal) => onCalificar(res, cbLocal)}
+            yaCalificadoProp={calificadas && typeof calificadas === 'object' ? calificadas[reserva.id] : undefined}
           />
         ))}
       </div>

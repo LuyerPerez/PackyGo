@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { calificarVehiculo } from "../api";
 
-export default function ModalCalificarVehiculo({ open, onClose, vehiculo, reserva, onCalificado }) {
+export default function ModalCalificarVehiculo({ open, onClose, vehiculo, reserva, yaCalifico }) {
   const [estrellas, setEstrellas] = useState(5);
   const [comentario, setComentario] = useState("");
   const [loading, setLoading] = useState(false);
@@ -11,15 +11,19 @@ export default function ModalCalificarVehiculo({ open, onClose, vehiculo, reserv
   const handleSubmit = async () => {
     setLoading(true);
     const usuario = JSON.parse(localStorage.getItem("usuario"));
+    const idUsuario = usuario.id || (usuario.user && usuario.user.id);
     await calificarVehiculo({
-      autor_id: usuario.id,
+      autor_id: idUsuario,
       vehiculo_destino_id: vehiculo.id,
       reserva_id: reserva.id,
       estrellas,
       comentario
     });
     setLoading(false);
-    onCalificado && onCalificado();
+    setComentario("");
+    setEstrellas(5);
+  onClose();
+  window.location.reload();
   };
 
   return (
@@ -35,8 +39,8 @@ export default function ModalCalificarVehiculo({ open, onClose, vehiculo, reserv
             <span
               key={n}
               className={`star-chimba ${estrellas >= n ? "filled" : ""}`}
-              onClick={() => !loading && setEstrellas(n)}
-              style={{cursor: loading ? "not-allowed" : "pointer", fontSize: "2rem"}}
+              onClick={() => !loading && !yaCalifico && setEstrellas(n)}
+              style={{cursor: loading || yaCalifico ? "not-allowed" : "pointer", fontSize: "2rem"}}
               title={`${n} estrella${n>1?"s":""}`}
             >★</span>
           ))}
@@ -44,13 +48,13 @@ export default function ModalCalificarVehiculo({ open, onClose, vehiculo, reserv
         <textarea
           value={comentario}
           onChange={e => setComentario(e.target.value)}
-          disabled={loading}
+          disabled={loading || yaCalifico}
           placeholder="¿Qué te gustaría destacar del vehículo?"
           style={{ width: "100%", minHeight: 60, borderRadius: 8, border: "1.5px solid #b2ebf2", marginTop: 4, fontSize: "1rem", padding: 8, background: "#f7fcfc" }}
         />
         <div style={{ marginTop: 16, display: "flex", gap: 12, justifyContent: "center" }}>
-          <button onClick={handleSubmit} className="btn-finalizar" disabled={loading}>
-            Enviar calificación
+          <button onClick={handleSubmit} className="btn-finalizar" disabled={loading || yaCalifico}>
+            {yaCalifico ? "Ya calificaste" : "Enviar calificación"}
           </button>
           <button onClick={onClose} className="btn-cancelar" disabled={loading}>
             Cancelar

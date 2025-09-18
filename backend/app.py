@@ -188,7 +188,7 @@ def verify():
     elif tipo == "login":
         user = verif["user"]
         verification_codes.pop(correo)
-        return user, 200
+        return jsonify(user), 200
 
     return {"error": "Tipo de verificación inválido"}, 400
 
@@ -409,8 +409,8 @@ def eliminar_vehiculo(vehiculo_id):
         cursor.close()
         conn.close()
 
-@app.route("/api/reservas", methods=["POST"])
-def crear_reserva():
+@app.route("/api/debug-reserva", methods=["POST"])
+def debug_reserva():
     data = request.json
     cliente_id = data.get("cliente_id")
     vehiculo_id = data.get("vehiculo_id")
@@ -473,7 +473,49 @@ def crear_reserva():
                 "¡Gracias por usar PackyGo!"
             )
             enviarCorreoReserva(cliente[1], mensaje_cliente)
-        return {"message": "Reserva realizada y correos enviados."}, 201
+        return {"message": "Reserva realizada y correos enviados (debug)."}, 201
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/reservas", methods=["POST"])
+def crear_reserva():
+    data = request.json
+    cliente_id = data.get("cliente_id")
+    vehiculo_id = data.get("vehiculo_id")
+    fecha_inicio = data.get("fecha_inicio")
+    fecha_fin = data.get("fecha_fin")
+    direccion_inicio = data.get("direccion_inicio")
+    direccion_destino = data.get("direccion_destino")
+    if not all([cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino]):
+        return {"error": "Todos los campos son obligatorios."}, 400
+
+    fecha_inicio = redondear_hora(fecha_inicio)
+    fecha_fin = redondear_hora(fecha_fin)
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            SELECT COUNT(*) FROM reserva
+            WHERE vehiculo_id=%s AND (
+                (fecha_inicio <= %s AND fecha_fin >= %s) OR
+                (fecha_inicio <= %s AND fecha_fin >= %s) OR
+                (fecha_inicio >= %s AND fecha_fin <= %s)
+            ) AND estado_reserva='activa'
+        """, (vehiculo_id, fecha_inicio, fecha_inicio, fecha_fin, fecha_fin, fecha_inicio, fecha_fin))
+        if cursor.fetchone()[0] > 0:
+            return {"error": "El vehículo no está disponible en ese rango de fechas."}, 400
+
+        cursor.execute("""
+            INSERT INTO reserva (cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva)
+            VALUES (%s, %s, %s, %s, %s, %s, 'activa')
+        """, (cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino))
+        conn.commit()
+        return {"message": "Reserva realizada correctamente."}, 201
     except Exception as e:
         conn.rollback()
         return {"error": str(e)}, 500
@@ -529,7 +571,9 @@ def listar_reservas():
         })
     cursor.close()
     conn.close()
-    return {"reservas": lista}
+    return jsonify(reservas=lista), 200
+
+
 
 @app.route("/api/reservas-todas", methods=["GET"])
 def listar_todas_reservas():
@@ -681,6 +725,37 @@ def pedidos_camionero(camionero_id):
     finally:
         cursor.close()
         conn.close()
+
+# Endpoint para obtener reservas por usuario
+@app.route("/api/reservas-usuario/<int:usuario_id>", methods=["GET"])
+def reservas_por_usuario(usuario_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT id, cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva
+        FROM reserva
+        WHERE cliente_id=%s
+        ORDER BY fecha_inicio DESC
+        """,
+        (usuario_id,)
+    )
+    reservas = cursor.fetchall()
+    lista = []
+    for r in reservas:
+        lista.append({
+            "id": r[0],
+            "cliente_id": r[1],
+            "vehiculo_id": r[2],
+            "fecha_inicio": r[3].isoformat() if hasattr(r[3], "isoformat") else str(r[3]),
+            "fecha_fin": r[4].isoformat() if hasattr(r[4], "isoformat") else str(r[4]),
+            "direccion_inicio": r[5],
+            "direccion_destino": r[6],
+            "estado_reserva": r[7]
+        })
+    cursor.close()
+    conn.close()
+    return jsonify(reservas=lista), 200
 
 @app.route("/api/calificar-cliente", methods=["POST"])
 def calificar_cliente():

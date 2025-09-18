@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { obtenerReservasPorCliente, obtenerTodosLosVehiculos } from "../api";
+import { obtenerReservasPorUsuario, obtenerTodosLosVehiculos } from "../api";
+import { obtenerCalificacionesVehiculoPorUsuario } from "../api";
 import ListaReservas from "../components/ListaReservas";
 import ModalCalificarVehiculo from "../components/ModalCalificarVehiculo";
 import "./../assets/MisReservas.css";
@@ -13,6 +14,7 @@ const opcionesFiltro = [
 
 export default function MisReservas() {
   const [reservas, setReservas] = useState([]);
+  const [calificadas, setCalificadas] = useState({}); // { reservaId: true }
   const [loading, setLoading] = useState(true);
   const [filtro, setFiltro] = useState("todas");
 
@@ -21,10 +23,42 @@ export default function MisReservas() {
   const [vehiculoAcalificar, setVehiculoAcalificar] = useState(null);
 
   useEffect(() => {
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    if (!usuario) return;
-    obtenerReservasPorCliente(usuario.id)
-      .then(setReservas)
+    // Soporta ambos formatos: 'usuario' y 'user'
+    let usuario = null;
+    const rawUsuario = localStorage.getItem("usuario");
+    const rawUser = localStorage.getItem("user");
+    if (rawUsuario) {
+      const parsed = JSON.parse(rawUsuario);
+      usuario = parsed.user ? parsed.user : parsed;
+    } else if (rawUser) {
+      usuario = JSON.parse(rawUser);
+    }
+    if (!usuario || !usuario.id) {
+      setLoading(false);
+      setReservas([]);
+      return;
+    }
+    obtenerReservasPorUsuario(usuario.id)
+      .then(async res => {
+        setReservas(res);
+        // Consultar calificaciones para reservas finalizadas
+        const usuarioId = usuario.id;
+        const promesas = res
+          .filter(r => r.estado_reserva === "finalizada")
+          .map(async r => {
+            const calificaciones = await obtenerCalificacionesVehiculoPorUsuario({ usuario_id: usuarioId, vehiculo_id: r.vehiculo_id });
+            const ya = Array.isArray(calificaciones) && calificaciones.some(c => c.reserva_id === r.id);
+            return { id: r.id, ya };
+          });
+        const resultados = await Promise.all(promesas);
+        const map = {};
+        resultados.forEach(({ id, ya }) => { map[id] = ya; });
+        setCalificadas(map);
+      })
+      .catch(err => {
+        console.error(err);
+        setReservas([]);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -33,21 +67,40 @@ export default function MisReservas() {
       ? reservas
       : reservas.filter(r => r.estado_reserva === filtro);
 
-  const handleAbrirModalCalificar = async (reserva) => {
+  const handleAbrirModalCalificar = async (reserva, callbackLocal) => {
     const vehiculos = await obtenerTodosLosVehiculos();
     const vehiculo = vehiculos.find(v => v.id === reserva.vehiculo_id);
     setReservaAcalificar(reserva);
     setVehiculoAcalificar(vehiculo);
     setModalOpen(true);
+    setCallbackLocal(() => callbackLocal);
   };
+
+  // Nuevo estado para guardar el callback local
+  const [callbackLocal, setCallbackLocal] = useState(null);
 
   const handleCalificado = () => {
     setModalOpen(false);
     setReservaAcalificar(null);
     setVehiculoAcalificar(null);
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    if (!usuario) return;
-    obtenerReservasPorCliente(usuario.id)
+    if (callbackLocal) {
+      callbackLocal(); // Actualiza el estado local de ReservaCard
+      setCallbackLocal(null);
+    }
+    let usuario = null;
+    const rawUsuario = localStorage.getItem("usuario");
+    const rawUser = localStorage.getItem("user");
+    if (rawUsuario) {
+      const parsed = JSON.parse(rawUsuario);
+      usuario = parsed.user ? parsed.user : parsed;
+    } else if (rawUser) {
+      usuario = JSON.parse(rawUser);
+    }
+    if (!usuario || !usuario.id) {
+      setReservas([]);
+      return;
+    }
+    obtenerReservasPorUsuario(usuario.id)
       .then(setReservas);
   };
 
@@ -73,6 +126,7 @@ export default function MisReservas() {
         <ListaReservas
           reservas={reservasFiltradas}
           onCalificar={handleAbrirModalCalificar}
+          calificadas={calificadas}
         />
       )}
       <ModalCalificarVehiculo
