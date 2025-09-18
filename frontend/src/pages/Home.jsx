@@ -18,7 +18,7 @@ export default function Home() {
           nombre: c.nombre || c.tipo_vehiculo || "Camión",
           imagen: c.imagen_url || "public/plataforma.jpg",
           tipo: c.tipo_vehiculo,
-          precio: c.tarifa_diaria ? `$${c.tarifa_diaria}/h` : "$--/h",
+          precio: c.tarifa_diaria ? `${Number(c.tarifa_diaria).toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}` : "$--",
           precioAnt: null,
           destacado: c.destacado || false,
           calificacion: c.calificacion ?? null,
@@ -172,7 +172,7 @@ export default function Home() {
                     <h3>{camion.nombre}</h3>
                     <p className="price">{camion.precio} {camion.precioAnt && <span>{camion.precioAnt}</span>}</p>
                     <p style={{fontSize: '0.95rem', color: '#555'}}>Reservas: <b>{reservasPorCamion[camion.id] || 0}</b></p>
-                    <button className="btn-info">Más información</button>
+                    <button className="btn-info" onClick={() => window.location.href = `/explorar`}>Más información</button>
                   </div>
                 </div>
               );
@@ -229,8 +229,8 @@ export default function Home() {
             <div className="contact-info">
               <p className="title-footer">Información de Contacto</p>
               <ul>
-                <li>Teléfono: 123-456-789</li>
-                <li>Email: info@packygo.com</li>
+                <li>Teléfono: 321-942-3757</li>
+                <li>Email: packygonotificaciones@gmail.com</li>
                 <li>Dirección: Bogotá, Colombia</li>
               </ul>
               <div className="social-icons">
@@ -244,19 +244,16 @@ export default function Home() {
             <div className="information">
               <p className="title-footer">Información</p>
               <ul>
-                <li><a href="#">Política de Privacidad</a></li>
-                <li><a href="#">Términos y Condiciones</a></li>
-                <li><a href="#">Preguntas Frecuentes</a></li>
-                <li><a href="#">Blog</a></li>
+                <li><a href="/privacidad">Política de Privacidad</a></li>
+                <li><a href="/terminos">Términos y Condiciones</a></li>
               </ul>
             </div>
             <div className="my-account">
               <p className="title-footer">Mi cuenta</p>
               <ul>
-                <li><a href="#">Iniciar sesión</a></li>
-                <li><a href="#">Registrarse</a></li>
-                <li><a href="#">Mis reservas</a></li>
-                <li><a href="#">Reportar incidencia</a></li>
+                <li><a href="/login">Iniciar sesión</a></li>
+                <li><a href="/register">Registrarse</a></li>
+                <li><a href="/mis-reservas">Mis reservas</a></li>
               </ul>
             </div>
             <div className="form-footer">
