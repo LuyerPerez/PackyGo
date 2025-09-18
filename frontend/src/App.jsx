@@ -19,6 +19,8 @@ import MisReservas from "./pages/MisReservas";
 import Pedidos from "./pages/Pedidos";
 import Administracion from "./pages/Administracion";
 import AdminCrud from "./pages/AdminCrud";
+import HomePrincipal from "./pages/HomePrincipal";
+import HomeCamionero from "./pages/HomeCamionero";
 
 const GOOGLE_CLIENT_ID = "710600040256-60ttnabd8kjbr1051o2giq3gubd0ab4g.apps.googleusercontent.com";
 const NAVBAR_HIDDEN_ROUTES = ["/login", "/register", "/recuperar-contrasena"];
@@ -44,6 +46,8 @@ export default function App() {
       {showNavBar && <NavBar />}
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/HomePrincipal" element={<HomePrincipal />} />
+        <Route path="/HomeCamionero" element={<HomeCamionero />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<RegisterPage />} />

@@ -54,7 +54,7 @@ export default function Reserva() {
     } else {
       navigate("/explorar", { replace: true });
     }
-    const u = localStorage.getItem("usuario");
+    const u = localStorage.getItem("user");
     if (u) {
       const usuarioObj = JSON.parse(u);
       setUsuario(usuarioObj);
@@ -159,8 +159,8 @@ export default function Reserva() {
       setMensajeTipo("error");
       return;
     }
-  console.log("Usuario en handleSubmit:", usuario);
-  console.log("Valor de usuario.user.id:", usuario?.user?.id);
+    // Si usuario tiene .user, usar ese objeto, si no, usar usuario directamente
+    const usuarioId = usuario.user?.id || usuario.id;
     if (!fechaInicio || !fechaFin) {
       setMensaje("Debes seleccionar fecha y hora.");
       setMensajeTipo("error");
@@ -174,7 +174,7 @@ export default function Reserva() {
     setLoading(true);
     try {
       await debugReserva({
-        cliente_id: usuario.user.id,
+        cliente_id: usuarioId,
         vehiculo_id: vehiculo.id,
         fecha_inicio: fechaInicio,
         fecha_fin: fechaFin,

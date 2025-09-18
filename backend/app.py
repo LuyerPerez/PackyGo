@@ -726,7 +726,36 @@ def pedidos_camionero(camionero_id):
         cursor.close()
         conn.close()
 
-# Endpoint para obtener reservas por usuario
+@app.route("/api/reservas-vehiculo-todas/<int:vehiculo_id>", methods=["GET"])
+def reservas_vehiculo_todas(vehiculo_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT id, cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva
+        FROM reserva
+        WHERE vehiculo_id=%s
+        ORDER BY fecha_inicio DESC
+        """,
+        (vehiculo_id,)
+    )
+    reservas = cursor.fetchall()
+    lista = []
+    for r in reservas:
+        lista.append({
+            "id": r[0],
+            "cliente_id": r[1],
+            "vehiculo_id": r[2],
+            "fecha_inicio": r[3].isoformat() if hasattr(r[3], "isoformat") else str(r[3]),
+            "fecha_fin": r[4].isoformat() if hasattr(r[4], "isoformat") else str(r[4]),
+            "direccion_inicio": r[5],
+            "direccion_destino": r[6],
+            "estado_reserva": r[7]
+        })
+    cursor.close()
+    conn.close()
+    return jsonify(reservas=lista), 200
+
 @app.route("/api/reservas-usuario/<int:usuario_id>", methods=["GET"])
 def reservas_por_usuario(usuario_id):
     conn = get_connection()
@@ -796,6 +825,33 @@ def calificaciones_vehiculo():
     cursor.close()
     conn.close()
     return {"calificaciones": [{"id": c[0], "reserva_id": c[1]} for c in calificaciones]}, 200
+
+
+
+@app.route("/api/calificaciones-vehiculo-todas", methods=["GET"])
+def calificaciones_vehiculo_todas():
+    vehiculo_id = request.args.get("vehiculo_id")
+    conn = get_connection()
+    cursor = conn.cursor()
+    calificaciones = []
+    if vehiculo_id:
+        cursor.execute(
+            "SELECT id, reserva_id, autor_id, vehiculo_destino_id, estrellas, comentario FROM calificacion_vehiculo WHERE vehiculo_destino_id=%s",
+            (vehiculo_id,)
+        )
+        rows = cursor.fetchall()
+        for row in rows:
+            calificaciones.append({
+                "id": row[0],
+                "reserva_id": row[1],
+                "autor_id": row[2],
+                "vehiculo_destino_id": row[3],
+                "estrellas": row[4],
+                "comentario": row[5]
+            })
+    cursor.close()
+    conn.close()
+    return {"calificaciones": calificaciones}, 200
 
 @app.route("/api/calificar-vehiculo", methods=["POST"])
 def calificar_vehiculo():

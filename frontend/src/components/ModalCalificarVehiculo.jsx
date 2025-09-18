@@ -10,8 +10,8 @@ export default function ModalCalificarVehiculo({ open, onClose, vehiculo, reserv
 
   const handleSubmit = async () => {
     setLoading(true);
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    const idUsuario = usuario.id || (usuario.user && usuario.user.id);
+    const usuario = JSON.parse(localStorage.getItem("user"));
+    const idUsuario = usuario.user?.id || usuario.id;
     await calificarVehiculo({
       autor_id: idUsuario,
       vehiculo_destino_id: vehiculo.id,

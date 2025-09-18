@@ -10,8 +10,9 @@ export async function Login(correo, contrasena) {
   const { data } = await api.post('/login', {
     correo,
     contrasena
-  })
-  return data
+  });
+  localStorage.setItem("user", JSON.stringify(data));
+  return data;
 }
 
 export async function Register({ nombre, noDocumento, correo, telefono, contrasena, rol }) {
@@ -32,7 +33,7 @@ export async function Verify({ correo, code, tipo }) {
     code,
     tipo
   })
-  localStorage.setItem("usuario", JSON.stringify(data));
+  localStorage.setItem("user", JSON.stringify(data));
   return data
 }
 
@@ -189,4 +190,14 @@ export async function editarReporte(id, data) {
 export async function eliminarReporte(id) {
   const res = await api.delete(`/reportes/${id}`);
   return res.data;
+}
+
+export async function obtenerCalificacionesPorVehiculo(vehiculo_id) {
+  const res = await api.get(`/calificaciones-vehiculo-todas?vehiculo_id=${vehiculo_id}`);
+  return res.data.calificaciones;
+}
+
+export async function obtenerTodasReservasPorVehiculo(vehiculo_id) {
+  const res = await api.get(`/reservas-vehiculo-todas/${vehiculo_id}`);
+  return res.data.reservas;
 }
