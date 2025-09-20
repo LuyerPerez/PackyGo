@@ -110,54 +110,69 @@ export default function RegisterForm() {
 
               <form onSubmit={handleSubmit} className="login-form">
                 <div className="input-group">
-                  <FontAwesomeIcon icon={faUser} />
-                  <input
-                    type="text"
-                    placeholder="Nombre"
-                    value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
-                    required
-                  />
+                  <FontAwesomeIcon icon={faUser} className="icon" />
+                  <div className="input-wrapper">
+                    <input
+                      type="text"
+                      value={nombre}
+                      onChange={(e) => setNombre(e.target.value)}
+                      required
+                      placeholder=" "
+                    />
+                    <label className="input-label">Nombre</label>
+                  </div>
                 </div>
                 <div className="input-group">
-                  <FontAwesomeIcon icon={faIdCard} />
-                  <input
-                    type="text"
-                    placeholder="No. Documento"
-                    value={noDocumento}
-                    onChange={(e) => setNoDocumento(e.target.value)}
-                    required
-                  />
+                  <FontAwesomeIcon icon={faIdCard} className="icon" />
+                  <div className="input-wrapper">
+                    <input
+                      type="text"
+                      value={noDocumento}
+                      onChange={(e) => setNoDocumento(e.target.value)}
+                      required
+                      placeholder=" "
+                    />
+                    <label className="input-label">No. Documento</label>
+                  </div>
                 </div>
                 <div className="input-group">
-                  <FontAwesomeIcon icon={faEnvelope} />
-                  <input
-                    type="email"
-                    placeholder="Correo Electrónico"
-                    value={correo}
-                    onChange={(e) => setCorreo(e.target.value)}
-                    required
-                  />
+                  <FontAwesomeIcon icon={faEnvelope} className="icon" />
+                  <div className="input-wrapper">
+                    <input
+                      type="email"
+                      value={correo}
+                      onChange={(e) => setCorreo(e.target.value)}
+                      required
+                      placeholder=" "
+                    />
+                    <label className="input-label">Correo Electrónico</label>
+                  </div>
                 </div>
                 <div className="input-group">
-                  <FontAwesomeIcon icon={faPhone} />
-                  <input
-                    type="text"
-                    placeholder="Teléfono"
-                    value={telefono}
-                    onChange={(e) => setTelefono(e.target.value)}
-                    required
-                  />
+                  <FontAwesomeIcon icon={faPhone} className="icon" />
+                  <div className="input-wrapper">
+                    <input
+                      type="text"
+                      value={telefono}
+                      onChange={(e) => setTelefono(e.target.value)}
+                      required
+                      placeholder=" "
+                    />
+                    <label className="input-label">Teléfono</label>
+                  </div>
                 </div>
                 <div className="input-group">
-                  <FontAwesomeIcon icon={faLock} />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Contraseña"
-                    value={contrasena}
-                    onChange={(e) => setContrasena(e.target.value)}
-                    required
-                  />
+                  <FontAwesomeIcon icon={faLock} className="icon" />
+                  <div className="input-wrapper">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={contrasena}
+                      onChange={(e) => setContrasena(e.target.value)}
+                      required
+                      placeholder=" "
+                    />
+                    <label className="input-label">Contraseña</label>
+                  </div>
                   <button
                     type="button"
                     style={{
@@ -172,25 +187,19 @@ export default function RegisterForm() {
                     <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                   </button>
                 </div>
-                {passwordError && <p className="error">{passwordError}</p>}
                 <div className="input-group">
-                  <FontAwesomeIcon icon={faUserShield} />
-                  <select
-                    value={rol}
-                    onChange={(e) => setRol(e.target.value)}
-                    required
-                    style={{
-                      border: "none",
-                      outline: "none",
-                      flex: 1,
-                      fontSize: "18px",
-                      color: "#333",
-                      background: "transparent"
-                    }}
-                  >
-                    <option value="cliente">Cliente</option>
-                    <option value="camionero">Camionero</option>
-                  </select>
+                  <FontAwesomeIcon icon={faUserShield} className="icon" />
+                  <div className="input-wrapper has-value">
+                    <select
+                      value={rol}
+                      onChange={(e) => setRol(e.target.value)}
+                      required
+                    >
+                      <option value="cliente">Cliente</option>
+                      <option value="camionero">Camionero</option>
+                    </select>
+                    <label className="input-label">Rol</label>
+                  </div>
                 </div>
                 <div className="terms-container">
                   <input
@@ -210,9 +219,10 @@ export default function RegisterForm() {
               </form>
 
               <div className="extra-links">
-                <span>¿YA TIENES CUENTA?</span>
+                <span>¿Ya tienes cuenta?</span>
                 <Link to="/login">Iniciar Sesión</Link>
               </div>
+
               <p className="divider">o continuar con</p>
               <div className="social-login">
                 <GoogleLogin

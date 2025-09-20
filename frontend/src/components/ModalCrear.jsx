@@ -27,9 +27,18 @@ const ModalCrear = ({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setForm(initialData || {});
-    setFile(null);
-  }, [initialData, visible]);
+    if (initialData && Object.keys(initialData).length > 0) {
+      const formData = {};
+      columnas.forEach(col => {
+        if (col.formOnly !== false) {
+          formData[col.key] = initialData[col.key] || '';
+        }
+      });
+      setForm(formData);
+    } else {
+      setForm({});
+    }
+  }, [initialData, columnas]);
 
   const handleChange = (e, key) => {
     setForm({ ...form, [key]: e.target.value });

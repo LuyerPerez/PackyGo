@@ -111,14 +111,14 @@ export default function VerificationForm({ correo, tipo, onVerified, onCancel })
             />
           ))}
         </div>
-        <button type="submit" className="btn-verify" disabled={loading}>
-          {loading ? <span className="spinner"></span> : "Verificar"}
-        </button>
         <button type="button" className="btn-cancel" onClick={onCancel} disabled={loading}>
           Cancelar
         </button>
+        <span>  </span>
+        <button type="submit" className="btn-verify" disabled={loading}>
+          {loading ? <span className="spinner"></span> : "Verificar"}
+        </button>
         {error && <p className="error">{error}</p>}
-        {!error && success && <p style={{ color: "green", fontSize: "13px" }}>{success}</p>}
       </form>
       <p className="resend-text">
         ¿No recibiste el código?{" "}

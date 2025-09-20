@@ -1,6 +1,6 @@
 import "../assets/HomePrincipal.css";
 import { useState, useEffect } from "react";
-import { obtenerTodosLosVehiculos, getImagenUrl, obtenerReservasPorVehiculo } from "../api";
+import { obtenerTodosLosVehiculos, getImagenUrl, obtenerReservasPorVehiculo, crearReporte } from "../api";
 
 const FILTROS = ["Destacados", "Más recientes", "Mejor valorados"];
 
@@ -8,11 +8,34 @@ export default function Home() {
   const [filtro, setFiltro] = useState("Destacados");
   const [camiones, setCamiones] = useState([]);
   const [reservasPorCamion, setReservasPorCamion] = useState({});
+  const [todasReservasUsuario, setTodasReservasUsuario] = useState([]);
+  const [actualYear, setActualYear] = useState(new Date().getFullYear());
+  
+  const [reporteForm, setReporteForm] = useState({
+    reserva_id: '',
+    descripcion: ''
+  });
+  const [enviandoReporte, setEnviandoReporte] = useState(false);
+  const [mensajeReporte, setMensajeReporte] = useState("");
+
+  let user = null;
+  const rawUser = localStorage.getItem("user");
+  if (rawUser) {
+    try {
+      const parsed = JSON.parse(rawUser);
+      user = parsed.user ? parsed.user : parsed;
+    } catch (e) {
+      console.log(e);
+      user = null;
+    }
+  }
+  const usuario_id = user && user.id ? user.id : null;
 
   useEffect(() => {
     async function fetchCamionesYReservas() {
       try {
         const data = await obtenerTodosLosVehiculos();
+        
         const adaptados = data.map(c => ({
           id: c.id,
           nombre: c.nombre || c.tipo_vehiculo || "Camión",
@@ -39,22 +62,77 @@ export default function Home() {
         setReservasPorCamion({});
       }
     }
+
+    async function fetchReservasUsuario() {
+      if (!usuario_id) return;
+      
+      try {
+        const { obtenerReservasPorUsuario } = await import("../api");
+        const reservasUsuario = await obtenerReservasPorUsuario(usuario_id);
+        setTodasReservasUsuario(Array.isArray(reservasUsuario) ? reservasUsuario : []);
+      } catch (error) {
+        console.error("Error al obtener reservas del usuario:", error);
+        setTodasReservasUsuario([]);
+      }
+    }
+
     fetchCamionesYReservas();
-  }, []);
+    fetchReservasUsuario();
+  }, [usuario_id]);
+
+  const handleReporteSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!reporteForm.reserva_id || !reporteForm.descripcion.trim()) {
+      setMensajeReporte("Por favor completa todos los campos");
+      return;
+    }
+
+    if (!usuario_id) {
+      setMensajeReporte("Debes iniciar sesión para enviar un reporte");
+      return;
+    }
+
+    setEnviandoReporte(true);
+    setMensajeReporte("");
+
+    try {
+      await crearReporte({
+        reserva_id: parseInt(reporteForm.reserva_id),
+        usuario_id: usuario_id,
+        descripcion: reporteForm.descripcion.trim(),
+        estado_reporte: 'abierto'
+      });
+
+      setMensajeReporte("Reporte enviado exitosamente");
+      setReporteForm({ reserva_id: '', descripcion: '' });
+      
+      setTimeout(() => setMensajeReporte(""), 3000);
+    } catch (error) {
+      setMensajeReporte("Error al enviar el reporte: " + error.message);
+    } finally {
+      setEnviandoReporte(false);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setReporteForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   let camionesFiltrados = [];
   if (filtro === "Destacados") {
-    
     camionesFiltrados = [...camiones]
       .sort((a, b) => (reservasPorCamion[b.id] || 0) - (reservasPorCamion[a.id] || 0))
       .slice(0, 3);
   } else if (filtro === "Más recientes") {
-    
     camionesFiltrados = [...camiones]
       .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
       .slice(0, 3);
   } else if (filtro === "Mejor valorados") {
-    
     camionesFiltrados = [...camiones]
       .sort((a, b) => (b.calificacion ?? 0) - (a.calificacion ?? 0))
       .slice(0, 3);
@@ -222,61 +300,102 @@ export default function Home() {
           </div>
         </section>
       </main>
-      {/* Modal eliminada */}
+      
       <footer className="footer">
-        <div className="container container-footer">
-          <div className="menu-footer">
+        <div className="footer-container">
+          <div className="footer-column">
+            <h3>INFORMACIÓN DE CONTACTO</h3>
             <div className="contact-info">
-              <p className="title-footer">Información de Contacto</p>
-              <ul>
-                <li>Teléfono: 321-942-3757</li>
-                <li>Email: packygonotificaciones@gmail.com</li>
-                <li>Dirección: Bogotá, Colombia</li>
-              </ul>
-              <div className="social-icons">
-                <span className="facebook"><i className="fa-brands fa-facebook"></i></span>
-                <span className="twitter"><i className="fa-brands fa-twitter"></i></span>
-                <span className="youtube"><i className="fa-brands fa-youtube"></i></span>
-                <span className="pinterest"><i className="fa-brands fa-pinterest"></i></span>
-                <span className="instagram"><i className="fa-brands fa-instagram"></i></span>
+              <div className="contact-item">
+                <span>+57 321 94237557</span>
+              </div>
+              <div className="contact-item">
+                <span>packynotificaciones@gmail.com</span>
+              </div>
+              <div className="contact-item">
+                <span>Bogotá, Colombia</span>
               </div>
             </div>
-            <div className="information">
-              <p className="title-footer">Información</p>
-              <ul>
-                <li><a href="/privacidad">Política de Privacidad</a></li>
-                <li><a href="/terminos">Términos y Condiciones</a></li>
-              </ul>
-            </div>
-            <div className="my-account">
-              <p className="title-footer">Mi cuenta</p>
-              <ul>
-                <li><a href="/login">Iniciar sesión</a></li>
-                <li><a href="/register">Registrarse</a></li>
-                <li><a href="/mis-reservas">Mis reservas</a></li>
-              </ul>
-            </div>
-            <div className="form-footer">
-              <p className="title-footer">Reportar Incidencia</p>
-              <form>
-                <ul style={{listStyle: 'none', padding: 0, margin: 0}}>
-                  <li className="form-group">
-                    <label htmlFor="reserva_id">ID Reserva</label>
-                    <input type="number" id="reserva_id" name="reserva_id" required />
-                  </li>
-                  <li className="form-group">
-                    <label htmlFor="usuario_id">ID Usuario</label>
-                    <input type="number" id="usuario_id" name="usuario_id" required />
-                  </li>
-                  <li className="form-group">
-                    <label htmlFor="descripcion">Descripción</label>
-                    <textarea id="descripcion" name="descripcion" placeholder="Escribe tu incidencia..." required></textarea>
-                  </li>
-                  <li className="form-group">
-                    <button type="submit">Enviar</button>
-                  </li>
-                </ul>
-              </form>
+          </div>
+          <div className="footer-column">
+            <h3>INFORMACIÓN LEGAL</h3>
+            <ul>
+              <li><a href="/privacidad">Políticas de Privacidad</a></li>
+              <li><a href="/terminos">Términos y condiciones</a></li>
+            </ul>
+          </div>
+          <div className="footer-column">
+            <h3>MI CUENTA</h3>
+            <ul>
+              <li><a href="/perfil">Mi perfil</a></li>
+              <li><a href="/pedidos">Historial de reservas</a></li>
+              <li><a href="/mis-vehiculos">Mis vehículos</a></li>
+              <li><a href="/configuracion">Configuración</a></li>
+            </ul>
+          </div>
+          <div className="footer-column footer-formulario">
+            <h3>REPORTAR INCIDENCIA</h3>
+            <form className="incidencia-form" onSubmit={handleReporteSubmit}>
+              <div className="form-group">
+                <label htmlFor="reserva_id">Reserva a reportar:</label>
+                <select 
+                  id="reserva_id"
+                  name="reserva_id"
+                  value={reporteForm.reserva_id}
+                  onChange={handleInputChange}
+                  required
+                  disabled={!usuario_id || todasReservasUsuario.length === 0}
+                >
+                  <option value="">
+                    {!usuario_id 
+                      ? "Inicia sesión para reportar" 
+                      : todasReservasUsuario.length === 0 
+                        ? "No tienes reservas" 
+                        : "Selecciona una reserva"
+                    }
+                  </option>
+                  {todasReservasUsuario.map(reserva => (
+                    <option key={reserva.id} value={reserva.id}>
+                      Reserva #{reserva.id} - {new Date(reserva.fecha_inicio).toLocaleDateString()} 
+                      ({reserva.estado_reserva})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="descripcion">Descripción del problema:</label>
+                <textarea 
+                  id="descripcion"
+                  name="descripcion"
+                  value={reporteForm.descripcion}
+                  onChange={handleInputChange}
+                  placeholder="Describe la incidencia detalladamente..."
+                  required
+                  disabled={enviandoReporte || !usuario_id}
+                />
+              </div>
+              
+              {mensajeReporte && (
+                <div className={`mensaje-reporte ${mensajeReporte.includes('Error') ? 'error' : 'success'}`}>
+                  {mensajeReporte}
+                </div>
+              )}
+              
+              <button 
+                type="submit" 
+                disabled={enviandoReporte || !usuario_id || todasReservasUsuario.length === 0}
+                className="btn-reporte"
+              >
+                {enviandoReporte ? "Enviando..." : "Enviar Reporte"}
+              </button>
+            </form>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <div className="footer-container">
+            <div className="copyright">
+              <p>&copy; {actualYear} PackyGo. Todos los derechos reservados.</p>
             </div>
           </div>
         </div>

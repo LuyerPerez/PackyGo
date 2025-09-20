@@ -5,7 +5,7 @@ import ModalCalificarUsuario from "../components/ModalCalificarUsuario";
 import "../assets/Pedido.css";
 
 
-const PEDIDOS_POR_PAGINA = 10;
+const PEDIDOS_POR_PAGINA = 6;
 
 export default function Pedidos() {
   const [pedidos, setPedidos] = useState([]);
@@ -13,6 +13,7 @@ export default function Pedidos() {
 
   const [filtroEstado, setFiltroEstado] = useState("");
   const [filtroCliente, setFiltroCliente] = useState("");
+  const [filtroFechaInicio, setFiltroFechaInicio] = useState("");
   const [pagina, setPagina] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [pedidoAcalificar, setPedidoAcalificar] = useState(null);
@@ -31,14 +32,21 @@ export default function Pedidos() {
       .finally(() => setLoading(false));
   };
 
-  const pedidosFiltrados = pedidos.filter(
-    p =>
-      (filtroEstado === "" || p.reserva.estado_reserva === filtroEstado) &&
-      (filtroCliente === "" ||
-        p.cliente.nombre
-          .toLowerCase()
-          .includes(filtroCliente.toLowerCase()))
-  );
+  const pedidosFiltrados = pedidos.filter(p => {
+    const cumpleEstado = filtroEstado === "" || p.reserva.estado_reserva === filtroEstado;
+    const cumpleCliente = filtroCliente === "" || 
+      p.cliente.nombre.toLowerCase().includes(filtroCliente.toLowerCase());
+    
+    let cumpleFechaInicio = true;
+    
+    if (filtroFechaInicio) {
+      const fechaReserva = new Date(p.reserva.fecha_inicio);
+      const fechaFiltro = new Date(filtroFechaInicio);
+      cumpleFechaInicio = fechaReserva >= fechaFiltro;
+    }
+
+    return cumpleEstado && cumpleCliente && cumpleFechaInicio;
+  });
 
   const totalPaginas = Math.ceil(pedidosFiltrados.length / PEDIDOS_POR_PAGINA);
   const pedidosPagina = pedidosFiltrados.slice(
@@ -94,14 +102,20 @@ export default function Pedidos() {
     setLoading(false);
   };
 
-  if (loading) return (
+  const limpiarFiltros = () => {
+    setFiltroEstado("");
+    setFiltroCliente("");
+    setFiltroFechaInicio("");
+  };
+
+  const PedidosLoading = () => (
     <div className="pedidos-loading">
       <span className="pedidos-empty-icon" role="img" aria-label="Cargando">🚚</span>
       Cargando pedidos...
     </div>
   );
 
-  if (pedidos.length === 0) return (
+  const PedidosSinDatos = () => (
     <div className="pedidos-empty">
       <span className="pedidos-empty-icon" role="img" aria-label="Sin pedidos">📦</span>
       <div>No tienes reservas.</div>
@@ -111,52 +125,115 @@ export default function Pedidos() {
     </div>
   );
 
+  // Función para cambiar página
+  const cambiarPagina = (nuevaPagina) => {
+    if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
+      setPagina(nuevaPagina);
+      // Scroll suave hacia arriba al cambiar página
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Generar números de página visibles
+  const generarPaginasVisibles = () => {
+    const paginas = [];
+    const maxPaginasVisibles = 5;
+    
+    if (totalPaginas <= maxPaginasVisibles) {
+      // Mostrar todas las páginas si son pocas
+      for (let i = 1; i <= totalPaginas; i++) {
+        paginas.push(i);
+      }
+    } else {
+      // Lógica para mostrar páginas con puntos suspensivos
+      if (pagina <= 3) {
+        // Mostrar: 1 2 3 4 ... última
+        for (let i = 1; i <= 4; i++) {
+          paginas.push(i);
+        }
+        if (totalPaginas > 4) {
+          paginas.push('...');
+          paginas.push(totalPaginas);
+        }
+      } else if (pagina >= totalPaginas - 2) {
+        // Mostrar: 1 ... antepenúltima penúltima última
+        paginas.push(1);
+        if (totalPaginas > 4) {
+          paginas.push('...');
+        }
+        for (let i = totalPaginas - 3; i <= totalPaginas; i++) {
+          if (i > 1) paginas.push(i);
+        }
+      } else {
+        // Mostrar: 1 ... anterior actual siguiente ... última
+        paginas.push(1);
+        paginas.push('...');
+        for (let i = pagina - 1; i <= pagina + 1; i++) {
+          paginas.push(i);
+        }
+        paginas.push('...');
+        paginas.push(totalPaginas);
+      }
+    }
+    
+    return paginas;
+  };
+
+  if (loading) return <PedidosLoading />;
+
+  if (pedidos.length === 0) return <PedidosSinDatos />;
+
   return (
     <div className="pedidos-container">
       <h2 className="pedidos-title">Pedidos recibidos</h2>
-      <form
-        className="filtro-form"
-        style={{
-          marginBottom: 20,
-          display: "flex",
-          gap: 16,
-          alignItems: "center"
-        }}
-      >
+      
+      <div className="filtro-form">
         <label>
           Estado:
           <select
             value={filtroEstado}
             onChange={e => setFiltroEstado(e.target.value)}
           >
-            <option value="">Todos</option>
+            <option value="">Todos los estados</option>
             <option value="activa">Activa</option>
             <option value="cancelada">Cancelada</option>
             <option value="finalizada">Finalizada</option>
           </select>
         </label>
+        
         <label>
           Cliente:
           <input
             type="text"
-            placeholder="Buscar por nombre"
+            placeholder="Buscar por nombre del cliente"
             value={filtroCliente}
             onChange={e => setFiltroCliente(e.target.value)}
           />
         </label>
-      </form>
+        
+        <label>
+          Fecha desde:
+          <input
+            type="date"
+            value={filtroFechaInicio}
+            onChange={e => setFiltroFechaInicio(e.target.value)}
+          />
+        </label>
+        
+        <div className="filtro-acciones">
+          <button
+            type="button"
+            className="btn-filtro secondary"
+            onClick={limpiarFiltros}
+          >
+            Limpiar filtros
+          </button>
+        </div>
+      </div>
 
       <div className="pedidos-list">
         {pedidosPagina.length === 0 ? (
-          <div className="pedidos-empty">
-            <span className="pedidos-empty-icon" role="img" aria-label="Sin resultados">
-              
-            </span>
-            <div>No hay reservas que coincidan con el filtro.</div>
-            <div style={{fontSize: "1rem", color: "#1976d2", marginTop: 6}}>
-              Prueba cambiando el estado o el nombre del cliente.
-            </div>
-          </div>
+          <PedidosSinDatos />
         ) : (
           pedidosPagina.map(pedido => (
             <CardPedido
@@ -168,21 +245,65 @@ export default function Pedidos() {
           ))
         )}
       </div>
-      <br />
+
+      {totalPaginas <= 1 && pedidosFiltrados.length > 0 && (
+        <div className="resultados-info-single">
+          Mostrando {pedidosFiltrados.length} reserva{pedidosFiltrados.length !== 1 ? 's' : ''}
+          {pedidosFiltrados.length !== pedidos.length && ` (filtradas de ${pedidos.length} total)`}
+        </div>
+      )}
+
+      {/* Paginación mejorada con información de resultados */}
       {totalPaginas > 1 && (
-        <div className="pagination">
-          {Array.from({ length: totalPaginas }, (_, i) => (
+        <div className="pagination-container">
+          <div className="pagination">
+            {/* Botón Anterior */}
             <button
-              key={i}
-              className={pagina === i + 1 ? "active" : ""}
-              onClick={e => {
-                e.preventDefault();
-                setPagina(i + 1);
-              }}
+              className="pagination-nav"
+              onClick={() => cambiarPagina(pagina - 1)}
+              disabled={pagina === 1}
+              title="Página anterior"
             >
-              {i + 1}
+              ‹
             </button>
-          ))}
+
+            {/* Números de página */}
+            {generarPaginasVisibles().map((numeroPagina, index) => (
+              <React.Fragment key={index}>
+                {numeroPagina === '...' ? (
+                  <span className="pagination-dots">...</span>
+                ) : (
+                  <button
+                    className={pagina === numeroPagina ? "active" : ""}
+                    onClick={() => cambiarPagina(numeroPagina)}
+                  >
+                    {numeroPagina}
+                  </button>
+                )}
+              </React.Fragment>
+            ))}
+
+            {/* Botón Siguiente */}
+            <button
+              className="pagination-nav"
+              onClick={() => cambiarPagina(pagina + 1)}
+              disabled={pagina === totalPaginas}
+              title="Página siguiente"
+            >
+              ›
+            </button>
+          </div>
+
+          {/* Información de resultados movida aquí */}
+          <div className="pagination-info-extended">
+            <div className="pagination-info">
+              Página {pagina} de {totalPaginas}
+            </div>
+            <div className="resultados-info-bottom">
+              Mostrando {pedidosPagina.length} de {pedidosFiltrados.length} reservas
+              {pedidosFiltrados.length !== pedidos.length && ` (filtradas de ${pedidos.length} total)`}
+            </div>
+          </div>
         </div>
       )}
 

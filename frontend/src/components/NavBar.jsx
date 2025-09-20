@@ -92,7 +92,7 @@ function NavBar() {
           ) : user && user.rol === "admin" ? (
             <Link to="/administracion" onClick={() => setMenuOpen(false)}>
               <FontAwesomeIcon icon={faUserLock} style={{ marginRight: "6px" }} />
-              Administracion
+              Administración
             </Link>
           ) : (
             <Link to="/explorar" onClick={() => setMenuOpen(false)}>
@@ -199,7 +199,7 @@ function NavBar() {
           <li>
             <Link to="/login" onClick={() => setMenuOpen(false)}>
               <FontAwesomeIcon icon={faUser} style={{ marginRight: "6px" }} />
-              Iniciar Sesion
+              Iniciar Sesión
             </Link>
           </li>
         )}

@@ -303,7 +303,7 @@ def listar_vehiculos():
     if camionero_id:
         cursor.execute(
             """
-            SELECT v.id, v.tipo_vehiculo, v.placa, v.modelo, v.ano_modelo, v.imagen_url, v.tarifa_diaria,
+            SELECT v.id, v.camionero_id, v.tipo_vehiculo, v.placa, v.modelo, v.ano_modelo, v.imagen_url, v.tarifa_diaria,
                    u.nombre, u.correo, u.telefono
             FROM vehiculo v
             JOIN usuario u ON v.camionero_id = u.id
@@ -314,7 +314,7 @@ def listar_vehiculos():
     else:
         cursor.execute(
             """
-            SELECT v.id, v.tipo_vehiculo, v.placa, v.modelo, v.ano_modelo, v.imagen_url, v.tarifa_diaria,
+            SELECT v.id, v.camionero_id, v.tipo_vehiculo, v.placa, v.modelo, v.ano_modelo, v.imagen_url, v.tarifa_diaria,
                    u.nombre, u.correo, u.telefono
             FROM vehiculo v
             JOIN usuario u ON v.camionero_id = u.id
@@ -330,17 +330,19 @@ def listar_vehiculos():
         calificacion = cursor.fetchone()[0]
         lista.append({
             "id": v[0],
-            "tipo_vehiculo": v[1],
-            "placa": v[2],
-            "modelo": v[3],
-            "ano_modelo": v[4],
-            "imagen_url": v[5],
-            "tarifa_diaria": float(v[6]),
+            "camionero_id": v[1],  # Incluir explícitamente el camionero_id
+            "tipo_vehiculo": v[2],
+            "placa": v[3],
+            "modelo": v[4],
+            "ano_modelo": v[5],
+            "imagen_url": v[6],
+            "tarifa_diaria": float(v[7]),
             "calificacion": calificacion,
             "conductor": {
-                "nombre": v[7],
-                "correo": v[8],
-                "telefono": v[9]
+                "id": v[1],  # También incluir el id en el objeto conductor
+                "nombre": v[8],
+                "correo": v[9],
+                "telefono": v[10]
             }
         })
     cursor.close()

@@ -7,6 +7,7 @@
   color: #222;
   display: flex;
   flex-direction: column;
+}
 
 .camionero-banner {
   background-image: linear-gradient(100deg, #000000, #050c1a00), url('../../public/banner-camionero.jpg');
@@ -16,11 +17,6 @@
   display: flex;     
   justify-content: flex-start;   
   align-items: center;      
-}
-
-.camionero-content-banner p {
-  font-size: 1.2rem;
-  margin-bottom: 0.5rem;
 }
 
 .camionero-content-banner {
@@ -35,12 +31,14 @@
   flex-direction: column;
   align-items: flex-start;
 }
+
 .camionero-content-banner p {
   font-size: 1.3rem;
   margin-bottom: 0.7rem;
   color: #fff;
   font-weight: 400;
 }
+
 .camionero-content-banner h2 {
   font-size: 2.3rem;
   font-weight: 700;
@@ -48,6 +46,7 @@
   color: #fff;
   line-height: 1.15;
 }
+
 .camionero-btn-registrar {
   border: none;
   border-radius: 25px;
@@ -56,7 +55,11 @@
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(30,144,255,0.15);
+  background: #fff;
+  color: #0086a8;
+  transition: all 0.2s;
 }
+
 .camionero-btn-registrar:hover {
   background: #1e90ff;
   color: #fff;
@@ -70,98 +73,396 @@
 }
 
 .camionero-dashboard {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
   justify-content: center;
-  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .camionero-card {
-  padding: 2rem 1.5rem 1.5rem 1.5rem;
   background: linear-gradient(120deg, #0086a8 0%, #0097b2 100%);
   color: #fff;
   border-radius: 22px;
   box-shadow: 0 6px 24px rgba(30,144,255,0.18);
   padding: 2.2rem 1.7rem 1.7rem 1.7rem;
-  min-width: 260px;
-  max-width: 350px;
-  flex: 1 1 260px;
-  margin-bottom: 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   transition: box-shadow 0.2s, transform 0.2s;
-  }
-  .camionero-card:hover {
-    box-shadow: 0 10px 32px rgba(30,144,255,0.22);
-    transform: translateY(-4px) scale(1.02);
-  }
-  .camionero-card h2 {
-    font-size: 1.35rem;
-    font-weight: 700;
-    margin-bottom: 0.7rem;
-    letter-spacing: 0.5px;
-  }
-  .camionero-stat {
-    font-size: 2.2rem;
-    font-weight: 700;
-    margin-bottom: 0.7rem;
-    color: #fff;
-    text-shadow: 0 2px 8px rgba(30,144,255,0.18);
-  }
-  .camionero-btn-detalle {
-    margin-top: 1.1rem;
-    background: #fff;
-    color: #2176d2;
-    border: none;
-    border-radius: 18px;
-    padding: 0.5rem 1.3rem;
-    font-size: 1rem;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(30,144,255,0.12);
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-    text-decoration: none;
-    display: inline-block;
-  }
-  .camionero-btn-detalle:hover {
-    background: #2176d2;
-    color: #fff;
-  }
-  .camionero-card-calificaciones .camionero-stat {
-    color: #ffe066;
-    text-shadow: 0 2px 8px rgba(255,224,102,0.18);
-  }
-  /* Lista de tarjetas dashboard */
-  .camionero-lista {
-    list-style: none;
-    padding: 0;
-    margin: 0.5rem 0 0 0;
-  }
-  .camionero-lista li {
-    background: rgba(255,255,255,0.13);
-    border-radius: 12px;
-    margin-bottom: 0.5rem;
-    padding: 0.6rem 1rem;
-    font-size: 1.01rem;
-    color: #f5f5f5;
-    box-shadow: 0 1px 6px rgba(30,144,255,0.08);
-    transition: background 0.2s;
-  }
-  .camionero-lista li:last-child {
-    margin-bottom: 0;
-  }
-  .camionero-card-calificaciones .camionero-lista li {
-    color: #ffe066;
-    background: rgba(255,224,102,0.13);
-  }
+  min-height: 280px;
+  position: relative;
+  overflow: hidden;
 }
 
+.camionero-card:hover {
+  box-shadow: 0 10px 32px rgba(30,144,255,0.22);
+  transform: translateY(-4px) scale(1.02);
+}
+
+.camionero-card h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.7rem;
+  letter-spacing: 0.5px;
+}
+
+.camionero-stat {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.7rem;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(30,144,255,0.18);
+}
+
+.camionero-btn-detalle {
+  margin-top: auto;
+  background: #fff;
+  color: #2176d2;
+  border: none;
+  border-radius: 18px;
+  padding: 0.5rem 1.3rem;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(30,144,255,0.12);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  text-decoration: none;
+  display: inline-block;
+  align-self: flex-start;
+}
+
+.camionero-btn-detalle:hover {
+  background: #2176d2;
+  color: #fff;
+}
+
+.camionero-card-calificaciones {
+  background: linear-gradient(120deg, #0086a8 0%, #0097b2 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.camionero-card-calificaciones::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.camionero-card-calificaciones .camionero-stat {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(30,144,255,0.18);
+}
+
+.camionero-promedio-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.camionero-promedio-izquierda {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.camionero-promedio-derecha {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  flex: 1;
+}
+
+.camionero-estrellas-promedio {
+  display: flex;
+  gap: 0.2rem;
+  font-size: 1.2rem;
+}
+
+.camionero-estrella {
+  display: inline-block;
+  transition: transform 0.2s ease;
+  font-size: 1.2rem;
+  position: relative;
+  width: 20px;
+  height: 20px;
+  margin-right: 0.1rem;
+}
+
+.camionero-estrella::before {
+  content: '★';
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #ffd700;
+  text-shadow: 0 1px 3px rgba(255, 215, 0, 0.5);
+}
+
+.camionero-estrella:not(.filled)::before {
+  color: #ddd;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.camionero-estrella.filled::before {
+  color: #ffd700;
+  text-shadow: 0 1px 3px rgba(255, 215, 0, 0.5);
+}
+
+.camionero-estrella:hover {
+  transform: scale(1.15);
+}
+
+.camionero-estrellas-promedio .camionero-estrella {
+  font-size: 1.4rem;
+  width: 24px;
+  height: 24px;
+}
+
+.camionero-estrellas-promedio .camionero-estrella::before {
+  font-size: 24px;
+}
+
+.camionero-estrellas-item .camionero-estrella {
+  font-size: 1rem;
+  width: 16px;
+  height: 16px;
+}
+
+.camionero-estrellas-item .camionero-estrella::before {
+  font-size: 16px;
+}
+
+.camionero-icon-calificacion {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.6;
+}
+
+.camionero-icon-calificacion::before {
+  content: '★';
+  color: #ffd700;
+  text-shadow: 0 2px 6px rgba(255, 215, 0, 0.4);
+}
+
+.camionero-promedio-texto {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  color: #fff;
+}
+
+.camionero-lista-calificaciones {
+  max-height: 140px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  width: 100%;
+  flex-grow: 1;
+}
+
+.camionero-lista-calificaciones::-webkit-scrollbar {
+  width: 6px;
+}
+
+.camionero-lista-calificaciones::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  margin: 4px 0;
+}
+
+.camionero-lista-calificaciones::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.6) 100%);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+  transition: background 0.2s;
+}
+
+.camionero-lista-calificaciones::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.8) 100%);
+  box-shadow: 0 2px 8px rgba(255,255,255,0.2);
+}
+
+.camionero-lista-calificaciones::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,1) 100%);
+}
+
+.camionero-lista-calificaciones::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Scroll personalizado para Firefox */
+.camionero-lista-calificaciones {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.5) rgba(255,255,255,0.1);
+}
+
+.camionero-item-calificacion {
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  margin-bottom: 0.8rem;
+  padding: 0.8rem 1rem;
+  border-left: 3px solid #ffd700;
+  transition: all 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.camionero-item-calificacion:hover {
+  background: rgba(255,255,255,0.15);
+  transform: translateX(5px);
+}
+
+.camionero-cliente-nombre {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+.camionero-comentario {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  font-style: italic;
+  margin-bottom: 0.4rem;
+  opacity: 0.9;
+  width: 100%;
+}
+
+.camionero-estrellas-item {
+  display: flex;
+  gap: 0.1rem;
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+.camionero-sin-calificaciones {
+  text-align: center;
+  padding: 2rem 1rem;
+  opacity: 0.8;
+  width: 100%;
+}
+
+/* Lista de tarjetas dashboard */
+.camionero-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0 0;
+  flex-grow: 1;
+}
+
+.camionero-lista li {
+  background: rgba(255,255,255,0.13);
+  border-radius: 12px;
+  margin-bottom: 0.5rem;
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  color: #f5f5f5;
+  box-shadow: 0 1px 6px rgba(30,144,255,0.08);
+  transition: background 0.2s;
+  word-wrap: break-word;
+  line-height: 1.3;
+}
+
+.camionero-lista li:last-child {
+  margin-bottom: 0;
+}
+
+.camionero-card-calificaciones .camionero-lista li {
+  color: #ffe066;
+  background: rgba(255,224,102,0.13);
+}
+
+/* Sección de instrucciones */
+.camionero-instrucciones {
+  background: #fff;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.camionero-instrucciones h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.camionero-instrucciones p {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 3rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.camionero-pasos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.camionero-paso {
+  background: #f8f9fa;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.camionero-paso:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.camionero-numero {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  background: #0086a8;
+  color: #fff;
+  border-radius: 50%;
+  line-height: 50px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.camionero-paso h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.8rem;
+}
+
+.camionero-paso p {
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.5;
+  margin: 0;
+}
 
 .camionero-footer {
   background: linear-gradient(120deg, #0086a8 0%, #0097b2 100%);
   color: #fff;
-  padding: 3rem 2rem;
+  padding: 3rem 2rem 0 2rem;
   margin-top: auto;
   border-radius: 0;
   width: 100%;
@@ -173,69 +474,18 @@
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 2rem;
   padding: 0 1rem;
 }
 
-
-.camionero-instrucciones {
-  background: #f6f7fb;
-  padding: 2.5rem 0 2.2rem 0;
-  text-align: center;
-  font-size: 2.2rem;
-  color: #14325c;
-  font-weight: 700;
-  margin-bottom: 0.7rem;
-  letter-spacing: 0.2px;
-  font-family: 'Segoe UI Semibold', 'Segoe UI', Arial, sans-serif;
-  color: #184e90;
-  font-size: 1.08rem;
-  margin-bottom: 2.2rem;
-  font-weight: 400;
-  font-family: 'Segoe UI', Arial, sans-serif;
-}
-
-.camionero-pasos {
-  display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 1.2rem;
-}
-
-.camionero-paso {
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 4px 18px rgba(30,144,255,0.13);
-  padding: 2.2rem 2rem 2rem 2rem;
-  min-width: 260px;
-  max-width: 350px;
-  flex: 1 1 260px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.camionero-numero {
-  display: inline-block;
-  background: linear-gradient(120deg, #0086a8 0%, #0097b2 100%);
-  color: #ffff;
-  border-radius: 50%;
-  width: 44px;
-  height: 44px;
-  text-align: center;
-  line-height: 44px;
-  font-size: 1.08rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
 .camionero-footer-column h3 {
   font-size: 1.1rem;
-  margin-bottom: 0.7rem;
+  margin-bottom: 1rem;
   font-weight: 600;
+  color: #fff;
+  border-bottom: 2px solid rgba(255,255,255,0.2);
+  padding-bottom: 0.5rem;
 }
 
 .camionero-footer-column ul {
@@ -245,120 +495,436 @@
 }
 
 .camionero-footer-column ul li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.7rem;
   color: #eaf6fb;
+  transition: color 0.2s;
+}
+
+.camionero-footer-column ul li:hover {
+  color: #fff;
 }
 
 .camionero-footer-column a {
   color: #eaf6fb;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 400;
+  transition: color 0.2s, text-decoration 0.2s;
+}
+
+.camionero-footer-column a:hover {
+  color: #fff;
   text-decoration: underline;
-  font-size: 0.98rem;
-  font-weight: 500;
+}
+
+.camionero-contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.camionero-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: #eaf6fb;
+  font-size: 0.95rem;
+}
+
+.camionero-contact-icon {
+  font-size: 1.1rem;
+  min-width: 24px;
+  text-align: center;
 }
 
 .camionero-formulario {
-  min-width: 220px;
+  min-width: 250px;
 }
 
 .camionero-incidencia-form {
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
+  gap: 0.8rem;
 }
 
-.camionero-incidencia-form input,
+.camionero-incidencia-form select,
 .camionero-incidencia-form textarea {
   border-radius: 8px;
-  border: none;
-  padding: 0.6rem 0.8rem;
-  font-size: 1rem;
-  margin-bottom: 0.2rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 0.7rem 0.9rem;
+  font-size: 0.9rem;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
   resize: vertical;
   max-width: 100%;
+  box-sizing: border-box;
+  transition: all 0.2s;
 }
 
-.camionero-incidencia-form textarea {
-  min-height: 60px;
-  max-height: 120px;
+.camionero-incidencia-form select:focus,
+.camionero-incidencia-form textarea:focus {
+  outline: none;
+  border-color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.15);
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
 }
 
-.camionero-incidencia-form button {
-  background: #fff;
-  color: #1e90ff;
-  border: none;
-  border-radius: 20px;
-  padding: 0.5rem 1.2rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  align-self: flex-end;
-  box-shadow: 0 2px 8px rgba(30,144,255,0.12);
-  transition: background 0.2s, color 0.2s;
-}
-.camionero-incidencia-form button:hover {
-  background: #1e90ff;
+.camionero-incidencia-form select option {
+  background: #0086a8;
   color: #fff;
 }
 
-@media (max-width: 900px) {
+.camionero-incidencia-form textarea {
+  min-height: 80px;
+  max-height: 120px;
+  font-family: inherit;
+}
+
+.camionero-incidencia-form textarea::placeholder {
+  color: rgba(255,255,255,0.6);
+}
+
+.camionero-mensaje-reporte {
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.camionero-mensaje-reporte.success {
+  background: rgba(76, 175, 80, 0.2);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  color: #c8e6c9;
+}
+
+.camionero-mensaje-reporte.error {
+  background: rgba(244, 67, 54, 0.2);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  color: #ffcdd2;
+}
+
+.camionero-btn-reporte {
+  background: #fff;
+  color: #0086a8;
+  border: none;
+  border-radius: 20px;
+  padding: 0.7rem 1.4rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-end;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.2s;
+  min-height: 40px;
+}
+
+.camionero-btn-reporte:hover:not(:disabled) {
+  background: #f0f9ff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.camionero-btn-reporte:disabled {
+  background: rgba(255,255,255,0.5);
+  color: rgba(0,134,168,0.5);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.camionero-footer-bottom {
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+}
+
+.camionero-footer-bottom .camionero-footer-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  grid-template-columns: none;
+  gap: 0;
+}
+
+.camionero-copyright p {
+  margin: 0;
+  color: rgba(255,255,255,0.8);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.camionero-social-links {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.camionero-social-links a {
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  text-align: center;
+  line-height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: all 0.2s;
+}
+
+.camionero-social-links a:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
   .camionero-dashboard {
-    flex-direction: column;
-    gap: 1.2rem;
-    align-items: center;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
   }
-  .camionero-card {
-    min-width: 220px;
-    max-width: 98vw;
-    width: 100%;
-    margin-bottom: 1.2rem;
-    padding: 1.5rem 1rem;
+  
+  .camionero-container {
+    padding: 1.5rem 0.8rem;
   }
-  .camionero-pasos {
-    flex-direction: column;
-    gap: 1.2rem;
-    align-items: center;
+}
+
+@media (max-width: 900px) {
+  .camionero-banner {
+    height: 28rem;
+    padding: 1rem;
   }
-  .camionero-footer-container {
+  
+  .camionero-content-banner {
+    margin-left: 2vw;
+    margin-top: 2vw;
+    max-width: 90%;
+  }
+  
+  .camionero-dashboard {
     grid-template-columns: 1fr;
-    gap: 1rem;
-    padding: 0 0.5rem;
+    gap: 1.5rem;
+    max-width: 500px;
+  }
+  
+  .camionero-card {
+    padding: 1.8rem 1.5rem;
+    min-height: 250px;
+  }
+  
+  .camionero-instrucciones {
+    padding: 3rem 1.5rem;
+  }
+  
+  .camionero-instrucciones h2 {
+    font-size: 1.8rem;
+  }
+  
+  .camionero-pasos {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .camionero-footer-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
   }
 }
 
 @media (max-width: 600px) {
   .camionero-banner {
-    height: 18rem;
+    height: 22rem;
     padding: 0.5rem;
   }
+  
   .camionero-content-banner {
-    padding: 1.2rem 0.7rem;
-    margin-left: 0;
+    padding: 1.5rem 1.2rem;
+    margin-left: 1vw;
     margin-top: 1vw;
-    max-width: 98vw;
+    max-width: 95%;
   }
-  .camionero-banner h2 {
+  
+  .camionero-content-banner h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  
+  .camionero-content-banner p {
     font-size: 1.1rem;
-    margin-bottom: 0.7rem;
-    font-weight: 700;
-    color: #fff;
-    font-size: 1rem;
   }
+  
   .camionero-container {
-    padding: 1rem 0.3rem;
-  }
-  .camionero-card,
-  .camionero-paso {
-    min-width: 140px;
-    max-width: 98vw;
-    width: 100%;
     padding: 1rem 0.5rem;
   }
+  
+  .camionero-card {
+    padding: 1.5rem 1.2rem;
+    min-height: 220px;
+  }
+  
+  .camionero-card h2 {
+    font-size: 1.2rem;
+  }
+  
+  .camionero-stat {
+    font-size: 1.8rem;
+  }
+  
+  .camionero-lista li {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.8rem;
+  }
+  
+  .camionero-promedio-container {
+    flex-direction: column;
+    gap: 0.8rem;
+    text-align: center;
+    align-items: center;
+    padding: 0.8rem;
+  }
+  
+  .camionero-promedio-izquierda,
+  .camionero-promedio-derecha {
+    align-items: center;
+    text-align: center;
+    flex: none;
+    width: 100%;
+  }
+  
+  .camionero-lista-calificaciones {
+    max-height: 100px;
+  }
+  
+  .camionero-item-calificacion {
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 0.6rem;
+  }
+  
+  .camionero-comentario {
+    font-size: 0.8rem;
+  }
+  
+  .camionero-instrucciones {
+    padding: 2.5rem 1rem;
+  }
+  
+  .camionero-instrucciones h2 {
+    font-size: 1.6rem;
+  }
+  
+  .camionero-instrucciones p {
+    font-size: 1rem;
+  }
+  
+  .camionero-paso {
+    padding: 1.5rem 1rem;
+  }
+  
+  .camionero-footer {
+    padding: 2rem 1rem 0 1rem;
+  }
+  
   .camionero-footer-container {
     grid-template-columns: 1fr;
-    padding: 0 0.3rem;
+    gap: 1.5rem;
+    padding: 0;
   }
+  
+  .camionero-contact-item {
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .camionero-incidencia-form {
+    gap: 0.6rem;
+  }
+  
+  .camionero-btn-reporte {
+    align-self: stretch;
+    text-align: center;
+  }
+  
+  .camionero-footer-bottom .camionero-footer-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .camionero-banner {
+    height: 18rem;
+  }
+  
+  .camionero-content-banner {
+    padding: 1.2rem 1rem;
+    max-width: 98%;
+  }
+  
+  .camionero-content-banner h2 {
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+  
+  .camionero-content-banner p {
+    font-size: 1rem;
+  }
+  
+  .camionero-btn-registrar {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .camionero-container {
+    padding: 0.8rem 0.3rem;
+  }
+  
+  .camionero-card {
+    padding: 1.2rem 1rem;
+    min-height: 200px;
+  }
+  
+  .camionero-card h2 {
+    font-size: 1.1rem;
+  }
+  
+  .camionero-stat {
+    font-size: 1.6rem;
+  }
+  
+  .camionero-lista li {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+  }
+  
+  .camionero-instrucciones {
+    padding: 2rem 0.8rem;
+  }
+  
+  .camionero-paso {
+    padding: 1.2rem 0.8rem;
+  }
+  
+  .camionero-numero {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 1.2rem;
+  }
+  
   .camionero-footer {
-    padding: 1.2rem 0.5rem;
-    font-size: 0.95rem;
+    padding: 1.5rem 0.8rem 0 0.8rem;
+  }
+  
+  .camionero-footer-column h3 {
+    font-size: 1rem;
+  }
+  
+  .camionero-incidencia-form select,
+  .camionero-incidencia-form textarea {
+    font-size: 0.85rem;
+    padding: 0.6rem 0.8rem;
   }
 }

@@ -78,29 +78,35 @@ export default function LoginForm() {
             <>
               <h2 className="login-title">
                 <FontAwesomeIcon icon={faUser} />
-                Inicio de Sesion
+                Inicio de Sesión
               </h2>
               {error && <p style={{ color: "red", fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>{error}</p>}
               <form onSubmit={handleSubmit} className="login-form">
                 <div className="input-group">
-                  <FontAwesomeIcon icon={faEnvelope} />
-                  <input
-                    type="email"
-                    placeholder="Correo Electronico"
-                    value={correo}
-                    onChange={(e) => setCorreo(e.target.value)}
-                    required
-                  />
+                  <FontAwesomeIcon icon={faEnvelope} className="icon" />
+                  <div className="input-wrapper">
+                    <input
+                      type="email"
+                      value={correo}
+                      onChange={(e) => setCorreo(e.target.value)}
+                      required
+                      placeholder=" "
+                    />
+                    <label className="input-label">Correo Electrónico</label>
+                  </div>
                 </div>
                 <div className="input-group">
-                  <FontAwesomeIcon icon={faLock} />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Contraseña"
-                    value={contrasena}
-                    onChange={(e) => setContrasena(e.target.value)}
-                    required
-                  />
+                  <FontAwesomeIcon icon={faLock} className="icon" />
+                  <div className="input-wrapper">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={contrasena}
+                      onChange={(e) => setContrasena(e.target.value)}
+                      required
+                      placeholder=" "
+                    />
+                    <label className="input-label">Contraseña</label>
+                  </div>
                   <button
                     type="button"
                     style={{
@@ -125,7 +131,7 @@ export default function LoginForm() {
                 <a href="/recuperar-contrasena">Recuperar</a>
               </div>
               <div className="extra-links">
-                <a href="/register">Registrate</a>
+                <a href="/register">Regístrate</a>
                 <a href="/">Volver</a>
               </div>
               <p className="divider">o continuar con</p>

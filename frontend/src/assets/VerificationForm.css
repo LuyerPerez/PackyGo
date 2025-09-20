@@ -103,8 +103,8 @@
 }
 
 .btn-verify {
-  background: white;
-  color: black;
+  background: #0097a7;
+  color: white;
   border: none;
   border-radius: 20px;
   padding: 12px 36px;
@@ -116,8 +116,8 @@
 }
 
 .btn-verify:hover {
-  background: #0097a7;
-  color: white;
+  background: white;
+  color: black;
 }
 
 .btn-cancel {

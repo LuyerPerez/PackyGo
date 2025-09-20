@@ -4,70 +4,102 @@ import { getImagenUrl } from "../api";
 export default function CardPedido({ pedido, onFinalizar, onCancelar }) {
   const { reserva, vehiculo, cliente } = pedido;
 
-  const estadoClass = {
-    activa: "estado-activa",
-    cancelada: "estado-cancelada",
-    finalizada: "estado-finalizada"
-  }[reserva.estado_reserva] || "";
+  const formatearFecha = (fecha) => {
+    return new Date(fecha).toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const renderEstrellas = (calificacion) => {
+    if (calificacion === null || calificacion === undefined) {
+      return <span className="sin-calificacion">Sin calificación</span>;
+    }
+
+    return (
+      <div className="card-pedido-calificacion">
+        <div className="calificacion-estrellas">
+          {Array.from({ length: 5 }, (_, i) => (
+            <span
+              key={i}
+              className={`star ${calificacion >= i + 1 ? 'filled' : ''}`}
+            >
+              ★
+            </span>
+          ))}
+        </div>
+        <span className="calificacion-numero">({calificacion.toFixed(1)})</span>
+      </div>
+    );
+  };
 
   return (
     <div className="card-pedido">
-      <div>
-        <img src={getImagenUrl(vehiculo.imagen_url)} alt={vehiculo.modelo} />
-        <h3>{vehiculo.modelo} ({vehiculo.ano_modelo})</h3>
-        <p><b>Tipo:</b> {vehiculo.tipo_vehiculo}</p>
-        <p><b>Placa:</b> {vehiculo.placa}</p>
-      </div>
-      <div>
-        <p><b>Reserva:</b></p>
-        <p>Inicio: {new Date(reserva.fecha_inicio).toLocaleString()}</p>
-        <p>Fin: {new Date(reserva.fecha_fin).toLocaleString()}</p>
-        <p>Origen: {reserva.direccion_inicio}</p>
-        <p>Destino: {reserva.direccion_destino}</p>
-        <p>
-          Estado:{" "}
-          <span className={estadoClass}>
-            {reserva.estado_reserva.charAt(0).toUpperCase() + reserva.estado_reserva.slice(1)}
+      <img 
+        src={getImagenUrl(vehiculo.imagen_url)} 
+        alt={vehiculo.modelo}
+        className="card-pedido-imagen"
+      />
+      
+      <div className="card-pedido-content">
+        <h3 className="card-pedido-titulo">
+          {vehiculo.modelo} ({vehiculo.ano_modelo})
+        </h3>
+        
+        <p className="card-pedido-subtitulo">
+          {vehiculo.tipo_vehiculo}
+        </p>
+        
+        <div className="card-pedido-info">
+          <div className="card-pedido-info-item">
+            <span className="card-pedido-info-label">Placa:</span>
+            <span>{vehiculo.placa}</span>
+          </div>
+          <div className="card-pedido-info-item">
+            <span className="card-pedido-info-label">Inicio:</span>
+            <span>{formatearFecha(reserva.fecha_inicio)}</span>
+          </div>
+          <div className="card-pedido-info-item">
+            <span className="card-pedido-info-label">Fin:</span>
+            <span>{formatearFecha(reserva.fecha_fin)}</span>
+          </div>
+        </div>
+
+        <div className="card-pedido-estado">
+          <span className="card-pedido-info-label">Estado:</span>
+          <span className={`estado-badge ${reserva.estado_reserva}`}>
+            {reserva.estado_reserva}
           </span>
-        </p>
-      </div>
-      <div>
-        <p><b>Cliente:</b></p>
-        <p>Nombre: {cliente.nombre}</p>
-        <p>Correo: {cliente.correo}</p>
-        <p>Teléfono: {cliente.telefono}</p>
-        <p className="calificacion">
-          Calificación:{" "}
-          {cliente.calificacion !== null && cliente.calificacion !== undefined
-            ? <>
-                {Array.from({ length: 5 }, (_, i) => {
-                  const val = cliente.calificacion;
-                  if (val >= i + 1) {
-                    return <span key={i} className="star filled">★</span>;
-                  } else if (val > i) {
-                    return <span key={i} className="star half">★</span>;
-                  } else {
-                    return <span key={i} className="star">★</span>;
-                  }
-                })}
-                <span className="promedio">({cliente.calificacion.toFixed(1)})</span>
-              </>
-            : <span className="sin-calificacion">No tiene calificación</span>
-          }
-        </p>
+        </div>
+
+        <div className="card-pedido-cliente">
+          <div className="cliente-nombre">{cliente.nombre}</div>
+          <div className="cliente-contacto">{cliente.correo}</div>
+          <div className="cliente-contacto">{cliente.telefono}</div>
+          {renderEstrellas(cliente.calificacion)}
+        </div>
+
+        <div style={{ fontSize: '0.85rem', color: '#666' }}>
+          <div><strong>Origen:</strong> {reserva.direccion_inicio}</div>
+          <div><strong>Destino:</strong> {reserva.direccion_destino}</div>
+        </div>
+
         {reserva.estado_reserva === "activa" && (
-          <div style={{ marginTop: 12, display: "flex", gap: 12 }}>
+          <div className="card-pedido-acciones">
             <button
-              className="btn-finalizar"
+              className="btn-accion danger"
+              onClick={onCancelar}
+            >
+              Cancelar
+            </button>
+            <button
+              className="btn-accion primary"
               onClick={onFinalizar}
             >
               Finalizar
-            </button>
-            <button
-              className="btn-cancelar"
-              onClick={onCancelar}
-            >
-              Cancelar reserva
             </button>
           </div>
         )}

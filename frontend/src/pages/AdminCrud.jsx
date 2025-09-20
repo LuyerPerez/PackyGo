@@ -43,7 +43,7 @@ const config = {
       { key: "modelo", label: "Modelo" },
       { key: "ano_modelo", label: "Año" },
       { key: "tarifa_diaria", label: "Tarifa" },
-      { key: "imagen_url", label: "Imagen" },
+      { key: "imagen_url", label: "Imagen", type: "file" },
       { key: "camionero_correo", label: "Correo conductor" } 
     ],
     endpoint: "/vehiculos",
@@ -111,9 +111,11 @@ const AdminCrud = () => {
 
   useEffect(() => {
     if (!conf) return;
+    
     api.get(conf.endpointDetallado || conf.endpoint)
       .then((res) => {
         let datos = (conf.extraeDatosDetallado || conf.extraeDatos)(res);
+        
         if (tabla === "vehiculos") {
           datos = datos.map(v => ({
             ...v,
@@ -123,18 +125,20 @@ const AdminCrud = () => {
           }));
         }
         setDatos(datos);
-      });
+      })
+      .catch(err => console.error("Error cargando datos:", err));
 
     if (tabla === "vehiculos") {
       api.get("/usuarios?rol=camionero").then((res) => {
+        const camioneros = res.data?.usuarios || res.usuarios || [];
         setSelectOptions((opts) => ({
           ...opts,
-          camionero_id: (res.usuarios || res.data?.usuarios || []).map(u => ({
+          camionero_id: camioneros.map(u => ({
             value: u.id,
             label: `${u.id} - ${u.nombre}`
           }))
         }));
-      });
+      }).catch(err => console.error("Error cargando camioneros:", err));
     }
 
     if (tabla === "reservas") {
@@ -192,22 +196,52 @@ const AdminCrud = () => {
     );
 
   const handleCrear = () => setModal({ visible: true, modo: "crear", data: null });
-  const handleEditar = (item) => setModal({ visible: true, modo: "editar", data: item });
+  
+  const handleEditar = (item) => {
+    let dataParaEditar = { ...item };
+    
+    if (tabla === "vehiculos") {
+      if (!dataParaEditar.camionero_id && dataParaEditar.conductor?.id) {
+        dataParaEditar.camionero_id = dataParaEditar.conductor.id;
+      }
+    }
+    
+    if (tabla === "reservas") {
+      if (dataParaEditar.fecha_inicio) {
+        dataParaEditar.fecha_inicio = dataParaEditar.fecha_inicio.slice(0, 16);
+      }
+      if (dataParaEditar.fecha_fin) {
+        dataParaEditar.fecha_fin = dataParaEditar.fecha_fin.slice(0, 16);
+      }
+    }
+    
+    setModal({ visible: true, modo: "editar", data: dataParaEditar });
+  };
 
   const handleSubmit = async (form) => {
-    if (modal.modo === "crear") {
-      await api.post(conf.endpointCrud, form);
-    } else if (modal.modo === "editar") {
-      await api.put(`${conf.endpointCrud}/${modal.data.id}`, form);
+    try {
+      if (modal.modo === "crear") {
+        await api.post(conf.endpointCrud, form);
+      } else if (modal.modo === "editar") {
+        await api.put(`${conf.endpointCrud}/${modal.data.id}`, form);
+      }
+      setModal({ visible: false, modo: "crear", data: null });
+      setRecargar((r) => !r);
+    } catch (error) {
+      console.error("Error en submit:", error);
+      alert("Error al guardar: " + error.message);
     }
-    setModal({ visible: false, modo: "crear", data: null });
-    setRecargar((r) => !r);
   };
 
   const handleEliminar = async (item) => {
     if (window.confirm("¿Eliminar este registro?")) {
-      await api.delete(`${conf.endpointCrud}/${item.id}`);
-      setRecargar((r) => !r);
+      try {
+        await api.delete(`${conf.endpointCrud}/${item.id}`);
+        setRecargar((r) => !r);
+      } catch (error) {
+        console.error("Error al eliminar:", error);
+        alert("Error al eliminar: " + error.message);
+      }
     }
   };
 
@@ -229,7 +263,8 @@ const AdminCrud = () => {
         columnas={conf.columnas}
         initialData={modal.data}
         titulo={modal.modo === "crear" ? `Crear ${conf.titulo.slice(0, -1)}` : `Editar ${conf.titulo.slice(0, -1)}`}
-        selectOptions={selectOptions} 
+        selectOptions={selectOptions}
+        key={modal.data?.id || 'nuevo'}
       />
     </div>
   );
