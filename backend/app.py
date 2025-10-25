@@ -215,7 +215,16 @@ def google_login():
             "rol": user[6] 
         }}, 200
     except Exception as e:
-        return {"error": str(e)}, 400
+        msg = str(e)
+        # Mensaje más amigable cuando el token indica diferencia de hora
+        if "Token used too early" in msg or "token used too early" in msg:
+            return {
+                "error": "Token inválido: la hora del sistema parece estar desincronizada. "
+                         "Sincroniza el reloj del equipo (NTP) y vuelve a intentarlo. "
+                         "Ejemplo en Windows: Ajustes > Hora e idioma > Sincronizar ahora, o ejecutar 'w32tm /resync' en PowerShell con permisos de administrador.",
+                "detalle": msg
+            }, 400
+        return {"error": msg}, 400
 
 @app.route("/api/google-register", methods=["POST"])
 def google_register():
@@ -255,7 +264,15 @@ def google_register():
             "rol": user[6]
         }}, 201
     except Exception as e:
-        return {"error": str(e)}, 400
+        msg = str(e)
+        if "Token used too early" in msg or "token used too early" in msg:
+            return {
+                "error": "Token inválido: la hora del sistema parece estar desincronizada. "
+                         "Sincroniza el reloj del equipo (NTP) y vuelve a intentarlo. "
+                         "Ejemplo en Windows: Ajustes > Hora e idioma > Sincronizar ahora, o ejecutar 'w32tm /resync' en PowerShell con permisos de administrador.",
+                "detalle": msg
+            }, 400
+        return {"error": msg}, 400
 
 @app.route("/api/vehiculos", methods=["POST"])
 def registrar_vehiculo():
