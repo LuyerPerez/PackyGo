@@ -924,18 +924,24 @@ def listar_usuarios():
 
 @app.route("/api/usuarios", methods=["POST"])
 def crear_usuario():
-    data = request.json
+    data = request.json or {}
     nombre = data.get("nombre")
+    noDocumento = data.get("noDocumento")
     correo = data.get("correo")
+    telefono = data.get("telefono")
     rol = data.get("rol")
-    if not all([nombre, correo, rol]):
+    contrasena = data.get("contrasena") or "123456"
+
+    if not all([nombre, noDocumento, correo, telefono, rol]):
         return {"error": "Faltan datos"}, 400
+
     conn = get_connection()
     cursor = conn.cursor()
     try:
+        hashed = generate_password_hash(contrasena)
         cursor.execute(
-            "INSERT INTO usuario (nombre, correo, rol, contrasena) VALUES (%s, %s, %s, %s)",
-            (nombre, correo, rol, generate_password_hash("123456"))
+            "INSERT INTO usuario (nombre, noDocumento, correo, telefono, rol, contrasena) VALUES (%s, %s, %s, %s, %s, %s)",
+            (nombre, noDocumento, correo, telefono, rol, hashed)
         )
         conn.commit()
         return {"message": "Usuario creado"}, 201
