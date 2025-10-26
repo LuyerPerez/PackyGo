@@ -1,19 +1,20 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faHome, faTruck, faRightFromBracket, faUserLock } from "@fortawesome/free-solid-svg-icons";
-
+import { faUser, faHome, faTruck, faRightFromBracket, faUserLock, faFileContract, faShieldHalved, faCalendarDays} from "@fortawesome/free-solid-svg-icons";
 
 function NavBar() {
   const [user, setUser] = useState(null);
-  const [open, setOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const dropdownRef = useRef(null);
+  const menuRef = useRef(null);
+  const closeTimerRef = useRef(null);
+  const location = useLocation();
+
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -26,12 +27,14 @@ function NavBar() {
       const updatedUser = localStorage.getItem("user");
       setUser(updatedUser ? JSON.parse(updatedUser) : null);
     };
-    window.addEventListener("storage", handleStorageChange);
 
     const handleRouteChange = () => {
       const updatedUser = localStorage.getItem("user");
       setUser(updatedUser ? JSON.parse(updatedUser) : null);
+      setIsMenuOpen(false);
     };
+
+    window.addEventListener("storage", handleStorageChange);
     window.addEventListener("popstate", handleRouteChange);
 
     return () => {
@@ -41,169 +44,269 @@ function NavBar() {
   }, []);
 
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setOpen(false);
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsDropdownOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [dropdownRef]);
-
-  useEffect(() => {
-    const closeMenu = () => setMenuOpen(false);
-    window.addEventListener("popstate", closeMenu);
-    return () => window.removeEventListener("popstate", closeMenu);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (isDropdownOpen) {
+        document.body.classList.add('nav-dropdown-open');
+      } else {
+        document.body.classList.remove('nav-dropdown-open');
+      }
+    } catch (err) {
+      console.debug('nav body class toggle failed', err);
+    }
+    return () => {
+      try { document.body.classList.remove('nav-dropdown-open'); } catch (e) { console.debug('nav body class cleanup failed', e); }
+    };
+  }, [isDropdownOpen]);
+
+  const debugLogUnderCursor = (e, context) => {
+    try {
+      if (!window || !window.__NAV_DEBUG) return;
+      const x = e?.clientX ?? (window.event && window.event.clientX) ?? null;
+      const y = e?.clientY ?? (window.event && window.event.clientY) ?? null;
+      if (x === null || y === null) return;
+      const el = document.elementFromPoint(x, y);
+      const styles = el ? window.getComputedStyle(el) : null;
+      console.log('[NAV-DEBUG]', context, { x, y, element: el, tag: el?.tagName, classes: el?.className, zIndex: styles?.zIndex, pointerEvents: styles?.pointerEvents });
+    } catch (err) {
+      console.log('[NAV-DEBUG] error', err);
+    }
+  };
+
+  const isActive = (path) => location.pathname === path;
+
   return (
-    <nav className={`navbar${scrolled ? " scrolled" : ""}`}> 
-      <div className="navbar-logo">
-        <Link to="/">
-          <img
-            src="../../public/logo.svg"
-            alt="logo"
-            className="logo-img"
-          />
-        </Link>
-        <button
-          className="navbar-toggle"
-          aria-label="Abrir menú"
-          onClick={() => setMenuOpen((prev) => !prev)}
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-      </div>
-      <ul className={`navbar-links${menuOpen ? " open" : ""}`}>
-        <li>
-          <Link to="/" onClick={() => setMenuOpen(false)}>
-            <FontAwesomeIcon icon={faHome} style={{ marginRight: "6px" }} />
-            Inicio
+    <nav className={`navbar${isScrolled ? " scrolled" : ""}`}>
+      <div className="navbar-container">
+        <div className="navbar-left">
+          <Link to="/" className="navbar-logo">
+            <img src="/logo.svg" alt="logo" className="logo-img" />
           </Link>
-        </li>
-        <li>
-          {user && user.rol === "camionero" ? (
-            <Link to="/pedidos" onClick={() => setMenuOpen(false)}>
-              <FontAwesomeIcon icon={faTruck} style={{ marginRight: "6px" }} />
-              Pedidos
-            </Link>
-          ) : user && user.rol === "admin" ? (
-            <Link to="/administracion" onClick={() => setMenuOpen(false)}>
-              <FontAwesomeIcon icon={faUserLock} style={{ marginRight: "6px" }} />
-              Administración
-            </Link>
+        </div>
+
+        <div ref={menuRef} className={`navbar-center${isMenuOpen ? ' show-mobile' : ''}`}>
+          <ul className="navbar-links">
+            <li>
+              <Link to="/" className={`nav-link${isActive("/") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
+                <FontAwesomeIcon icon={faHome} />
+                <span className="nav-label">Inicio</span>
+              </Link>
+            </li>
+            <li>
+              {user && user.rol === "camionero" ? (
+                <Link to="/pedidos" className={`nav-link${isActive("/pedidos") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
+                  <FontAwesomeIcon icon={faTruck} />
+                  <span className="nav-label">Pedidos</span>
+                </Link>
+              ) : user && user.rol === "admin" ? (
+                <Link to="/administracion" className={`nav-link${isActive("/administracion") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
+                  <FontAwesomeIcon icon={faUserLock} />
+                  <span className="nav-label">Administración</span>
+                </Link>
+              ) : (
+                <Link to="/explorar" className={`nav-link${isActive("/explorar") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
+                  <FontAwesomeIcon icon={faTruck} />
+                  <span className="nav-label">Explorar</span>
+                </Link>
+              )}
+            </li>
+
+            <li>
+              <Link to="/terminos" className={`nav-link${isActive("/terminos") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
+                <FontAwesomeIcon icon={faFileContract} />
+                <span className="nav-label">Términos</span>
+              </Link>
+            </li>
+
+            <li>
+              <Link to="/privacidad" className={`nav-link${isActive("/privacidad") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
+                <FontAwesomeIcon icon={faShieldHalved} />
+                <span className="nav-label">Políticas</span>
+              </Link>
+            </li>
+
+            {user && user.rol === "cliente" && (
+              <li>
+                <Link to="/mis-reservas" className={`nav-link${isActive("/mis-reservas") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
+                  <FontAwesomeIcon icon={faCalendarDays} />
+                  <span className="nav-label">Mis Reservas</span>
+                </Link>
+              </li>
+            )}
+          </ul>
+        </div>
+
+        <div className="navbar-right">
+
+          {user ? (
+            <div
+              className={`user-pill${isDropdownOpen ? " active" : ""}`}
+              ref={dropdownRef}
+              onMouseEnter={() => {
+                if (closeTimerRef.current) { clearTimeout(closeTimerRef.current); closeTimerRef.current = null; }
+                setIsDropdownOpen(true);
+                debugLogUnderCursor(window.event || {}, 'user-pill mouseenter');
+              }}
+              onMouseLeave={() => {
+                if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+                closeTimerRef.current = setTimeout(() => setIsDropdownOpen(false), 300);
+                debugLogUnderCursor(window.event || {}, 'user-pill mouseleave');
+              }}
+              onFocus={() => {
+                if (closeTimerRef.current) { clearTimeout(closeTimerRef.current); closeTimerRef.current = null; }
+                setIsDropdownOpen(true);
+                debugLogUnderCursor(window.event || {}, 'user-pill focus');
+              }}
+              onBlur={() => {
+                if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+                closeTimerRef.current = setTimeout(() => setIsDropdownOpen(false), 300);
+                debugLogUnderCursor(window.event || {}, 'user-pill blur');
+              }}
+            >
+              <button
+                className="user-btn"
+                onClick={() => {
+                  if (closeTimerRef.current) { clearTimeout(closeTimerRef.current); closeTimerRef.current = null; }
+                  setIsDropdownOpen((p) => !p);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if (closeTimerRef.current) { clearTimeout(closeTimerRef.current); closeTimerRef.current = null; }
+                    setIsDropdownOpen((p) => !p);
+                  }
+                }}
+                aria-haspopup="true"
+                aria-expanded={isDropdownOpen}
+                tabIndex={0}
+              >
+                <FontAwesomeIcon icon={faUser} />
+                <span className="user-name">{user.nombre}</span>
+                <span className="user-arrow">▾</span>
+              </button>
+              <div
+                className={`dropdown-menu${isDropdownOpen ? " show" : ""}`}
+                onMouseEnter={() => {
+                  if (closeTimerRef.current) { clearTimeout(closeTimerRef.current); closeTimerRef.current = null; }
+                  setIsDropdownOpen(true);
+                  debugLogUnderCursor(window.event || {}, 'dropdown mouseenter');
+                }}
+                onMouseLeave={() => {
+                  if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+                  closeTimerRef.current = setTimeout(() => setIsDropdownOpen(false), 300);
+                  debugLogUnderCursor(window.event || {}, 'dropdown mouseleave');
+                }}
+                onFocus={() => {
+                  if (closeTimerRef.current) { clearTimeout(closeTimerRef.current); closeTimerRef.current = null; }
+                  setIsDropdownOpen(true);
+                  debugLogUnderCursor(window.event || {}, 'dropdown focus');
+                }}
+                onBlur={() => {
+                  if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+                  closeTimerRef.current = setTimeout(() => setIsDropdownOpen(false), 300);
+                  debugLogUnderCursor(window.event || {}, 'dropdown blur');
+                }}
+                tabIndex={-1}
+              >
+                <div className="dropdown-header">
+                  <div className="user-info">
+                    <span className="user-fullname">{user.nombre}</span>
+                    <span className="user-email">{user.correo}</span>
+                  </div>
+                </div>
+
+                <div className="dropdown-section">
+                  <Link
+                    to="/perfil"
+                    className={`menu-item${isActive("/perfil") ? " active" : ""}`}
+                    onClick={() => { setIsDropdownOpen(false); }}
+                  >
+                    <FontAwesomeIcon icon={faUser} />
+                    <div className="item-content">
+                      <span className="item-title">Perfil</span>
+                      <span className="item-description">Información personal y preferencias</span>
+                    </div>
+                  </Link>
+
+                  {user.rol === "camionero" && (
+                    <Link
+                      to="/mis-vehiculos"
+                      className={`menu-item${isActive("/mis-vehiculos") ? " active" : ""}`}
+                      onClick={() => { setIsDropdownOpen(false); }}
+                    >
+                      <FontAwesomeIcon icon={faTruck} />
+                      <div className="item-content">
+                        <span className="item-title">Mis Vehículos</span>
+                        <span className="item-description">Gestiona tus vehículos registrados</span>
+                      </div>
+                    </Link>
+                  )}
+
+                  {user.rol === "cliente" && (
+                    <Link
+                      to="/mis-reservas"
+                      className={`menu-item${isActive("/mis-reservas") ? " active" : ""}`}
+                      onClick={() => { setIsDropdownOpen(false); }}
+                    >
+                      <FontAwesomeIcon icon={faTruck} />
+                      <div className="item-content">
+                        <span className="item-title">Mis Reservas</span>
+                        <span className="item-description">Historial y estado de reservas</span>
+                      </div>
+                    </Link>
+                  )}
+                </div>
+
+                <div className="dropdown-section">
+                  <div className="section-title">Sesión</div>
+                  <Link 
+                    to="/logout" 
+                    className="menu-item menu-item-danger" 
+                    onClick={() => { setIsDropdownOpen(false); }}
+                  >
+                    <FontAwesomeIcon icon={faRightFromBracket} />
+                    <div className="item-content">
+                      <span className="item-title">Cerrar sesión</span>
+                      <span className="item-description">Salir de la cuenta</span>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+            </div>
           ) : (
-            <Link to="/explorar" onClick={() => setMenuOpen(false)}>
-              <FontAwesomeIcon icon={faTruck} style={{ marginRight: "6px" }} />
-              Explorar Camiones
+            <Link to="/login" className={`nav-link login-link${isActive("/login") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
+              <FontAwesomeIcon icon={faUser} />
+              <span className="nav-label">Iniciar Sesión</span>
             </Link>
           )}
-        </li>
-        {user ? (
-          <li ref={dropdownRef} style={{ position: "relative" }}>
-            <button
-              className="navbar-link"
-              style={{
-                background: "none",
-                border: "none",
-                fontWeight: "600",
-                color: "white",
-                cursor: "pointer",
-                fontFamily: "inherit",
-                fontSize: "inherit", 
-                textDecoration: "none"
-              }}
-              onClick={() => setOpen((prev) => !prev)}
-            >
-              <FontAwesomeIcon icon={faUser} style={{ marginRight: "6px" }} />
-              {user.nombre} ▼
-            </button>
-            {open && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "calc(100% + 8px)",
-                  right: 0,
-                  background: "#083c5d",
-                  borderRadius: "6px",
-                  minWidth: "140px",
-                  zIndex: 10,
-                }}
-              >
-                <Link
-                  to="/perfil"
-                  style={{
-                    display: "block",
-                    padding: "10px 16px",
-                    color: "#fff",
-                    textDecoration: "none",
-                    fontWeight: "500",
-                  }}
-                  onClick={() => { setOpen(false); setMenuOpen(false); }}
-                >
-                  <FontAwesomeIcon icon={faUser} style={{ marginRight: "6px" }} />
-                  Perfil
-                </Link>
-                {user.rol === "camionero" && (
-                  <Link
-                    to="/mis-vehiculos"
-                    style={{
-                      display: "block",
-                      padding: "10px 16px",
-                      color: "#fff",
-                      textDecoration: "none",
-                      fontWeight: "500",
-                    }}
-                    onClick={() => { setOpen(false); setMenuOpen(false); }}
-                  >
-                    <FontAwesomeIcon icon={faTruck} style={{ marginRight: "6px" }} />
-                    Mis Vehículos
-                  </Link>
-                )}
-                {user.rol === "cliente" && (
-                  <Link
-                    to="/mis-reservas"
-                    style={{
-                      display: "block",
-                      padding: "10px 16px",
-                      color: "#fff",
-                      textDecoration: "none",
-                      fontWeight: "500",
-                    }}
-                    onClick={() => { setOpen(false); setMenuOpen(false); }}
-                  >
-                    <FontAwesomeIcon icon={faTruck} style={{ marginRight: "6px" }} />
-                    Mis Reservas
-                  </Link>
-                )}
-                <Link
-                  to="/logout"
-                  style={{
-                    display: "block",
-                    padding: "10px 16px",
-                    color: "#fff",
-                    textDecoration: "none",
-                    fontWeight: "500",
-                  }}
-                  onClick={() => { setOpen(false); setMenuOpen(false); }}
-                >
-                  <FontAwesomeIcon icon={faRightFromBracket} style={{ marginRight: "6px" }} />
-                  Cerrar sesión
-                </Link>
-              </div>
-            )}
-          </li>
-        ) : (
-          <li>
-            <Link to="/login" onClick={() => setMenuOpen(false)}>
-              <FontAwesomeIcon icon={faUser} style={{ marginRight: "6px" }} />
-              Iniciar Sesión
-            </Link>
-          </li>
-        )}
-      </ul>
+          <button
+            className={`menu-button${isMenuOpen ? ' active' : ''}`}
+            onClick={() => { setIsDropdownOpen(false); setIsMenuOpen(p => !p); }}
+            aria-label="Abrir menú"
+            aria-expanded={isMenuOpen}
+          >
+            <span />
+          </button>
+        </div>
+      </div>
     </nav>
   );
 }
