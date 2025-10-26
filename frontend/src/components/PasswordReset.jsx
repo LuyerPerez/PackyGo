@@ -56,7 +56,14 @@ export default function PasswordReset() {
     }
     setLoading(true);
     try {
-      await resetPassword({ correo, code, nueva });
+      const data = await resetPassword({ correo, code, nueva });
+      // Si el backend retorna el usuario, iniciar sesión automáticamente
+      const user = data?.user ? data.user : data;
+      if (user && (user.id || user.correo)) {
+        localStorage.setItem('user', JSON.stringify(user));
+        window.location.href = '/';
+        return;
+      }
       setSuccess('Contraseña actualizada correctamente. ¡Ya puedes iniciar sesión!');
       setStep(4);
     } catch (e) {
@@ -67,9 +74,8 @@ export default function PasswordReset() {
   };
 
   return (
-    <div className="login-page-wrapper">
-      <div className="login-left-panel">
-        <div className="reset-container">
+    <div className="reset-page-wrapper">
+      <div className="reset-container">
           {error && <p className="reset-error">{error}</p>}
           {success && <p className="reset-success">{success}</p>}
 
@@ -155,10 +161,6 @@ export default function PasswordReset() {
             </a>
           )}
         </div>
-      </div>
-      <div className="login-right-panel">
-        <img src="../../public/rocket-login.png" alt="Rocket Illustration" />
-      </div>
     </div>
   );
 }

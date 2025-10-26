@@ -75,6 +75,16 @@ def reset_password():
         conn.commit()
         reset_codes.pop(correo)
         enviarCorreoCambio(correo)
+        # Obtener datos del usuario para iniciar sesión automáticamente en el cliente
+        cursor.execute("SELECT * FROM usuario WHERE correo=%s", (correo,))
+        user = cursor.fetchone()
+        if user:
+            return ({
+                "id": user[0],
+                "nombre": user[1],
+                "correo": user[3],
+                "rol": user[6]
+            }, 200)
         return {"message": "Contraseña actualizada exitosamente."}, 200
     except Exception as e:
         conn.rollback()
@@ -180,9 +190,19 @@ def verify():
                 return {"error": "El documento ya está registrado."}, 400
             return {"error": error_msg}, 400
         finally:
+            # consultar el usuario recién creado
+            cursor.execute("SELECT * FROM usuario WHERE correo=%s", (datos["correo"],))
+            user = cursor.fetchone()
             cursor.close()
             conn.close()
         verification_codes.pop(correo)
+        if user:
+            return ({
+                "id": user[0],
+                "nombre": user[1],
+                "correo": user[3],
+                "rol": user[6]
+            }, 201)
         return {"message": "Usuario registrado exitosamente."}, 201
 
     elif tipo == "login":

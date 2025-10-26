@@ -3,154 +3,148 @@ from email.message import EmailMessage
 import ssl
 import smtplib
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 email_sender = "packygonotificaciones@gmail.com"
 password = os.getenv("PASSWORD")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+EMAIL_LOGO_URL = os.getenv("EMAIL_LOGO_URL", "")
+BRAND_PRIMARY = os.getenv("BRAND_PRIMARY", "#0097a7")
+BRAND_SECONDARY = os.getenv("BRAND_SECONDARY", "#083c5d")
+SUPPORT_EMAIL = os.getenv("SUPPORT_EMAIL", "soporte@packygo.example")
+SOCIAL_TWITTER = os.getenv("SOCIAL_TWITTER", "#")
+SOCIAL_LINKEDIN = os.getenv("SOCIAL_LINKEDIN", "#")
+def _build_html_template(title: str, subtitle: str, body_html: str, primary_color: str = BRAND_PRIMARY, secondary_color: str = BRAND_SECONDARY) -> str:
+        """Construye una plantilla HTML minimalista y moderna para los correos.
+
+        Parámetros:
+            - title, subtitle: títulos del correo
+            - body_html: contenido principal
+            - primary_color, secondary_color: colores de marca
+        """
+        html = f"""
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#ffffff; padding:24px;">
+            <div style="max-width:600px;margin:0 auto;">
+                <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.05);">
+                    <div style="padding:32px 36px;background:linear-gradient(135deg,{primary_color},{secondary_color});color:white;">
+                        <h1 style="margin:0;font-size:24px;font-weight:700;">{title}</h1>
+                        <div style="margin-top:8px;font-size:16px;opacity:0.92;">{subtitle}</div>
+                    </div>
+
+                    <div style="padding:36px;background:white;color:#2c3e50;font-size:16px;line-height:1.6;">
+                        {body_html}
+                    </div>
+
+                    <div style="padding:24px 36px;background:#f8fafc;border-top:1px solid #edf2f7;color:#64748b;font-size:14px;text-align:center;">
+                        PackyGo © {datetime.now().year}
+                    </div>
+                </div>
+            </div>
+        </div>
+        """
+        return html
+
+
+def _send_email(to_email: str, subject: str, plain_text: str, html: str):
+    try:
+        em = EmailMessage()
+        em["From"] = email_sender
+        em["To"] = to_email
+        em["Subject"] = subject
+        em.set_content(plain_text)
+        em.add_alternative(html, subtype="html")
+
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
+            smtp.login(email_sender, password)
+            smtp.send_message(em)
+        print(f"Correo '{subject}' enviado a {to_email}")
+    except Exception as e:
+        print(f"Error al enviar correo '{subject}' a {to_email}:", e)
+
 
 def enviarCorreo(correo, codigoVerificacion):
-    try:
-        em = EmailMessage()
-        em["From"] = email_sender
-        em["To"] = correo
-        em["Subject"] = "Código de verificación"
-        em.set_content(f"Su código de verificación es: {codigoVerificacion}")
+    subject = "Código de verificación — PackyGo"
+    plain = f"Tu código de verificación es: {codigoVerificacion}\n\nIngresa este código en la aplicación para continuar."
+    body_html = f"""
+      <div style="text-align:center;">
+        <div style="margin:0 0 24px 0;color:#64748b;font-size:16px;">Este es tu código de verificación:</div>
+        <div style="display:inline-block;padding:16px 32px;border-radius:12px;background:#f1f5f9;color:#0f172a;font-weight:700;font-size:28px;letter-spacing:8px;margin:0;">{codigoVerificacion}</div>
+        <div style="margin:24px 0 0 0;color:#94a3b8;font-size:14px;">Ingresa este código en la aplicación para continuar</div>
+      </div>
+    """
+    html = _build_html_template("Verificación de cuenta", "Código de verificación", body_html)
+    _send_email(correo, subject, plain, html)
 
-        html = f"""
-        <div style="font-family: Arial, sans-serif; background:#fff; padding:24px;">
-            <div style="max-width:420px;margin:auto;background:#f4f8fb;border-radius:12px;padding:24px 28px;box-shadow:0 2px 12px #0097a722;">
-                <h2 style="color:#0097a7;text-align:center;">Verificación de correo</h2>
-                <p style="font-size:1.1em;color:#083c5d;">Tu código de verificación es:</p>
-                <div style="font-size:2em;font-weight:bold;color:#083c5d;background:#e0f7fa;padding:12px 0;border-radius:8px;text-align:center;letter-spacing:4px;margin:18px 0;">
-                    {codigoVerificacion}
-                </div>
-                <p style="color:#888;text-align:center;font-size:0.98em;">Ingresa este código en PackyGo para continuar.</p>
-            </div>
-        </div>
-        """
-        em.add_alternative(html, subtype="html")
-
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
-            smtp.login(email_sender, password)
-            smtp.send_message(em)
-        print("Correo enviado correctamente")
-    except Exception as e:
-        print("Error al enviar correo:", e)
 
 def enviarCorreoCambio(correo):
-    try:
-        em = EmailMessage()
-        em["From"] = email_sender
-        em["To"] = correo
-        em["Subject"] = "Contraseña actualizada"
-        em.set_content("Tu contraseña ha sido cambiada exitosamente. Si no fuiste tú, contacta soporte de inmediato.")
-
-        html = """
-        <div style="font-family: Arial, sans-serif; background:#f4f8fb; padding:24px;">
-            <div style="max-width:420px;margin:auto;background:#fff;border-radius:12px;padding:24px 28px;box-shadow:0 2px 12px #0097a722;">
-                <h2 style="color:#0097a7;text-align:center;">Contraseña actualizada</h2>
-                <p style="font-size:1.1em;color:#083c5d;">Tu contraseña ha sido cambiada exitosamente.</p>
-                <p style="color:#888;font-size:0.98em;">Si no fuiste tú, contacta soporte de inmediato.</p>
-            </div>
+    subject = "Tu contraseña fue actualizada — PackyGo"
+    plain = "Tu contraseña ha sido cambiada exitosamente. Si no fuiste tú, contacta soporte de inmediato."
+    body_html = """
+      <div style="text-align:center;">
+        <div style="margin:0 0 20px 0;">
+          <span style="display:inline-block;width:48px;height:48px;background:#22c55e;border-radius:50%;margin-bottom:16px;">
+            <span style="line-height:48px;font-size:24px;color:white;">✓</span>
+          </span>
+          <div style="color:#64748b;font-size:16px;">Tu contraseña ha sido actualizada correctamente</div>
         </div>
-        """
-        em.add_alternative(html, subtype="html")
+        <div style="color:#94a3b8;font-size:14px;">Si no reconoces este cambio, contacta a soporte de inmediato</div>
+      </div>
+    """
+    html = _build_html_template("Contraseña actualizada", "Actualización de seguridad", body_html)
+    _send_email(correo, subject, plain, html)
 
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
-            smtp.login(email_sender, password)
-            smtp.send_message(em)
-        print("Correo de cambio de contraseña enviado")
-    except Exception as e:
-        print("Error al enviar correo de cambio:", e)
 
 def enviarCorreoVerificacion(correo, codigoVerificacion):
-    try:
-        em = EmailMessage()
-        em["From"] = email_sender
-        em["To"] = correo
-        em["Subject"] = "Código de verificación"
-        em.set_content(f"Su código de verificación es: {codigoVerificacion}")
+    subject = "Verifica tu correo — PackyGo"
+    plain = f"Tu código de verificación es: {codigoVerificacion}\n\nUsa este código para confirmar tu cuenta en PackyGo."
+    body_html = f"""
+      <div style="text-align:center;">
+        <div style="margin:0 0 24px 0;color:#64748b;font-size:16px;">Para completar tu registro, usa este código:</div>
+        <div style="display:inline-block;padding:16px 32px;border-radius:12px;background:#f1f5f9;color:#0f172a;font-weight:700;font-size:28px;letter-spacing:8px;margin:0;">{codigoVerificacion}</div>
+        <div style="margin:24px 0 0 0;color:#94a3b8;font-size:14px;">Ingresa este código en la aplicación para verificar tu cuenta</div>
+      </div>
+    """
+    html = _build_html_template("Bienvenido a PackyGo", "Verificación de cuenta", body_html)
+    _send_email(correo, subject, plain, html)
 
-        html = f"""
-        <div style="font-family: Arial, sans-serif; background:#f4f8fb; padding:24px;">
-            <div style="max-width:420px;margin:auto;background:#fff;border-radius:12px;padding:24px 28px;box-shadow:0 2px 12px #0097a722;">
-                <h2 style="color:#0097a7;text-align:center;">Verificación de correo</h2>
-                <p style="font-size:1.1em;color:#083c5d;">Tu código de verificación es:</p>
-                <div style="font-size:2em;font-weight:bold;color:#083c5d;background:#e0f7fa;padding:12px 0;border-radius:8px;text-align:center;letter-spacing:4px;margin:18px 0;">
-                    {codigoVerificacion}
-                </div>
-                <p style="color:#888;text-align:center;font-size:0.98em;">Ingresa este código en PackyGo para continuar.</p>
-            </div>
-        </div>
-        """
-        em.add_alternative(html, subtype="html")
-
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
-            smtp.login(email_sender, password)
-            smtp.send_message(em)
-        print("Correo de verificación enviado correctamente")
-    except Exception as e:
-        print("Error al enviar correo de verificación:", e)
 
 def enviarCorreoReserva(correo, mensaje):
-    try:
-        em = EmailMessage()
-        em["From"] = email_sender
-        em["To"] = correo
-        em["Subject"] = "Nueva reserva recibida"
-        em.set_content(mensaje)
+    subject = "Nueva reserva — PackyGo"
+    plain = mensaje
+    short_msg = f"{mensaje[:300]}..." if len(mensaje) > 300 else mensaje
+    body_html = f"""
+      <div style="text-align:center;">
+        <span style="display:inline-block;width:64px;height:64px;background:#0097a7;border-radius:50%;margin-bottom:20px;">
+          <span style="line-height:64px;font-size:32px;color:white;">🚚</span>
+        </span>
+        <h3 style="margin:0 0 16px 0;color:#0f172a;font-size:18px;">¡Tienes una nueva reserva!</h3>
+        <p style="margin:0;color:#546e7a;font-size:15px;white-space:pre-line;text-align:left;">{short_msg}</p>
+      </div>
+    """
+    html = _build_html_template("Nueva reserva recibida", "Tienes una nueva reserva", body_html)
+    _send_email(correo, subject, plain, html)
 
-        html = f"""
-        <div style="font-family: Arial, sans-serif; background:#f4f8fb; padding:24px;">
-            <div style="max-width:480px;margin:auto;background:#fff;border-radius:12px;padding:24px 28px;box-shadow:0 2px 12px #0097a722;">
-                <h2 style="color:#0097a7;text-align:center;">¡Tienes una nueva reserva!</h2>
-                <div style="font-size:1.08em;color:#083c5d;margin:18px 0 10px 0;white-space:pre-line;">
-                    {mensaje}
-                </div>
-                <p style="color:#888;text-align:center;font-size:0.98em;margin-top:18px;">Gracias por usar PackyGo.</p>
-            </div>
-        </div>
-        """
-        em.add_alternative(html, subtype="html")
-
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
-            smtp.login(email_sender, password)
-            smtp.send_message(em)
-        print("Correo de reserva enviado correctamente")
-    except Exception as e:
-        print("Error al enviar correo de reserva:", e)
 
 def enviarCorreoCancelacion(correo, nombre, mensaje_extra, es_cliente=True):
-    try:
-        em = EmailMessage()
-        em["From"] = email_sender
-        em["To"] = correo
-        em["Subject"] = "Reserva cancelada"
-        if es_cliente:
-            texto = f"Hola {nombre}, tu reserva ha sido cancelada. {mensaje_extra}"
-        else:
-            texto = f"Hola {nombre}, una reserva de tu vehículo ha sido cancelada. {mensaje_extra}"
-        em.set_content(texto)
+    subject = "Reserva cancelada — PackyGo"
+    if es_cliente:
+        texto = f"Hola {nombre}, tu reserva ha sido cancelada. {mensaje_extra}"
+        subtitle = "Reserva cancelada"
+    else:
+        texto = f"Hola {nombre}, una reserva de tu vehículo ha sido cancelada. {mensaje_extra}"
+        subtitle = "Reserva cancelada"
 
-        html = f"""
-        <div style="font-family: Arial, sans-serif; background:#f4f8fb; padding:24px;">
-            <div style="max-width:420px;margin:auto;background:#fff;border-radius:12px;padding:24px 28px;box-shadow:0 2px 12px #0097a722;">
-                <h2 style="color:#0097a7;text-align:center;">Reserva cancelada</h2>
-                <p style="font-size:1.1em;color:#083c5d;">{texto}</p>
-                <p style="color:#888;text-align:center;font-size:0.98em;">PackyGo</p>
-            </div>
-        </div>
-        """
-        em.add_alternative(html, subtype="html")
-
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
-            smtp.login(email_sender, password)
-            smtp.send_message(em)
-        print("Correo de cancelación enviado correctamente")
-    except Exception as e:
-        print("Error al enviar correo de cancelación:", e)
+    plain = texto
+    body_html = f"""
+      <div style="text-align:center;">
+        <span style="display:inline-block;width:64px;height:64px;background:#ef4444;border-radius:50%;margin-bottom:20px;">
+          <span style="line-height:64px;font-size:32px;color:white;">✕</span>
+        </span>
+        <h3 style="margin:0 0 16px 0;color:#0f172a;font-size:18px;">Reserva Cancelada</h3>
+        <p style="margin:0;color:#546e7a;font-size:15px;text-align:left;">{texto}</p>
+      </div>
+    """
+    html = _build_html_template("Notificación de cancelación", subtitle, body_html)
+    _send_email(correo, subject, plain, html)

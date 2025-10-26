@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://10.15.9.25:5000/api'
+  baseURL: 'http://192.168.0.3:5000/api'
 })
 
 export default api
@@ -33,7 +33,21 @@ export async function Verify({ correo, code, tipo }) {
     code,
     tipo
   })
-  localStorage.setItem("user", JSON.stringify(data));
+  // Guardar en localStorage sólo cuando la verificación devuelve datos de usuario
+  // (por ejemplo, tipo 'login' o 'register'). Para tipos como 'reset' no debemos
+  // sobrescribir la sesión.
+  try {
+    if (tipo === 'login' || tipo === 'register') {
+      // Si el backend devuelve directamente el usuario o un objeto { user: ... }
+      const user = data?.user ? data.user : data
+      if (user && (user.id || user.correo)) {
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+    }
+  } catch (e) {
+    // no bloquear el flujo si algo falla al escribir en localStorage
+    console.warn('No se pudo guardar user en localStorage tras Verify:', e)
+  }
   return data
 }
 
@@ -162,7 +176,7 @@ export function getImagenUrl(imagen_url) {
   } else if (imagen_url.startsWith("uploads/")) {
     fileName = imagen_url.replace("uploads/", "");
   }
-  return `http://10.15.9.25:5000/uploads/${fileName}`;
+  return `http://192.168.0.3:5000/uploads/${fileName}`;
 }
 
 export async function editarReserva(id, data) {

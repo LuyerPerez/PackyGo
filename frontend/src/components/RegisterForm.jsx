@@ -61,8 +61,20 @@ export default function RegisterForm() {
     }
   }
 
-  const handleVerified = () => {
-    setSuccess("Registro exitoso. ¡Ahora puedes iniciar sesión!")
+  const handleVerified = (data) => {
+    // Verify API stores user in localStorage, but aseguramos y redirigimos para iniciar sesión automáticamente
+    try {
+      const user = data?.user ? data.user : data
+      if (user && (user.id || user.correo)) {
+        localStorage.setItem("user", JSON.stringify(user))
+        window.location.href = "/"
+        return
+      }
+    } catch (e) {
+      // si algo falla, mostrar éxito y volver al formulario de verificación cerrado
+      console.error("Auto-login tras verificación falló:", e)
+    }
+    setSuccess("Registro verificado. Por favor inicia sesión.")
     setShowVerification(false)
   }
 
@@ -187,6 +199,9 @@ export default function RegisterForm() {
                     <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                   </button>
                 </div>
+                {passwordError && (
+                  <p className="error" style={{ marginTop: 6 }}>{passwordError}</p>
+                )}
                 <div className="input-group">
                   <FontAwesomeIcon icon={faUserShield} className="icon" />
                   <div className="input-wrapper has-value">
