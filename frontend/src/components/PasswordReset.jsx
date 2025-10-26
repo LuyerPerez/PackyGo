@@ -74,8 +74,9 @@ export default function PasswordReset() {
   };
 
   return (
-    <div className="reset-page-wrapper">
-      <div className="reset-container">
+    <div className="login-page-wrapper">
+      <div className="login-left-panel">
+        <div className="login-container reset-container">
           {error && <p className="reset-error">{error}</p>}
           {success && <p className="reset-success">{success}</p>}
 
@@ -161,6 +162,10 @@ export default function PasswordReset() {
             </a>
           )}
         </div>
+      </div>
+      <div className="login-right-panel">
+        <img src="../../public/rocket-login.png" alt="Rocket Illustration" />
+      </div>
     </div>
   );
 }
