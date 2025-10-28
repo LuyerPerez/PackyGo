@@ -54,7 +54,7 @@ export default function PoliticaPrivacidad() {
           </p>
         </section>
         <div className="terminos-footer">
-          <img src="/logo.svg" alt="PackyGo Rocket" className="terminos-img" />
+          <img src="/logo_title.png" alt="PackyGo Rocket" className="terminos-img" />
           <p>PackyGo &copy; 2025</p>
         </div>
       </div>

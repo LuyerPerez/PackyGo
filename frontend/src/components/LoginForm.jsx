@@ -154,7 +154,7 @@ export default function LoginForm() {
         </div>
       </div>
       <div className="login-right-panel">
-        <img src="../../public/rocket-login.png" alt="Rocket Illustration" />
+        <img src="../../public/fondo-login.jpg" alt="Rocket Illustration" />
       </div>
     </div>
   )
