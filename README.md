@@ -35,10 +35,6 @@ PackyGo/
 
 ## Instalación y ejecución
 
-## Base de datos 
-
-1. En la carpeta db esta el script de la base de datos, ejecutar en MySQL Workbench o PhpMyAdmin
-
 ### Backend
 
 1. Ejecutar o crear su entorno virtual:
@@ -53,11 +49,11 @@ PackyGo/
 #### Ejemplo de archivo `.env` para el backend
 
 ```properties
-MYSQL_HOST=localhost
-MYSQL_PORT=3306
+MYSQL_HOST=switchback.proxy.rlwy.net
+MYSQL_PORT=31036
 MYSQL_USER=root
-MYSQL_PASSWORD=
-MYSQL_DATABASE=packygo
+MYSQL_PASSWORD=SQrfkSLyJilwIhOMqqxmIWwNzQBKBfKl
+MYSQL_DATABASE=railway
 FLASK_DEBUG=1
 FLASK_PORT=5000
 
@@ -76,7 +72,7 @@ GOOGLE_CLIENT_ID=tu_client_id_google
    ```
    npm run dev
    ```
-
+3. Se ejecuta con el
 ---
 
 ## Funcionalidades principales
