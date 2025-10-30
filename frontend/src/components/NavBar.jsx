@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faHome, faTruck, faRightFromBracket, faUserLock, faFileContract, faShieldHalved, faCalendarDays} from "@fortawesome/free-solid-svg-icons";
+import { faUser, faHome, faTruck, faRightFromBracket, faUserLock, faFileContract, faShieldHalved, faCalendarDays, faUserShield, faSearch, faInfoCircle} from "@fortawesome/free-solid-svg-icons";
 
 function NavBar() {
   const [user, setUser] = useState(null);
@@ -123,23 +123,16 @@ function NavBar() {
                 </Link>
               ) : (
                 <Link to="/explorar" className={`nav-link${isActive("/explorar") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
-                  <FontAwesomeIcon icon={faTruck} />
+                  <FontAwesomeIcon icon={faSearch} />
                   <span className="nav-label">Explorar</span>
                 </Link>
               )}
             </li>
 
             <li>
-              <Link to="/terminos" className={`nav-link${isActive("/terminos") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
-                <FontAwesomeIcon icon={faFileContract} />
-                <span className="nav-label">Términos</span>
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/privacidad" className={`nav-link${isActive("/privacidad") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
-                <FontAwesomeIcon icon={faShieldHalved} />
-                <span className="nav-label">Políticas</span>
+              <Link to="/nosotros" className={`nav-link${isActive("/nosotros") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
+                <FontAwesomeIcon icon={faInfoCircle} />
+                <span className="nav-label">Nosotros</span>
               </Link>
             </li>
 
@@ -199,7 +192,7 @@ function NavBar() {
                 tabIndex={0}
               >
                 <FontAwesomeIcon icon={faUser} />
-                <span className="user-name">{user.nombre}</span>
+                <span className="user-name">{user.primer_nombre} {user.primer_apellido}</span>
                 <span className="user-arrow">▾</span>
               </button>
               <div
@@ -228,7 +221,7 @@ function NavBar() {
               >
                 <div className="dropdown-header">
                   <div className="user-info">
-                    <span className="user-fullname">{user.nombre}</span>
+                    <span className="user-fullname">{user.primer_nombre} {user.primer_apellido}</span>
                     <span className="user-email">{user.correo}</span>
                   </div>
                 </div>
@@ -270,6 +263,20 @@ function NavBar() {
                       <div className="item-content">
                         <span className="item-title">Mis Reservas</span>
                         <span className="item-description">Historial y estado de reservas</span>
+                      </div>
+                    </Link>
+                  )}
+
+                  {user.rol === "admin" && (
+                    <Link
+                      to="/administracion"
+                      className={`menu-item${isActive("/administracion") ? " active" : ""}`}
+                      onClick={() => { setIsDropdownOpen(false); }}
+                    >
+                      <FontAwesomeIcon icon={faUserShield} />
+                      <div className="item-content">
+                        <span className="item-title">Administración</span>
+                        <span className="item-description">Panel de administración</span>
                       </div>
                     </Link>
                   )}

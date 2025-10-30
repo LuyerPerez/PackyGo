@@ -66,7 +66,7 @@ const ModalVehiculo = ({ vehiculo, onClose }) => {
           </div>
           <div className="conductor-info modal-info-col">
             <h1>Conductor</h1>
-            <p><strong>Nombre:</strong> {vehiculo.conductor?.nombre}</p>
+            <p><strong>Nombre:</strong> {vehiculo.conductor?.primer_nombre} {vehiculo.conductor?.primer_apellido}</p>
             <p><strong>Correo:</strong> {vehiculo.conductor?.correo}</p>
             <p><strong>Teléfono:</strong> {vehiculo.conductor?.telefono}</p>
             <div className="reservar-wrapper">

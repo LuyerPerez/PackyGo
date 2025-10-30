@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://10.15.9.13:5000/api'
+  baseURL: 'http://10.15.9.24:5000/api'
 })
 
 export default api
@@ -15,9 +15,12 @@ export async function Login(correo, contrasena) {
   return data;
 }
 
-export async function Register({ nombre, noDocumento, correo, telefono, contrasena, rol }) {
+export async function Register({ primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, noDocumento, correo, telefono, contrasena, rol }) {
   const { data } = await api.post('/register', {
-    nombre,
+    primer_nombre,
+    segundo_nombre,
+    primer_apellido,
+    segundo_apellido,
     noDocumento,
     correo,
     telefono,
@@ -48,6 +51,14 @@ export async function Verify({ correo, code, tipo }) {
 
 export async function requestPasswordReset(correo) {
   const { data } = await api.post('/request-reset', { correo });
+  return data;
+}
+
+export async function resendCode({ correo, tipo }) {
+  const { data } = await api.post('/resend-code', { 
+    correo, 
+    tipo 
+  });
   return data;
 }
 
@@ -171,7 +182,7 @@ export function getImagenUrl(imagen_url) {
   } else if (imagen_url.startsWith("uploads/")) {
     fileName = imagen_url.replace("uploads/", "");
   }
-  return `http://10.15.9.13:5000/uploads/${fileName}`;
+  return `http://10.15.9.24:5000/uploads/${fileName}`;
 }
 
 export async function editarReserva(id, data) {

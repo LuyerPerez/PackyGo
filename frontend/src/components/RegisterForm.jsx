@@ -19,7 +19,10 @@ function validarContrasena(str) {
 }
 
 export default function RegisterForm() {
-  const [nombre, setNombre] = useState('')
+  const [primerNombre, setPrimerNombre] = useState('')
+  const [segundoNombre, setSegundoNombre] = useState('')
+  const [primerApellido, setPrimerApellido] = useState('')
+  const [segundoApellido, setSegundoApellido] = useState('')
   const [noDocumento, setNoDocumento] = useState('')
   const [correo, setCorreo] = useState('')
   const [telefono, setTelefono] = useState('')
@@ -48,7 +51,17 @@ export default function RegisterForm() {
     }
     setLoading(true)
     try {
-      await Register({ nombre, noDocumento, correo, telefono, contrasena, rol })
+      await Register({ 
+        primer_nombre: primerNombre,
+        segundo_nombre: segundoNombre,
+        primer_apellido: primerApellido,
+        segundo_apellido: segundoApellido,
+        noDocumento, 
+        correo, 
+        telefono, 
+        contrasena, 
+        rol 
+      })
       setShowVerification(true)
     } catch (e) {
       setError(
@@ -126,12 +139,49 @@ export default function RegisterForm() {
                   <div className="input-wrapper">
                     <input
                       type="text"
-                      value={nombre}
-                      onChange={(e) => setNombre(e.target.value)}
+                      value={primerNombre}
+                      onChange={(e) => setPrimerNombre(e.target.value)}
                       required
                       placeholder=" "
                     />
-                    <label className="input-label">Nombre</label>
+                    <label className="input-label">Primer Nombre</label>
+                  </div>
+                </div>
+                <div className="input-group">
+                  <FontAwesomeIcon icon={faUser} className="icon" />
+                  <div className="input-wrapper">
+                    <input
+                      type="text"
+                      value={segundoNombre}
+                      onChange={(e) => setSegundoNombre(e.target.value)}
+                      placeholder=" "
+                    />
+                    <label className="input-label">Segundo Nombre (Opcional)</label>
+                  </div>
+                </div>
+                <div className="input-group">
+                  <FontAwesomeIcon icon={faUser} className="icon" />
+                  <div className="input-wrapper">
+                    <input
+                      type="text"
+                      value={primerApellido}
+                      onChange={(e) => setPrimerApellido(e.target.value)}
+                      required
+                      placeholder=" "
+                    />
+                    <label className="input-label">Primer Apellido</label>
+                  </div>
+                </div>
+                <div className="input-group">
+                  <FontAwesomeIcon icon={faUser} className="icon" />
+                  <div className="input-wrapper">
+                    <input
+                      type="text"
+                      value={segundoApellido}
+                      onChange={(e) => setSegundoApellido(e.target.value)}
+                      placeholder=" "
+                    />
+                    <label className="input-label">Segundo Apellido (Opcional)</label>
                   </div>
                 </div>
                 <div className="input-group">

@@ -21,6 +21,7 @@ import Administracion from "./pages/Administracion";
 import AdminCrud from "./pages/AdminCrud";
 import HomePrincipal from "./pages/HomePrincipal";
 import HomeCamionero from "./pages/HomeCamionero";
+import Nosotros from "./pages/Nosotros";
 
 const GOOGLE_CLIENT_ID = "710600040256-60ttnabd8kjbr1051o2giq3gubd0ab4g.apps.googleusercontent.com";
 const NAVBAR_HIDDEN_ROUTES = ["/login", "/register", "/recuperar-contrasena"];
@@ -61,6 +62,7 @@ export default function App() {
         <Route path="/pedidos" element={<Pedidos />} />
         <Route path="/administracion" element={<Administracion />} />
         <Route path="/admin/:tabla" element={<AdminCrud />} />
+        <Route path="/nosotros" element={<Nosotros />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </GoogleOAuthProvider>

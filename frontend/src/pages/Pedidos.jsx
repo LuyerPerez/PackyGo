@@ -35,7 +35,7 @@ export default function Pedidos() {
   const pedidosFiltrados = pedidos.filter(p => {
     const cumpleEstado = filtroEstado === "" || p.reserva.estado_reserva === filtroEstado;
     const cumpleCliente = filtroCliente === "" || 
-      p.cliente.nombre.toLowerCase().includes(filtroCliente.toLowerCase());
+      `${p.cliente.primer_nombre} ${p.cliente.primer_apellido}`.toLowerCase().includes(filtroCliente.toLowerCase());
     
     let cumpleFechaInicio = true;
     

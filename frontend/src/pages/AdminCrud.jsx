@@ -11,7 +11,10 @@ const config = {
     titulo: "Usuarios",
     columnas: [
       { key: "id", label: "ID" },
-      { key: "nombre", label: "Nombre" },
+      { key: "primer_nombre", label: "Primer Nombre" },
+      { key: "segundo_nombre", label: "Segundo Nombre (Opcional)", formOnly: true, required: false },
+      { key: "primer_apellido", label: "Primer Apellido" },
+      { key: "segundo_apellido", label: "Segundo Apellido (Opcional)", formOnly: true, required: false },
       { key: "noDocumento", label: "Documento" },
       { key: "correo", label: "Correo" },
       { key: "telefono", label: "Teléfono" },
@@ -119,7 +122,7 @@ const AdminCrud = () => {
         if (tabla === "vehiculos") {
           datos = datos.map(v => ({
             ...v,
-            camionero_nombre: v.conductor?.nombre || "",
+            camionero_nombre: `${v.conductor?.primer_nombre || ""} ${v.conductor?.primer_apellido || ""}`.trim(),
             camionero_correo: v.conductor?.correo || "",
             camionero_telefono: v.conductor?.telefono || ""
           }));
@@ -135,7 +138,7 @@ const AdminCrud = () => {
           ...opts,
           camionero_id: camioneros.map(u => ({
             value: u.id,
-            label: `${u.id} - ${u.nombre}`
+            label: `${u.id} - ${u.primer_nombre} ${u.primer_apellido}`
           }))
         }));
       }).catch(err => console.error("Error cargando camioneros:", err));
@@ -147,7 +150,7 @@ const AdminCrud = () => {
           ...opts,
           cliente_id: (res.usuarios || res.data?.usuarios || []).map(u => ({
             value: u.id,
-            label: `${u.id} - ${u.nombre}`
+            label: `${u.id} - ${u.primer_nombre} ${u.primer_apellido}`
           }))
         }));
       });
@@ -169,7 +172,7 @@ const AdminCrud = () => {
           ...opts,
           usuario_id: (res.usuarios || res.data?.usuarios || []).map(u => ({
             value: u.id,
-            label: `${u.id} - ${u.nombre}`
+            label: `${u.id} - ${u.primer_nombre} ${u.primer_apellido}`
           }))
         }));
       });

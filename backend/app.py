@@ -53,8 +53,15 @@ def request_reset():
         return {"error": "No existe usuario con ese correo"}, 404
     codigo = str(random.randint(100000, 999999))
     reset_codes[correo] = codigo
-    enviarCorreo(correo, codigo)
-    return {"message": "Código de recuperación enviado al correo."}, 200
+    email_sent = enviarCorreo(correo, codigo)
+    
+    if email_sent:
+        return {"message": "Código de recuperación enviado al correo."}, 200
+    else:
+        return {
+            "message": "Código generado correctamente.", 
+            "warning": "Hubo un problema enviando el correo. Usa el código: " + codigo
+        }, 200
 
 @app.route("/api/reset-password", methods=["POST"])
 def reset_password():
@@ -81,9 +88,12 @@ def reset_password():
         if user:
             return ({
                 "id": user[0],
-                "nombre": user[1],
-                "correo": user[3],
-                "rol": user[6]
+                "primer_nombre": user[1],
+                "segundo_nombre": user[2],
+                "primer_apellido": user[3],
+                "segundo_apellido": user[4],
+                "correo": user[6],
+                "rol": user[9]
             }, 200)
         return {"message": "Contraseña actualizada exitosamente."}, 200
     except Exception as e:
@@ -96,21 +106,27 @@ def reset_password():
 @app.route("/api/register", methods=["POST"])
 def register():
     data = request.json
-    nombre = data.get("nombre")
+    primer_nombre = data.get("primer_nombre")
+    segundo_nombre = data.get("segundo_nombre", "")
+    primer_apellido = data.get("primer_apellido")
+    segundo_apellido = data.get("segundo_apellido", "")
     noDocumento = data.get("noDocumento")
     correo = data.get("correo")
     telefono = data.get("telefono")
     contrasena = data.get("contrasena")
     rol = data.get("rol")
 
-    if not all([nombre, noDocumento, correo, telefono, contrasena, rol]):
-        return {"error": "Todos los campos son obligatorios"}, 400
+    if not all([primer_nombre, primer_apellido, noDocumento, correo, telefono, contrasena, rol]):
+        return {"error": "Todos los campos obligatorios deben ser completados"}, 400
 
     codigo = str(random.randint(100000, 999999))
     verification_codes[correo] = {
         "code": codigo,
         "data": {
-            "nombre": nombre,
+            "primer_nombre": primer_nombre,
+            "segundo_nombre": segundo_nombre,
+            "primer_apellido": primer_apellido,
+            "segundo_apellido": segundo_apellido,
             "noDocumento": noDocumento,
             "correo": correo,
             "telefono": telefono,
@@ -137,15 +153,18 @@ def login():
     cursor.close()
     conn.close()
 
-    if user and check_password_hash(user[5], contrasena):
+    if user and check_password_hash(user[8], contrasena):
         codigo = str(random.randint(100000, 999999))
         verification_codes[correo] = {
             "code": codigo,
             "user": {
                 "id": user[0],
-                "nombre": user[1],
-                "correo": user[3],
-                "rol": user[6] 
+                "primer_nombre": user[1],
+                "segundo_nombre": user[2],
+                "primer_apellido": user[3],
+                "segundo_apellido": user[4],
+                "correo": user[6],
+                "rol": user[9] 
             }
         }
         enviarCorreo(correo, codigo)
@@ -177,8 +196,8 @@ def verify():
         cursor = conn.cursor()
         try:
             cursor.execute(
-                "INSERT INTO usuario (nombre, noDocumento, correo, telefono, contrasena, rol) VALUES (%s, %s, %s, %s, %s, %s)",
-                (datos["nombre"], datos["noDocumento"], datos["correo"], datos["telefono"], hashed_password, datos["rol"])
+                "INSERT INTO usuario (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, noDocumento, correo, telefono, contrasena, rol) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (datos["primer_nombre"], datos["segundo_nombre"], datos["primer_apellido"], datos["segundo_apellido"], datos["noDocumento"], datos["correo"], datos["telefono"], hashed_password, datos["rol"])
             )
             conn.commit()
         except Exception as e:
@@ -199,9 +218,12 @@ def verify():
         if user:
             return ({
                 "id": user[0],
-                "nombre": user[1],
-                "correo": user[3],
-                "rol": user[6]
+                "primer_nombre": user[1],
+                "segundo_nombre": user[2],
+                "primer_apellido": user[3],
+                "segundo_apellido": user[4],
+                "correo": user[6],
+                "rol": user[9]
             }, 201)
         return {"message": "Usuario registrado exitosamente."}, 201
 
@@ -211,6 +233,89 @@ def verify():
         return jsonify(user), 200
 
     return {"error": "Tipo de verificación inválido"}, 400
+
+@app.route("/api/resend-code", methods=["POST"])
+def resend_code():
+    data = request.json
+    correo = data.get("correo")
+    tipo = data.get("tipo")
+    
+    print(f"🔧 Resend-code request: correo={correo}, tipo={tipo}")
+    print(f"🔧 verification_codes keys: {list(verification_codes.keys())}")
+    print(f"🔧 reset_codes keys: {list(reset_codes.keys())}")
+
+    if not correo or not tipo:
+        return {"error": "Correo y tipo son obligatorios"}, 400
+
+    if tipo == "register":
+        # Verificar si existe un código pendiente de registro
+        print(f"🔧 Checking register for {correo}: {correo in verification_codes}")
+        if correo in verification_codes and "data" in verification_codes[correo]:
+            codigo = str(random.randint(100000, 999999))
+            verification_codes[correo]["code"] = codigo
+            print(f"🔧 Nuevo código de registro generado: {codigo}")
+            email_sent = enviarCorreo(correo, codigo)
+            if email_sent:
+                return {"message": "Código reenviado correctamente"}, 200
+            else:
+                return {
+                    "message": "Código generado correctamente.", 
+                    "warning": "Hubo un problema enviando el correo. Usa el código: " + codigo
+                }, 200
+        else:
+            print(f"🔧 No hay proceso de registro activo para {correo}")
+            return {"error": "No hay proceso de registro pendiente para este correo"}, 400
+            
+    elif tipo == "login":
+        # Verificar si existe un código pendiente de login
+        print(f"🔧 Checking login for {correo}: {correo in verification_codes}")
+        if correo in verification_codes and "user" in verification_codes[correo]:
+            codigo = str(random.randint(100000, 999999))
+            verification_codes[correo]["code"] = codigo
+            print(f"🔧 Nuevo código de login generado: {codigo}")
+            email_sent = enviarCorreo(correo, codigo)
+            if email_sent:
+                return {"message": "Código reenviado correctamente"}, 200
+            else:
+                return {
+                    "message": "Código generado correctamente.", 
+                    "warning": "Hubo un problema enviando el correo. Usa el código: " + codigo
+                }, 200
+        else:
+            print(f"🔧 No hay proceso de login activo para {correo}")
+            return {"error": "No hay proceso de login pendiente para este correo"}, 400
+            
+    elif tipo == "reset":
+        # Verificar si existe un código pendiente de reset
+        print(f"🔧 Checking reset for {correo}: {correo in reset_codes}")
+        if correo in reset_codes:
+            codigo = str(random.randint(100000, 999999))
+            reset_codes[correo] = codigo
+            print(f"🔧 Nuevo código de reset generado: {codigo}")
+            email_sent = enviarCorreo(correo, codigo)
+            if email_sent:
+                return {"message": "Código reenviado correctamente"}, 200
+            else:
+                return {
+                    "message": "Código generado correctamente.", 
+                    "warning": "Hubo un problema enviando el correo. Usa el código: " + codigo
+                }, 200
+        else:
+            # Si no existe en reset_codes, crear uno nuevo
+            print(f"🔧 No hay proceso de reset activo, creando uno nuevo")
+            codigo = str(random.randint(100000, 999999))
+            reset_codes[correo] = codigo
+            print(f"🔧 Nuevo código de reset creado: {codigo}")
+            email_sent = enviarCorreo(correo, codigo)
+            if email_sent:
+                return {"message": "Código reenviado correctamente"}, 200
+            else:
+                return {
+                    "message": "Código generado correctamente.", 
+                    "warning": "Hubo un problema enviando el correo. Usa el código: " + codigo
+                }, 200
+
+    return {"error": "Tipo de reenvío inválido"}, 400
 
 @app.route("/api/google-login", methods=["POST"])
 def google_login():
@@ -230,9 +335,12 @@ def google_login():
             return {"error": "No existe usuario con ese correo"}, 404
         return {"user": {
             "id": user[0],
-            "nombre": user[1],
-            "correo": user[3],
-            "rol": user[6] 
+            "primer_nombre": user[1],
+            "segundo_nombre": user[2],
+            "primer_apellido": user[3],
+            "segundo_apellido": user[4],
+            "correo": user[6],
+            "rol": user[9] 
         }}, 200
     except Exception as e:
         msg = str(e)
@@ -254,7 +362,24 @@ def google_register():
         return {"error": "Token requerido"}, 400
     try:
         idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), os.getenv("GOOGLE_CLIENT_ID"))
-        nombre = idinfo.get("name", "")
+        nombre_completo = idinfo.get("name", "")
+        # Separar el nombre completo de Google
+        partes_nombre = nombre_completo.split()
+        primer_nombre = partes_nombre[0] if len(partes_nombre) > 0 else ""
+        segundo_nombre = ""
+        primer_apellido = partes_nombre[1] if len(partes_nombre) > 1 else ""
+        segundo_apellido = ""
+        
+        # Si hay más de 2 partes, ajustar la distribución
+        if len(partes_nombre) > 2:
+            if len(partes_nombre) == 3:
+                segundo_nombre = partes_nombre[1]
+                primer_apellido = partes_nombre[2]
+            elif len(partes_nombre) >= 4:
+                segundo_nombre = partes_nombre[1]
+                primer_apellido = partes_nombre[2]
+                segundo_apellido = partes_nombre[3]
+        
         correo = idinfo["email"]
         noDocumento = None
         telefono = None
@@ -269,8 +394,8 @@ def google_register():
             return {"error": "El correo ya está registrado."}, 400
         hashed_password = generate_password_hash(contrasena)
         cursor.execute(
-            "INSERT INTO usuario (nombre, noDocumento, correo, telefono, contrasena, rol) VALUES (%s, %s, %s, %s, %s, %s)",
-            (nombre, noDocumento, correo, telefono, hashed_password, rol)
+            "INSERT INTO usuario (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, noDocumento, correo, telefono, contrasena, rol) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, noDocumento, correo, telefono, hashed_password, rol)
         )
         conn.commit()
         cursor.execute("SELECT * FROM usuario WHERE correo=%s", (correo,))
@@ -279,9 +404,12 @@ def google_register():
         conn.close()
         return {"user": {
             "id": user[0],
-            "nombre": user[1],
-            "correo": user[3],
-            "rol": user[6]
+            "primer_nombre": user[1],
+            "segundo_nombre": user[2],
+            "primer_apellido": user[3],
+            "segundo_apellido": user[4],
+            "correo": user[6],
+            "rol": user[9]
         }}, 201
     except Exception as e:
         msg = str(e)
@@ -341,7 +469,7 @@ def listar_vehiculos():
         cursor.execute(
             """
             SELECT v.id, v.camionero_id, v.tipo_vehiculo, v.placa, v.modelo, v.ano_modelo, v.imagen_url, v.tarifa_diaria,
-                   u.nombre, u.correo, u.telefono
+                   u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido, u.correo, u.telefono
             FROM vehiculo v
             JOIN usuario u ON v.camionero_id = u.id
             WHERE v.camionero_id=%s
@@ -352,7 +480,7 @@ def listar_vehiculos():
         cursor.execute(
             """
             SELECT v.id, v.camionero_id, v.tipo_vehiculo, v.placa, v.modelo, v.ano_modelo, v.imagen_url, v.tarifa_diaria,
-                   u.nombre, u.correo, u.telefono
+                   u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido, u.correo, u.telefono
             FROM vehiculo v
             JOIN usuario u ON v.camionero_id = u.id
             """
@@ -377,9 +505,12 @@ def listar_vehiculos():
             "calificacion": calificacion,
             "conductor": {
                 "id": v[1],  # También incluir el id en el objeto conductor
-                "nombre": v[8],
-                "correo": v[9],
-                "telefono": v[10]
+                "primer_nombre": v[8],
+                "segundo_nombre": v[9],
+                "primer_apellido": v[10],
+                "segundo_apellido": v[11],
+                "correo": v[12],
+                "telefono": v[13]
             }
         })
     cursor.close()
@@ -484,12 +615,12 @@ def debug_reserva():
         conn.commit()
 
         cursor.execute("""
-            SELECT u.nombre, u.correo FROM usuario u
+            SELECT u.primer_nombre, u.primer_apellido, u.correo FROM usuario u
             JOIN vehiculo v ON v.camionero_id = u.id
             WHERE v.id=%s
         """, (vehiculo_id,))
         conductor = cursor.fetchone()
-        cursor.execute("SELECT nombre, correo FROM usuario WHERE id=%s", (cliente_id,))
+        cursor.execute("SELECT primer_nombre, primer_apellido, correo FROM usuario WHERE id=%s", (cliente_id,))
         cliente = cursor.fetchone()
         if conductor and cliente:
             mensaje_conductor = (
@@ -655,11 +786,11 @@ def cancelar_reserva(reserva_id):
             return {"error": "Reserva no encontrada."}, 404
         cliente_id, vehiculo_id, fecha_inicio, fecha_fin = reserva
 
-        cursor.execute("SELECT nombre, correo FROM usuario WHERE id=%s", (cliente_id,))
+        cursor.execute("SELECT primer_nombre, primer_apellido, correo FROM usuario WHERE id=%s", (cliente_id,))
         cliente = cursor.fetchone()
 
         cursor.execute("""
-            SELECT u.nombre, u.correo FROM usuario u
+            SELECT u.primer_nombre, u.primer_apellido, u.correo FROM usuario u
             JOIN vehiculo v ON v.camionero_id = u.id
             WHERE v.id=%s
         """, (vehiculo_id,))
@@ -714,7 +845,7 @@ def pedidos_camionero(camionero_id):
         cursor.execute(""" 
             SELECT r.id, r.cliente_id, r.vehiculo_id, r.fecha_inicio, r.fecha_fin, r.direccion_inicio, r.direccion_destino, r.estado_reserva,
                    v.tipo_vehiculo, v.placa, v.modelo, v.ano_modelo, v.imagen_url, v.tarifa_diaria,
-                   u.nombre, u.correo, u.telefono
+                   u.primer_nombre, u.primer_apellido, u.correo, u.telefono
             FROM reserva r
             JOIN vehiculo v ON r.vehiculo_id = v.id
             JOIN usuario u ON r.cliente_id = u.id
@@ -926,17 +1057,20 @@ def uploaded_file(filename):
 def listar_usuarios():
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT id, nombre, noDocumento, correo, telefono, rol FROM usuario")
+    cursor.execute("SELECT id, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, noDocumento, correo, telefono, rol FROM usuario")
     usuarios = cursor.fetchall()
     lista = []
     for u in usuarios:
         lista.append({
             "id": u[0],
-            "nombre": u[1],
-            "noDocumento": u[2],
-            "correo": u[3],
-            "telefono": u[4],
-            "rol": u[5]
+            "primer_nombre": u[1],
+            "segundo_nombre": u[2],
+            "primer_apellido": u[3],
+            "segundo_apellido": u[4],
+            "noDocumento": u[5],
+            "correo": u[6],
+            "telefono": u[7],
+            "rol": u[8]
         })
     cursor.close()
     conn.close()
@@ -945,23 +1079,26 @@ def listar_usuarios():
 @app.route("/api/usuarios", methods=["POST"])
 def crear_usuario():
     data = request.json or {}
-    nombre = data.get("nombre")
+    primer_nombre = data.get("primer_nombre")
+    segundo_nombre = data.get("segundo_nombre", "")
+    primer_apellido = data.get("primer_apellido")
+    segundo_apellido = data.get("segundo_apellido", "")
     noDocumento = data.get("noDocumento")
     correo = data.get("correo")
     telefono = data.get("telefono")
     rol = data.get("rol")
     contrasena = data.get("contrasena") or "123456"
 
-    if not all([nombre, noDocumento, correo, telefono, rol]):
-        return {"error": "Faltan datos"}, 400
+    if not all([primer_nombre, primer_apellido, noDocumento, correo, telefono, rol]):
+        return {"error": "Faltan datos obligatorios"}, 400
 
     conn = get_connection()
     cursor = conn.cursor()
     try:
         hashed = generate_password_hash(contrasena)
         cursor.execute(
-            "INSERT INTO usuario (nombre, noDocumento, correo, telefono, rol, contrasena) VALUES (%s, %s, %s, %s, %s, %s)",
-            (nombre, noDocumento, correo, telefono, rol, hashed)
+            "INSERT INTO usuario (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, noDocumento, correo, telefono, rol, contrasena) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, noDocumento, correo, telefono, rol, hashed)
         )
         conn.commit()
         return {"message": "Usuario creado"}, 201
@@ -975,19 +1112,22 @@ def crear_usuario():
 @app.route("/api/usuarios/<int:usuario_id>", methods=["PUT"])
 def editar_usuario(usuario_id):
     data = request.json
-    nombre = data.get("nombre")
+    primer_nombre = data.get("primer_nombre")
+    segundo_nombre = data.get("segundo_nombre", "")
+    primer_apellido = data.get("primer_apellido")
+    segundo_apellido = data.get("segundo_apellido", "")
     correo = data.get("correo")
     noDocumento = data.get("noDocumento")
     telefono = data.get("telefono")
     rol = data.get("rol")
-    if not all([nombre, correo, noDocumento, telefono, rol]):
-        return {"error": "Faltan datos"}, 400
+    if not all([primer_nombre, primer_apellido, correo, noDocumento, telefono, rol]):
+        return {"error": "Faltan datos obligatorios"}, 400
     conn = get_connection()
     cursor = conn.cursor()
     try:
         cursor.execute(
-            "UPDATE usuario SET nombre=%s, correo=%s, noDocumento=%s, telefono=%s, rol=%s WHERE id=%s",
-            (nombre, correo, noDocumento, telefono, rol, usuario_id)
+            "UPDATE usuario SET primer_nombre=%s, segundo_nombre=%s, primer_apellido=%s, segundo_apellido=%s, correo=%s, noDocumento=%s, telefono=%s, rol=%s WHERE id=%s",
+            (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, correo, noDocumento, telefono, rol, usuario_id)
         )
         conn.commit()
         return {"message": "Usuario actualizado"}, 200
@@ -1018,7 +1158,7 @@ def usuarios_detallado():
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT u.id, u.nombre, u.noDocumento, u.correo, u.telefono, u.rol,
+        SELECT u.id, u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido, u.noDocumento, u.correo, u.telefono, u.rol,
             COUNT(DISTINCT v.id) as vehiculos,
             COUNT(DISTINCT r.id) as reservas
         FROM usuario u
@@ -1031,13 +1171,16 @@ def usuarios_detallado():
     for u in usuarios:
         lista.append({
             "id": u[0],
-            "nombre": u[1],
-            "noDocumento": u[2],
-            "correo": u[3],
-            "telefono": u[4],
-            "rol": u[5],
-            "vehiculos": u[6],
-            "reservas": u[7]
+            "primer_nombre": u[1],
+            "segundo_nombre": u[2],
+            "primer_apellido": u[3],
+            "segundo_apellido": u[4],
+            "noDocumento": u[5],
+            "correo": u[6],
+            "telefono": u[7],
+            "rol": u[8],
+            "vehiculos": u[9],
+            "reservas": u[10]
         })
     cursor.close()
     conn.close()
@@ -1120,7 +1263,7 @@ def listar_reportes():
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT r.id, r.reserva_id, r.usuario_id, u.nombre, r.descripcion, r.estado_reporte, r.fecha_reporte
+        SELECT r.id, r.reserva_id, r.usuario_id, u.primer_nombre, u.primer_apellido, r.descripcion, r.estado_reporte, r.fecha_reporte
         FROM reporte r
         JOIN usuario u ON r.usuario_id = u.id
         ORDER BY r.fecha_reporte DESC
@@ -1132,10 +1275,10 @@ def listar_reportes():
             "id": rep[0],
             "reserva_id": rep[1],
             "usuario_id": rep[2],
-            "usuario_nombre": rep[3],
-            "descripcion": rep[4],
-            "estado_reporte": rep[5],
-            "fecha_reporte": rep[6].isoformat() if hasattr(rep[6], "isoformat") else str(rep[6])
+            "usuario_nombre": f"{rep[3]} {rep[4]}".strip(),
+            "descripcion": rep[5],
+            "estado_reporte": rep[6],
+            "fecha_reporte": rep[7].isoformat() if hasattr(rep[7], "isoformat") else str(rep[7])
         })
     cursor.close()
     conn.close()
@@ -1189,7 +1332,7 @@ def reportes_detallado():
     cursor = conn.cursor()
     cursor.execute("""
         SELECT r.id, r.descripcion, r.estado_reporte, r.fecha_reporte,
-               u.id, u.nombre, u.correo,
+               u.id, u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido, u.correo,
                res.id, res.fecha_inicio, res.fecha_fin,
                v.id, v.placa
         FROM reporte r
@@ -1207,13 +1350,13 @@ def reportes_detallado():
             "estado_reporte": rep[2],
             "fecha_reporte": rep[3].isoformat() if hasattr(rep[3], "isoformat") else str(rep[3]),
             "usuario_id": rep[4],
-            "usuario_nombre": rep[5],
-            "usuario_correo": rep[6],
-            "reserva_id": rep[7],
-            "reserva_fecha_inicio": rep[8].isoformat() if hasattr(rep[8], "isoformat") else str(rep[8]),
-            "reserva_fecha_fin": rep[9].isoformat() if hasattr(rep[9], "isoformat") else str(rep[9]),
-            "vehiculo_id": rep[10],
-            "vehiculo_placa": rep[11]
+            "usuario_nombre": f"{rep[5]} {rep[7]}".strip(),
+            "usuario_correo": rep[9],
+            "reserva_id": rep[10],
+            "reserva_fecha_inicio": rep[11].isoformat() if hasattr(rep[11], "isoformat") else str(rep[11]),
+            "reserva_fecha_fin": rep[12].isoformat() if hasattr(rep[12], "isoformat") else str(rep[12]),
+            "vehiculo_id": rep[13],
+            "vehiculo_placa": rep[14]
         })
     cursor.close()
     conn.close()
@@ -1225,9 +1368,9 @@ def reservas_detallado():
     cursor = conn.cursor()
     cursor.execute("""
         SELECT r.id, r.fecha_inicio, r.fecha_fin, r.direccion_inicio, r.direccion_destino, r.estado_reserva,
-               c.id, c.nombre, c.correo,
+               c.id, c.primer_nombre, c.segundo_nombre, c.primer_apellido, c.segundo_apellido, c.correo,
                v.id, v.tipo_vehiculo, v.placa,
-               u.id, u.nombre
+               u.id, u.primer_nombre, u.primer_apellido
         FROM reserva r
         JOIN usuario c ON r.cliente_id = c.id
         JOIN vehiculo v ON r.vehiculo_id = v.id
@@ -1245,13 +1388,13 @@ def reservas_detallado():
             "direccion_destino": r[4],
             "estado_reserva": r[5],
             "cliente_id": r[6],
-            "cliente_nombre": r[7],
-            "cliente_correo": r[8],
-            "vehiculo_id": r[9],
-            "vehiculo_tipo": r[10],
-            "vehiculo_placa": r[11],
-            "camionero_id": r[12],
-            "camionero_nombre": r[13]
+            "cliente_nombre": f"{r[7]} {r[9]}".strip(),
+            "cliente_correo": r[11],
+            "vehiculo_id": r[12],
+            "vehiculo_tipo": r[13],
+            "vehiculo_placa": r[14],
+            "camionero_id": r[15],
+            "camionero_nombre": f"{r[16]} {r[17]}".strip()
         })
     cursor.close()
     conn.close()

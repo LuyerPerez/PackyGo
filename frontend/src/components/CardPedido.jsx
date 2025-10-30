@@ -76,7 +76,7 @@ export default function CardPedido({ pedido, onFinalizar, onCancelar }) {
         </div>
 
         <div className="card-pedido-cliente">
-          <div className="cliente-nombre">{cliente.nombre}</div>
+          <div className="cliente-nombre">{cliente.primer_nombre} {cliente.primer_apellido}</div>
           <div className="cliente-contacto">{cliente.correo}</div>
           <div className="cliente-contacto">{cliente.telefono}</div>
           {renderEstrellas(cliente.calificacion)}

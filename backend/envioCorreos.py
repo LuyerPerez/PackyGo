@@ -6,15 +6,12 @@ from dotenv import load_dotenv
 from datetime import datetime
 
 load_dotenv()
-email_sender = "packygonotificaciones@gmail.com"
+email_sender = "packygonotificaciones@gmail.com"  # Cambia esto por tu correo de Gmail
 password = os.getenv("PASSWORD")
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
-EMAIL_LOGO_URL = os.getenv("EMAIL_LOGO_URL", "")
+DEV_MODE = os.getenv("FLASK_DEBUG", "0") == "1"  # Modo desarrollo si FLASK_DEBUG=1
+
 BRAND_PRIMARY = os.getenv("BRAND_PRIMARY", "#0097a7")
 BRAND_SECONDARY = os.getenv("BRAND_SECONDARY", "#083c5d")
-SUPPORT_EMAIL = os.getenv("SUPPORT_EMAIL", "soporte@packygo.example")
-SOCIAL_TWITTER = os.getenv("SOCIAL_TWITTER", "#")
-SOCIAL_LINKEDIN = os.getenv("SOCIAL_LINKEDIN", "#")
 def _build_html_template(title: str, subtitle: str, body_html: str, primary_color: str = BRAND_PRIMARY, secondary_color: str = BRAND_SECONDARY) -> str:
         """Construye una plantilla HTML minimalista y moderna para los correos.
 
@@ -48,6 +45,15 @@ def _build_html_template(title: str, subtitle: str, body_html: str, primary_colo
 
 def _send_email(to_email: str, subject: str, plain_text: str, html: str):
     try:
+        if not password:
+            if DEV_MODE:
+                print(f"🔧 MODO DESARROLLO - Simulando envío de correo a {to_email}:")
+                print(f"   📧 Asunto: {subject}")
+                print(f"   📝 Contenido: {plain_text}")
+                print(f"   ✅ Correo 'enviado' exitosamente (modo desarrollo)")
+                return True
+            raise ValueError("PASSWORD no está configurado en las variables de entorno")
+        
         em = EmailMessage()
         em["From"] = email_sender
         em["To"] = to_email
@@ -59,9 +65,30 @@ def _send_email(to_email: str, subject: str, plain_text: str, html: str):
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
             smtp.login(email_sender, password)
             smtp.send_message(em)
-        print(f"Correo '{subject}' enviado a {to_email}")
+        print(f"✅ Correo '{subject}' enviado exitosamente a {to_email}")
+        return True
+    except smtplib.SMTPAuthenticationError as e:
+        print(f"❌ Error de autenticación Gmail para {to_email}:")
+        print(f"   - Verifica que la cuenta {email_sender} tenga 2FA habilitado")
+        print(f"   - Genera una nueva contraseña de aplicación en: https://myaccount.google.com/apppasswords")
+        print(f"   - Actualiza la variable PASSWORD en el archivo .env")
+        print(f"   - Error técnico: {e}")
+        
+        # En modo desarrollo, mostrar el código de todas formas
+        if DEV_MODE:
+            print(f"🔧 MODO DESARROLLO - Código disponible en consola:")
+            print(f"   📝 {plain_text}")
+            return True
+        return False
     except Exception as e:
-        print(f"Error al enviar correo '{subject}' a {to_email}:", e)
+        print(f"❌ Error al enviar correo '{subject}' a {to_email}: {e}")
+        
+        # En modo desarrollo, mostrar el código de todas formas
+        if DEV_MODE:
+            print(f"🔧 MODO DESARROLLO - Código disponible en consola:")
+            print(f"   📝 {plain_text}")
+            return True
+        return False
 
 
 def enviarCorreo(correo, codigoVerificacion):
@@ -75,7 +102,7 @@ def enviarCorreo(correo, codigoVerificacion):
       </div>
     """
     html = _build_html_template("Verificación de cuenta", "Código de verificación", body_html)
-    _send_email(correo, subject, plain, html)
+    return _send_email(correo, subject, plain, html)
 
 
 def enviarCorreoCambio(correo):

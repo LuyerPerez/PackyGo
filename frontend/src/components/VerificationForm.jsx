@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { Verify } from "../api"
+import { Verify, resendCode } from "../api"
 import "../assets/VerificationForm.css"
 
 export default function VerificationForm({ correo, tipo, onVerified, onCancel }) {
@@ -70,11 +70,11 @@ export default function VerificationForm({ correo, tipo, onVerified, onCancel })
     setError(null)
     setSuccess(null)
     try {
-      await Verify({ correo, code: "", tipo, resend: true })
+      await resendCode({ correo, tipo })
       setSuccess("Código reenviado correctamente")
       setResendTimer(30)
-    } catch {
-      setError("No se pudo reenviar el código")
+    } catch (err) {
+      setError(err.response?.data?.error || "No se pudo reenviar el código")
     } finally {
       setLoading(false)
     }

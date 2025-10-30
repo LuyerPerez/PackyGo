@@ -5,7 +5,10 @@ USE packygo;
 -- Tabla usuario
 CREATE TABLE usuario (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  nombre VARCHAR(100) NOT NULL,
+  primer_nombre VARCHAR(50) NOT NULL,
+  segundo_nombre VARCHAR(50),
+  primer_apellido VARCHAR(50) NOT NULL,
+  segundo_apellido VARCHAR(50),
   noDocumento VARCHAR(10) UNIQUE NULL,
   correo VARCHAR(100) NOT NULL UNIQUE,
   telefono VARCHAR(15),
@@ -93,10 +96,11 @@ CREATE TABLE notificacion (
 ) ENGINE=InnoDB;
 
 INSERT INTO usuario VALUES 
-(1, 'Luyer Perez', '1025143367', 'luyerperez0@gmail.com', '3219423757', 'pass1', 'admin', DEFAULT),
-(2, 'Alison Ospina', '1034289794', 'alisonospinaariza0126@gmail.com', '3145975921', 'pass2', 'cliente', DEFAULT),
-(3, 'Dina Monroy', '1031423129', 'milaniamalaver94@gmail.com', '3019122987', 'pass3', 'camionero', DEFAULT),
-(4, 'Evelin Amaya', '1074812760', 'evelinjasbleidya@gmail.com', '3222165858', 'pass4', 'camionero', DEFAULT);
+(1, 'Luyer', '', 'Perez', '', '1025143367', 'luyerperez0@gmail.com', '3219423757', 'pass1', 'admin', DEFAULT),
+(2, 'Alison', '', 'Ospina', '', '1034289794', 'alisonospinaariza0126@gmail.com', '3145975921', 'pass2', 'cliente', DEFAULT),
+(3, 'Dina', '', 'Monroy', '', '1031423129', 'milaniamalaver94@gmail.com', '3019122987', 'pass3', 'camionero', DEFAULT),
+(4, 'Evelin', '', 'Amaya', '', '1074812760', 'evelinjasbleidya@gmail.com', '3222165858', 'pass4', 'camionero', DEFAULT),
+(5, 'Admin', '', 'Usuario', '', '1074812761', 'packygonotificaciones@gmail.com', '3001234567', 'adminpass', 'admin', DEFAULT);
 
 INSERT INTO vehiculo VALUES 
 (1, 3, 'Camión sencillo', 'TZX123', 'Chevrolet NHR', 2021, '/uploads/Chevrolet_NHR.jpg', 180000),
