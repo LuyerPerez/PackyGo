@@ -8,6 +8,7 @@ import {
   faFlag,
   faBars,
   faTimes,
+  faCarAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { NavLink } from "react-router-dom";
 import "../assets/Administracion.css";
@@ -69,6 +70,17 @@ const SideBar = () => {
                 onClick={() => setOpen(false)}
               >
                 <FontAwesomeIcon icon={faTruck} /> Vehículos
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/admin/aprobacion-vehiculos"
+                className={({ isActive }) =>
+                  isActive ? "active" : ""
+                }
+                onClick={() => setOpen(false)}
+              >
+                <FontAwesomeIcon icon={faCarAlt} /> Aprobación
               </NavLink>
             </li>
             <li>

@@ -27,7 +27,11 @@ app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "uploads")
+IMAGES_FOLDER = os.path.join(UPLOAD_FOLDER, "images")
+DOCS_FOLDER = os.path.join(UPLOAD_FOLDER, "docs")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(IMAGES_FOLDER, exist_ok=True)
+os.makedirs(DOCS_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 verification_codes = {}
@@ -433,12 +437,42 @@ def registrar_vehiculo():
     ano_modelo = request.form.get("ano_modelo")
     tarifa_diaria = request.form.get("tarifa_diaria")
     imagen_url = None
+    tarjeta_propiedad_url = None
+    soat_url = None
+    revision_tecnomecanica_url = None
 
     imagen = request.files.get("imagen")
     if imagen:
         filename = secure_filename(imagen.filename)
-        imagen.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        imagen_url = f"/uploads/{filename}" 
+        ext = os.path.splitext(filename)[1]
+        unique_name = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(1000,9999)}{ext}"
+        imagen.save(os.path.join(IMAGES_FOLDER, unique_name))
+        imagen_url = f"/uploads/images/{unique_name}" 
+
+    # Guardar documentos del vehículo
+    tarjeta_propiedad = request.files.get("tarjeta_propiedad")
+    if tarjeta_propiedad:
+        filename = secure_filename(tarjeta_propiedad.filename)
+        ext = os.path.splitext(filename)[1]
+        unique_name = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(1000,9999)}{ext}"
+        tarjeta_propiedad.save(os.path.join(DOCS_FOLDER, unique_name))
+        tarjeta_propiedad_url = f"/uploads/docs/{unique_name}"
+
+    soat = request.files.get("soat")
+    if soat:
+        filename = secure_filename(soat.filename)
+        ext = os.path.splitext(filename)[1]
+        unique_name = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(1000,9999)}{ext}"
+        soat.save(os.path.join(DOCS_FOLDER, unique_name))
+        soat_url = f"/uploads/docs/{unique_name}"
+
+    revision_tecnomecanica = request.files.get("revision_tecnomecanica")
+    if revision_tecnomecanica:
+        filename = secure_filename(revision_tecnomecanica.filename)
+        ext = os.path.splitext(filename)[1]
+        unique_name = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(1000,9999)}{ext}"
+        revision_tecnomecanica.save(os.path.join(DOCS_FOLDER, unique_name))
+        revision_tecnomecanica_url = f"/uploads/docs/{unique_name}"
 
     if not all([camionero_id, tipo_vehiculo, placa, modelo, ano_modelo, tarifa_diaria]):
         return {"error": "Todos los campos son obligatorios."}, 400
@@ -448,13 +482,15 @@ def registrar_vehiculo():
     try:
         cursor.execute(
             """
-            INSERT INTO vehiculo (camionero_id, tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO vehiculo (camionero_id, tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria, 
+                                  tarjeta_propiedad, soat, revision_tecnomecanica, estado_aprobacion)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'pendiente')
             """,
-            (camionero_id, tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria)
+            (camionero_id, tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria,
+             tarjeta_propiedad_url, soat_url, revision_tecnomecanica_url)
         )
         conn.commit()
-        return {"message": "Vehículo registrado correctamente."}, 201
+        return {"message": "Vehículo registrado correctamente. Pendiente de aprobación."}, 201
     except Exception as e:
         conn.rollback()
         return {"error": str(e)}, 500
@@ -471,7 +507,8 @@ def listar_vehiculos():
         cursor.execute(
             """
             SELECT v.id, v.camionero_id, v.tipo_vehiculo, v.placa, v.modelo, v.ano_modelo, v.imagen_url, v.tarifa_diaria,
-                   u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido, u.correo, u.telefono
+                   u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido, u.correo, u.telefono,
+                   v.tarjeta_propiedad, v.soat, v.revision_tecnomecanica, v.estado_aprobacion
             FROM vehiculo v
             JOIN usuario u ON v.camionero_id = u.id
             WHERE v.camionero_id=%s
@@ -479,12 +516,15 @@ def listar_vehiculos():
             (camionero_id,)
         )
     else:
+        # Para clientes solo mostrar vehículos aprobados
         cursor.execute(
             """
             SELECT v.id, v.camionero_id, v.tipo_vehiculo, v.placa, v.modelo, v.ano_modelo, v.imagen_url, v.tarifa_diaria,
-                   u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido, u.correo, u.telefono
+                   u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido, u.correo, u.telefono,
+                   v.tarjeta_propiedad, v.soat, v.revision_tecnomecanica, v.estado_aprobacion
             FROM vehiculo v
             JOIN usuario u ON v.camionero_id = u.id
+            WHERE v.estado_aprobacion = 'aprobado'
             """
         )
     vehiculos = cursor.fetchall()
@@ -513,7 +553,11 @@ def listar_vehiculos():
                 "segundo_apellido": v[11],
                 "correo": v[12],
                 "telefono": v[13]
-            }
+            },
+            "tarjeta_propiedad": v[14],
+            "soat": v[15],
+            "revision_tecnomecanica": v[16],
+            "estado_aprobacion": v[17]
         })
     cursor.close()
     conn.close()
@@ -528,12 +572,42 @@ def editar_vehiculo(vehiculo_id):
     ano_modelo = request.form.get("ano_modelo")
     tarifa_diaria = request.form.get("tarifa_diaria")
     imagen_url = None
+    tarjeta_propiedad_url = None
+    soat_url = None
+    revision_tecnomecanica_url = None
 
     imagen = request.files.get("imagen")
     if imagen:
         filename = secure_filename(imagen.filename)
-        imagen.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        imagen_url = f"/uploads/{filename}"
+        ext = os.path.splitext(filename)[1]
+        unique_name = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(1000,9999)}{ext}"
+        imagen.save(os.path.join(IMAGES_FOLDER, unique_name))
+        imagen_url = f"/uploads/images/{unique_name}"
+
+    # Manejar documentos del vehículo
+    tarjeta_propiedad = request.files.get("tarjeta_propiedad")
+    if tarjeta_propiedad:
+        filename = secure_filename(tarjeta_propiedad.filename)
+        ext = os.path.splitext(filename)[1]
+        unique_name = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(1000,9999)}{ext}"
+        tarjeta_propiedad.save(os.path.join(DOCS_FOLDER, unique_name))
+        tarjeta_propiedad_url = f"/uploads/docs/{unique_name}"
+
+    soat = request.files.get("soat")
+    if soat:
+        filename = secure_filename(soat.filename)
+        ext = os.path.splitext(filename)[1]
+        unique_name = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(1000,9999)}{ext}"
+        soat.save(os.path.join(DOCS_FOLDER, unique_name))
+        soat_url = f"/uploads/docs/{unique_name}"
+
+    revision_tecnomecanica = request.files.get("revision_tecnomecanica")
+    if revision_tecnomecanica:
+        filename = secure_filename(revision_tecnomecanica.filename)
+        ext = os.path.splitext(filename)[1]
+        unique_name = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(1000,9999)}{ext}"
+        revision_tecnomecanica.save(os.path.join(DOCS_FOLDER, unique_name))
+        revision_tecnomecanica_url = f"/uploads/docs/{unique_name}"
 
     if not all([camionero_id, tipo_vehiculo, placa, modelo, ano_modelo, tarifa_diaria]):
         return {"error": "Todos los campos son obligatorios."}, 400
@@ -541,22 +615,33 @@ def editar_vehiculo(vehiculo_id):
     conn = get_connection()
     cursor = conn.cursor()
     try:
+        # Construir query dinámicamente según archivos que se hayan subido
+        updates = []
+        params = []
+        
+        updates.extend(["camionero_id=%s", "tipo_vehiculo=%s", "placa=%s", "modelo=%s", "ano_modelo=%s", "tarifa_diaria=%s"])
+        params.extend([camionero_id, tipo_vehiculo, placa, modelo, ano_modelo, tarifa_diaria])
+        
         if imagen_url:
-            cursor.execute(
-                """
-                UPDATE vehiculo SET camionero_id=%s, tipo_vehiculo=%s, placa=%s, modelo=%s, ano_modelo=%s, imagen_url=%s, tarifa_diaria=%s
-                WHERE id=%s
-                """,
-                (camionero_id, tipo_vehiculo, placa, modelo, ano_modelo, imagen_url, tarifa_diaria, vehiculo_id)
-            )
-        else:
-            cursor.execute(
-                """
-                UPDATE vehiculo SET camionero_id=%s, tipo_vehiculo=%s, placa=%s, modelo=%s, ano_modelo=%s, tarifa_diaria=%s
-                WHERE id=%s
-                """,
-                (camionero_id, tipo_vehiculo, placa, modelo, ano_modelo, tarifa_diaria, vehiculo_id)
-            )
+            updates.append("imagen_url=%s")
+            params.append(imagen_url)
+        
+        if tarjeta_propiedad_url:
+            updates.append("tarjeta_propiedad=%s")
+            params.append(tarjeta_propiedad_url)
+        
+        if soat_url:
+            updates.append("soat=%s")
+            params.append(soat_url)
+        
+        if revision_tecnomecanica_url:
+            updates.append("revision_tecnomecanica=%s")
+            params.append(revision_tecnomecanica_url)
+        
+        params.append(vehiculo_id)
+        
+        query = f"UPDATE vehiculo SET {', '.join(updates)} WHERE id=%s"
+        cursor.execute(query, tuple(params))
         conn.commit()
         return {"message": "Vehículo actualizado correctamente."}, 200
     except Exception as e:
@@ -574,6 +659,115 @@ def eliminar_vehiculo(vehiculo_id):
         cursor.execute("DELETE FROM vehiculo WHERE id=%s", (vehiculo_id,))
         conn.commit()
         return {"message": "Vehículo eliminado correctamente."}, 200
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/vehiculos-pendientes", methods=["GET"])
+def listar_vehiculos_pendientes():
+    """Endpoint para que el admin vea vehículos pendientes de aprobación"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT v.id, v.camionero_id, v.tipo_vehiculo, v.placa, v.modelo, v.ano_modelo, 
+                   v.imagen_url, v.tarifa_diaria, v.tarjeta_propiedad, v.soat, v.revision_tecnomecanica,
+                   v.estado_aprobacion,
+                   u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido, 
+                   u.correo, u.telefono
+            FROM vehiculo v
+            JOIN usuario u ON v.camionero_id = u.id
+                        WHERE v.estado_aprobacion = 'pendiente'
+                            AND v.tarjeta_propiedad IS NOT NULL AND v.tarjeta_propiedad <> ''
+                            AND v.soat IS NOT NULL AND v.soat <> ''
+                            AND v.revision_tecnomecanica IS NOT NULL AND v.revision_tecnomecanica <> ''
+            ORDER BY v.id DESC
+            """
+        )
+        vehiculos = cursor.fetchall()
+        lista = []
+        for v in vehiculos:
+            lista.append({
+                "id": v[0],
+                "camionero_id": v[1],
+                "tipo_vehiculo": v[2],
+                "placa": v[3],
+                "modelo": v[4],
+                "ano_modelo": v[5],
+                "imagen_url": v[6],
+                "tarifa_diaria": float(v[7]),
+                "tarjeta_propiedad": v[8],
+                "soat": v[9],
+                "revision_tecnomecanica": v[10],
+                "estado_aprobacion": v[11],
+                "conductor": {
+                    "id": v[1],
+                    "primer_nombre": v[12],
+                    "segundo_nombre": v[13],
+                    "primer_apellido": v[14],
+                    "segundo_apellido": v[15],
+                    "correo": v[16],
+                    "telefono": v[17]
+                }
+            })
+        return {"vehiculos": lista}, 200
+    except Exception as e:
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/vehiculos/<int:vehiculo_id>/aprobar", methods=["PUT"])
+def aprobar_vehiculo(vehiculo_id):
+    """Endpoint para que el admin apruebe un vehículo"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        # Validar que existan los 3 documentos antes de aprobar
+        cursor.execute(
+            """
+            SELECT tarjeta_propiedad, soat, revision_tecnomecanica
+            FROM vehiculo
+            WHERE id=%s
+            """,
+            (vehiculo_id,)
+        )
+        doc = cursor.fetchone()
+        if not doc:
+            return {"error": "Vehículo no encontrado"}, 404
+        tarjeta, soat, rev = doc
+        if not tarjeta or tarjeta == '' or not soat or soat == '' or not rev or rev == '':
+            return {"error": "No se puede aprobar: faltan documentos obligatorios."}, 400
+
+        cursor.execute(
+            "UPDATE vehiculo SET estado_aprobacion='aprobado' WHERE id=%s",
+            (vehiculo_id,)
+        )
+        conn.commit()
+        return {"message": "Vehículo aprobado correctamente."}, 200
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route("/api/vehiculos/<int:vehiculo_id>/denegar", methods=["PUT"])
+def denegar_vehiculo(vehiculo_id):
+    """Endpoint para que el admin deniegue un vehículo"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "UPDATE vehiculo SET estado_aprobacion='denegado' WHERE id=%s",
+            (vehiculo_id,)
+        )
+        conn.commit()
+        return {"message": "Vehículo denegado."}, 200
     except Exception as e:
         conn.rollback()
         return {"error": str(e)}, 500
@@ -847,7 +1041,7 @@ def pedidos_camionero(camionero_id):
         cursor.execute(""" 
             SELECT r.id, r.cliente_id, r.vehiculo_id, r.fecha_inicio, r.fecha_fin, r.direccion_inicio, r.direccion_destino, r.estado_reserva,
                    v.tipo_vehiculo, v.placa, v.modelo, v.ano_modelo, v.imagen_url, v.tarifa_diaria,
-                   u.primer_nombre, u.primer_apellido, u.correo, u.telefono
+                   u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido, u.correo, u.telefono
             FROM reserva r
             JOIN vehiculo v ON r.vehiculo_id = v.id
             JOIN usuario u ON r.cliente_id = u.id
@@ -877,9 +1071,12 @@ def pedidos_camionero(camionero_id):
             }
             cliente = {
                 "id": row[1],
-                "nombre": row[14],
-                "correo": row[15],
-                "telefono": row[16]
+                "primer_nombre": row[14],
+                "segundo_nombre": row[15],
+                "primer_apellido": row[16],
+                "segundo_apellido": row[17],
+                "correo": row[18],
+                "telefono": row[19]
             }
             cursor.execute(
                 "SELECT AVG(estrellas) FROM calificacion_usuario WHERE usuario_destino_id=%s", (row[1],)
@@ -1051,7 +1248,7 @@ def calificar_vehiculo():
         cursor.close()
         conn.close()
 
-@app.route('/uploads/<filename>')
+@app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 

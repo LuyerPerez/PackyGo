@@ -27,8 +27,12 @@ CREATE TABLE vehiculo (
   placa VARCHAR(20) NOT NULL,
   modelo VARCHAR(50) NOT NULL,
   ano_modelo INT NOT NULL,
-  imagen_url TEXT NOT NULL,
+  imagen_url TEXT,
   tarifa_diaria DECIMAL(10,2) NOT NULL,
+  tarjeta_propiedad TEXT,
+  soat TEXT,
+  revision_tecnomecanica TEXT,
+  estado_aprobacion ENUM('pendiente', 'aprobado', 'denegado') DEFAULT 'pendiente',
   FOREIGN KEY (camionero_id) REFERENCES usuario(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
@@ -105,12 +109,12 @@ INSERT INTO usuario VALUES
 (5, 'Admin', '', 'Usuario', '', 'CC', '1074812761', 'packygonotificaciones@gmail.com', '3001234567', 'adminpass', 'admin', DEFAULT);
 
 INSERT INTO vehiculo VALUES 
-(1, 3, 'Camión sencillo', 'TZX123', 'Chevrolet NHR', 2021, '/uploads/Chevrolet_NHR.jpg', 180000),
-(2, 3, 'Camioneta pequeña', 'VBG456', 'Toyota Hilux', 2020, '/uploads/Toyota_Hilux.jpg', 130000),
-(3, 3, 'Furgón cerrado', 'JKL789', 'Renault Master', 2022, '/uploads/Renault_Master.webp', 150000),
-(4, 4, 'Camión turbo', 'QWE321', 'Isuzu NPR Turbo', 2021, '/uploads/Isuzu_NPR_Turbo.webp', 200000),
-(5, 4, 'Camioneta pequeña', 'RTY654', 'Ford Ranger', 2019, '/uploads/Ford_Ranger.jpg', 120000),
-(6, 4, 'Furgón cerrado', 'UIO987', 'Mercedes Sprinter', 2020, '/uploads/Mercedes_Sprinter.webp', 140000);
+(1, 3, 'Camión sencillo', 'TZX123', 'Chevrolet NHR', 2021, '/uploads/images/Chevrolet_NHR.jpg', 180000, NULL, NULL, NULL, 'aprobado'),
+(2, 3, 'Camioneta pequeña', 'VBG456', 'Toyota Hilux', 2020, '/uploads/images/Toyota_Hilux.webp', 130000, NULL, NULL, NULL, 'aprobado'),
+(3, 3, 'Furgón cerrado', 'JKL789', 'Renault Master', 2022, '/uploads/images/Renault_Master.webp', 150000, NULL, NULL, NULL, 'aprobado'),
+(4, 4, 'Camión turbo', 'QWE321', 'Isuzu NPR Turbo', 2021, '/uploads/images/Isuzu_NPR_Turbo.webp', 200000, NULL, NULL, NULL, 'aprobado'),
+(5, 4, 'Camioneta pequeña', 'RTY654', 'Ford Ranger', 2019, '/uploads/images/Ford_Ranger.jpg', 120000, NULL, NULL, NULL, 'aprobado'),
+(6, 4, 'Furgón cerrado', 'UIO987', 'Mercedes Sprinter', 2020, '/uploads/images/Mercedes_Sprinter.webp', 140000, NULL, NULL, NULL, 'aprobado');
 
 INSERT INTO reserva (id, cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva, total_pago, fecha_creacion) VALUES
 (1, 2, 1, '2025-09-01 08:00:00', '2025-09-03 18:00:00', 'Cra 10 #20-30', 'Calle 50 #15-10', 'activa', 450.00, '2025-09-01 07:50:00'),

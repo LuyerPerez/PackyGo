@@ -32,6 +32,7 @@ const Administracion = () => {
   });
 
   const [busqueda, setBusqueda] = useState("");
+  const [pendientes, setPendientes] = useState(0);
 
   useEffect(() => {
     async function fetchStats() {
@@ -39,6 +40,13 @@ const Administracion = () => {
       const vehiculosRes = await api.get("/vehiculos");
       const reservasRes = await api.get("/reservas-todas");
       const reportesRes = await api.get("/reportes");
+      // Vehículos pendientes de aprobación
+      try {
+        const pendRes = await api.get("/vehiculos-pendientes");
+        setPendientes((pendRes.data.vehiculos || []).length);
+      } catch {
+        setPendientes(0);
+      }
       const roles = { admin: 0, camionero: 0, cliente: 0 };
       (usuariosRes.data.usuarios || []).forEach(u => {
         if (roles[u.rol] !== undefined) roles[u.rol]++;
@@ -120,6 +128,16 @@ const Administracion = () => {
           </div>
           <div className="admin-dashboard-main">
             <div className="admin-dashboard-center">
+                {pendientes > 0 && (
+                  <div className="admin-alert-pendientes">
+                    <span>
+                      Tienes <strong>{pendientes}</strong> vehículo(s) pendientes de aprobación.
+                    </span>
+                    <Link to="/admin/aprobacion-vehiculos" className="admin-alert-link">
+                      Revisar solicitudes
+                    </Link>
+                  </div>
+                )}
               {/* Título KPIs */}
               <h3 className="panel-section-title">
                 <FontAwesomeIcon icon={faChartBar} style={{ marginRight: "8px" }} />
@@ -207,6 +225,11 @@ const Administracion = () => {
                   <FontAwesomeIcon icon={faCar} className="card-icon" />
                   <h3>Vehículos</h3>
                   <p>Gestiona los vehículos registrados</p>
+                </Link>
+                <Link to="/admin/aprobacion-vehiculos" className="admin-card">
+                  <FontAwesomeIcon icon={faCar} className="card-icon" />
+                  <h3>Aprobar Vehículos</h3>
+                  <p>Revisa y aprueba solicitudes de vehículos</p>
                 </Link>
                 <Link to="/admin/reservas" className="admin-card">
                   <FontAwesomeIcon icon={faClipboardList} className="card-icon" />

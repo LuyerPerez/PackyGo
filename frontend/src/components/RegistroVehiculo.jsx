@@ -11,6 +11,9 @@ function RegistroVehiculo({ onSuccess, editVehiculo }) {
     tarifa_diaria: "",
   });
   const [imagenFile, setImagenFile] = useState(null);
+  const [tarjetaPropiedadFile, setTarjetaPropiedadFile] = useState(null);
+  const [soatFile, setSoatFile] = useState(null);
+  const [revisionTecnomecanicaFile, setRevisionTecnomecanicaFile] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -24,6 +27,9 @@ function RegistroVehiculo({ onSuccess, editVehiculo }) {
         tarifa_diaria: editVehiculo.tarifa_diaria || "",
       });
       setImagenFile(null);
+      setTarjetaPropiedadFile(null);
+      setSoatFile(null);
+      setRevisionTecnomecanicaFile(null);
     } else {
       setForm({
         tipo_vehiculo: "",
@@ -33,6 +39,9 @@ function RegistroVehiculo({ onSuccess, editVehiculo }) {
         tarifa_diaria: "",
       });
       setImagenFile(null);
+      setTarjetaPropiedadFile(null);
+      setSoatFile(null);
+      setRevisionTecnomecanicaFile(null);
     }
   }, [editVehiculo]);
 
@@ -42,6 +51,18 @@ function RegistroVehiculo({ onSuccess, editVehiculo }) {
 
   const handleFileChange = (e) => {
     setImagenFile(e.target.files[0]);
+  };
+
+  const handleTarjetaPropiedadChange = (e) => {
+    setTarjetaPropiedadFile(e.target.files[0]);
+  };
+
+  const handleSoatChange = (e) => {
+    setSoatFile(e.target.files[0]);
+  };
+
+  const handleRevisionTecnomecanicaChange = (e) => {
+    setRevisionTecnomecanicaFile(e.target.files[0]);
   };
 
   const handleSubmit = async (e) => {
@@ -59,6 +80,9 @@ function RegistroVehiculo({ onSuccess, editVehiculo }) {
       data.append("camionero_id", user.id);
       Object.entries(form).forEach(([key, value]) => data.append(key, value));
       if (imagenFile) data.append("imagen", imagenFile);
+      if (tarjetaPropiedadFile) data.append("tarjeta_propiedad", tarjetaPropiedadFile);
+      if (soatFile) data.append("soat", soatFile);
+      if (revisionTecnomecanicaFile) data.append("revision_tecnomecanica", revisionTecnomecanicaFile);
 
       if (editVehiculo) {
         await editarVehiculo(editVehiculo.id, data, true); // true para indicar FormData
@@ -75,6 +99,9 @@ function RegistroVehiculo({ onSuccess, editVehiculo }) {
         tarifa_diaria: "",
       });
       setImagenFile(null);
+      setTarjetaPropiedadFile(null);
+      setSoatFile(null);
+      setRevisionTecnomecanicaFile(null);
     } catch (err) {
       setError(
         err.response?.data?.error ||
@@ -93,6 +120,17 @@ function RegistroVehiculo({ onSuccess, editVehiculo }) {
       <h2 className="registro-title">
         {editVehiculo ? "Editar Vehículo" : "Registrar Vehículo"}
       </h2>
+      <div className="registro-info-message" style={{
+        backgroundColor: "#e3f2fd",
+        border: "1px solid #2196f3",
+        borderRadius: "5px",
+        padding: "12px",
+        marginBottom: "15px",
+        fontSize: "14px",
+        color: "#1565c0"
+      }}>
+        <strong>Importante:</strong> Tu vehículo solo será enviado para aprobación cuando hayas subido todos los documentos requeridos (Tarjeta de propiedad, SOAT y Revisión técnico-mecánica).
+      </div>
       <div className="form-group">
         <label>Tipo de vehículo</label>
         <select
@@ -152,6 +190,48 @@ function RegistroVehiculo({ onSuccess, editVehiculo }) {
           onChange={handleFileChange}
           className="input"
         />
+      </div>
+      <div className="form-group">
+        <label>Tarjeta de propiedad (opcional)</label>
+        <input
+          type="file"
+          accept="image/*,application/pdf"
+          onChange={handleTarjetaPropiedadChange}
+          className="input"
+        />
+        {editVehiculo?.tarjeta_propiedad && (
+          <small style={{ color: "#666" }}>
+            Documento actual: {editVehiculo.tarjeta_propiedad.split('/').pop()}
+          </small>
+        )}
+      </div>
+      <div className="form-group">
+        <label>SOAT (opcional)</label>
+        <input
+          type="file"
+          accept="image/*,application/pdf"
+          onChange={handleSoatChange}
+          className="input"
+        />
+        {editVehiculo?.soat && (
+          <small style={{ color: "#666" }}>
+            Documento actual: {editVehiculo.soat.split('/').pop()}
+          </small>
+        )}
+      </div>
+      <div className="form-group">
+        <label>Revisión técnico-mecánica (opcional)</label>
+        <input
+          type="file"
+          accept="image/*,application/pdf"
+          onChange={handleRevisionTecnomecanicaChange}
+          className="input"
+        />
+        {editVehiculo?.revision_tecnomecanica && (
+          <small style={{ color: "#666" }}>
+            Documento actual: {editVehiculo.revision_tecnomecanica.split('/').pop()}
+          </small>
+        )}
       </div>
       <div className="form-group">
         <label>Tarifa diaria ($)</label>

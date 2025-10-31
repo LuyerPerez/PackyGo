@@ -101,6 +101,7 @@ function TableVehiculos({ reload, setReload }) {
                 <th title="Año de fabricación del vehículo">Año</th>
                 <th title="Fotografía del vehículo">Imagen</th>
                 <th title="Precio por día de alquiler">Tarifa diaria</th>
+                <th title="Estado de aprobación del vehículo">Estado</th>
                 <th title="Acciones disponibles para este vehículo">Acciones</th>
               </tr>
             </thead>
@@ -141,6 +142,30 @@ function TableVehiculos({ reload, setReload }) {
                       minimumFractionDigits: 2,
                     })}{" "}
                     COP
+                  </td>
+                  <td>
+                    <span
+                      style={{
+                        padding: "5px 10px",
+                        borderRadius: "5px",
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                        backgroundColor:
+                          v.estado_aprobacion === "aprobado"
+                            ? "#4caf50"
+                            : v.estado_aprobacion === "denegado"
+                            ? "#f44336"
+                            : "#ff9800",
+                        color: "white",
+                      }}
+                      title={`Estado: ${v.estado_aprobacion || "pendiente"}`}
+                    >
+                      {v.estado_aprobacion === "aprobado"
+                        ? "Aprobado"
+                        : v.estado_aprobacion === "denegado"
+                        ? "Denegado"
+                        : "Pendiente"}
+                    </span>
                   </td>
                   <td>
                     <button
