@@ -92,8 +92,8 @@ def reset_password():
                 "segundo_nombre": user[2],
                 "primer_apellido": user[3],
                 "segundo_apellido": user[4],
-                "correo": user[6],
-                "rol": user[9]
+                "correo": user[7],
+                "rol": user[10]
             }, 200)
         return {"message": "Contraseña actualizada exitosamente."}, 200
     except Exception as e:
@@ -111,12 +111,13 @@ def register():
     primer_apellido = data.get("primer_apellido")
     segundo_apellido = data.get("segundo_apellido", "")
     noDocumento = data.get("noDocumento")
+    tipoDocumento = data.get("tipoDocumento")
     correo = data.get("correo")
     telefono = data.get("telefono")
     contrasena = data.get("contrasena")
     rol = data.get("rol")
 
-    if not all([primer_nombre, primer_apellido, noDocumento, correo, telefono, contrasena, rol]):
+    if not all([primer_nombre, primer_apellido, noDocumento, tipoDocumento, correo, telefono, contrasena, rol]):
         return {"error": "Todos los campos obligatorios deben ser completados"}, 400
 
     codigo = str(random.randint(100000, 999999))
@@ -128,6 +129,7 @@ def register():
             "primer_apellido": primer_apellido,
             "segundo_apellido": segundo_apellido,
             "noDocumento": noDocumento,
+            "tipoDocumento": tipoDocumento,
             "correo": correo,
             "telefono": telefono,
             "contrasena": contrasena,
@@ -153,7 +155,7 @@ def login():
     cursor.close()
     conn.close()
 
-    if user and check_password_hash(user[8], contrasena):
+    if user and check_password_hash(user[9], contrasena):
         codigo = str(random.randint(100000, 999999))
         verification_codes[correo] = {
             "code": codigo,
@@ -163,8 +165,8 @@ def login():
                 "segundo_nombre": user[2],
                 "primer_apellido": user[3],
                 "segundo_apellido": user[4],
-                "correo": user[6],
-                "rol": user[9] 
+                "correo": user[7],
+                "rol": user[10] 
             }
         }
         enviarCorreo(correo, codigo)
@@ -196,8 +198,8 @@ def verify():
         cursor = conn.cursor()
         try:
             cursor.execute(
-                "INSERT INTO usuario (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, noDocumento, correo, telefono, contrasena, rol) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (datos["primer_nombre"], datos["segundo_nombre"], datos["primer_apellido"], datos["segundo_apellido"], datos["noDocumento"], datos["correo"], datos["telefono"], hashed_password, datos["rol"])
+                "INSERT INTO usuario (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, noDocumento, correo, telefono, contrasena, rol, tipoDocumento) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (datos["primer_nombre"], datos["segundo_nombre"], datos["primer_apellido"], datos["segundo_apellido"], datos["noDocumento"], datos["correo"], datos["telefono"], hashed_password, datos["rol"], datos["tipoDocumento"])
             )
             conn.commit()
         except Exception as e:
@@ -222,8 +224,8 @@ def verify():
                 "segundo_nombre": user[2],
                 "primer_apellido": user[3],
                 "segundo_apellido": user[4],
-                "correo": user[6],
-                "rol": user[9]
+                "correo": user[7],
+                "rol": user[10]
             }, 201)
         return {"message": "Usuario registrado exitosamente."}, 201
 
@@ -339,8 +341,8 @@ def google_login():
             "segundo_nombre": user[2],
             "primer_apellido": user[3],
             "segundo_apellido": user[4],
-            "correo": user[6],
-            "rol": user[9] 
+            "correo": user[7],
+            "rol": user[10] 
         }}, 200
     except Exception as e:
         msg = str(e)
@@ -408,8 +410,8 @@ def google_register():
             "segundo_nombre": user[2],
             "primer_apellido": user[3],
             "segundo_apellido": user[4],
-            "correo": user[6],
-            "rol": user[9]
+            "correo": user[7],
+            "rol": user[10]
         }}, 201
     except Exception as e:
         msg = str(e)
@@ -1057,7 +1059,7 @@ def uploaded_file(filename):
 def listar_usuarios():
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT id, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, noDocumento, correo, telefono, rol FROM usuario")
+    cursor.execute("SELECT id, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, noDocumento, correo, telefono, rol, tipoDocumento FROM usuario")
     usuarios = cursor.fetchall()
     lista = []
     for u in usuarios:
@@ -1070,7 +1072,8 @@ def listar_usuarios():
             "noDocumento": u[5],
             "correo": u[6],
             "telefono": u[7],
-            "rol": u[8]
+            "rol": u[8],
+            "tipoDocumento": u[9]
         })
     cursor.close()
     conn.close()
@@ -1084,12 +1087,13 @@ def crear_usuario():
     primer_apellido = data.get("primer_apellido")
     segundo_apellido = data.get("segundo_apellido", "")
     noDocumento = data.get("noDocumento")
+    tipoDocumento = data.get("tipoDocumento")
     correo = data.get("correo")
     telefono = data.get("telefono")
     rol = data.get("rol")
     contrasena = data.get("contrasena") or "123456"
 
-    if not all([primer_nombre, primer_apellido, noDocumento, correo, telefono, rol]):
+    if not all([primer_nombre, primer_apellido, noDocumento, tipoDocumento, correo, telefono, rol]):
         return {"error": "Faltan datos obligatorios"}, 400
 
     conn = get_connection()
@@ -1097,8 +1101,8 @@ def crear_usuario():
     try:
         hashed = generate_password_hash(contrasena)
         cursor.execute(
-            "INSERT INTO usuario (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, noDocumento, correo, telefono, rol, contrasena) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-            (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, noDocumento, correo, telefono, rol, hashed)
+            "INSERT INTO usuario (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, noDocumento, correo, telefono, rol, contrasena, tipoDocumento) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, noDocumento, correo, telefono, rol, hashed, tipoDocumento)
         )
         conn.commit()
         return {"message": "Usuario creado"}, 201
@@ -1118,16 +1122,17 @@ def editar_usuario(usuario_id):
     segundo_apellido = data.get("segundo_apellido", "")
     correo = data.get("correo")
     noDocumento = data.get("noDocumento")
+    tipoDocumento = data.get("tipoDocumento")
     telefono = data.get("telefono")
     rol = data.get("rol")
-    if not all([primer_nombre, primer_apellido, correo, noDocumento, telefono, rol]):
+    if not all([primer_nombre, primer_apellido, correo, noDocumento, tipoDocumento, telefono, rol]):
         return {"error": "Faltan datos obligatorios"}, 400
     conn = get_connection()
     cursor = conn.cursor()
     try:
         cursor.execute(
-            "UPDATE usuario SET primer_nombre=%s, segundo_nombre=%s, primer_apellido=%s, segundo_apellido=%s, correo=%s, noDocumento=%s, telefono=%s, rol=%s WHERE id=%s",
-            (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, correo, noDocumento, telefono, rol, usuario_id)
+            "UPDATE usuario SET primer_nombre=%s, segundo_nombre=%s, primer_apellido=%s, segundo_apellido=%s, correo=%s, noDocumento=%s, tipoDocumento=%s, telefono=%s, rol=%s WHERE id=%s",
+            (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, correo, noDocumento, tipoDocumento, telefono, rol, usuario_id)
         )
         conn.commit()
         return {"message": "Usuario actualizado"}, 200
@@ -1158,7 +1163,7 @@ def usuarios_detallado():
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT u.id, u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido, u.noDocumento, u.correo, u.telefono, u.rol,
+        SELECT u.id, u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido, u.noDocumento, u.correo, u.telefono, u.rol, u.tipoDocumento,
             COUNT(DISTINCT v.id) as vehiculos,
             COUNT(DISTINCT r.id) as reservas
         FROM usuario u
@@ -1179,8 +1184,9 @@ def usuarios_detallado():
             "correo": u[6],
             "telefono": u[7],
             "rol": u[8],
-            "vehiculos": u[9],
-            "reservas": u[10]
+            "tipoDocumento": u[9],
+            "vehiculos": u[10],
+            "reservas": u[11]
         })
     cursor.close()
     conn.close()

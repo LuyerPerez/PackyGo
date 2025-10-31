@@ -23,6 +23,7 @@ export default function RegisterForm() {
   const [segundoNombre, setSegundoNombre] = useState('')
   const [primerApellido, setPrimerApellido] = useState('')
   const [segundoApellido, setSegundoApellido] = useState('')
+  const [tipoDocumento, setTipoDocumento] = useState('CC')
   const [noDocumento, setNoDocumento] = useState('')
   const [correo, setCorreo] = useState('')
   const [telefono, setTelefono] = useState('')
@@ -56,6 +57,7 @@ export default function RegisterForm() {
         segundo_nombre: segundoNombre,
         primer_apellido: primerApellido,
         segundo_apellido: segundoApellido,
+        tipoDocumento,
         noDocumento, 
         correo, 
         telefono, 
@@ -192,17 +194,35 @@ export default function RegisterForm() {
                   </div>
                 </div>
 
-                <div className="input-group">
-                  <FontAwesomeIcon icon={faIdCard} className="icon" />
-                  <div className="input-wrapper">
-                    <input
-                      type="text"
-                      value={noDocumento}
-                      onChange={(e) => setNoDocumento(e.target.value)}
-                      required
-                      placeholder=" "
-                    />
-                    <label className="input-label">No. Documento</label>
+                <div className="form-row form-row-doc">
+                  <div className="input-group">
+                    <FontAwesomeIcon icon={faIdCard} className="icon" />
+                    <div className="input-wrapper has-value">
+                      <select
+                        value={tipoDocumento}
+                        onChange={(e) => setTipoDocumento(e.target.value)}
+                        required
+                      >
+                        <option value="CC">CC</option>
+                        <option value="TI">TI</option>
+                        <option value="CE">CE</option>
+                        <option value="PA">PA</option>
+                      </select>
+                      <label className="input-label">Tipo</label>
+                    </div>
+                  </div>
+                  <div className="input-group">
+                    <FontAwesomeIcon icon={faIdCard} className="icon" />
+                    <div className="input-wrapper">
+                      <input
+                        type="text"
+                        value={noDocumento}
+                        onChange={(e) => setNoDocumento(e.target.value)}
+                        required
+                        placeholder=" "
+                      />
+                      <label className="input-label">Número de documento</label>
+                    </div>
                   </div>
                 </div>
                 <div className="input-group">

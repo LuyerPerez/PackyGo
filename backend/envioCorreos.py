@@ -6,9 +6,9 @@ from dotenv import load_dotenv
 from datetime import datetime
 
 load_dotenv()
-email_sender = "packygonotificaciones@gmail.com"  # Cambia esto por tu correo de Gmail
+email_sender = "packygonotificaciones@gmail.com"  
 password = os.getenv("PASSWORD")
-DEV_MODE = os.getenv("FLASK_DEBUG", "0") == "1"  # Modo desarrollo si FLASK_DEBUG=1
+DEV_MODE = os.getenv("FLASK_DEBUG", "0") == "1"  
 
 BRAND_PRIMARY = os.getenv("BRAND_PRIMARY", "#0097a7")
 BRAND_SECONDARY = os.getenv("BRAND_SECONDARY", "#083c5d")

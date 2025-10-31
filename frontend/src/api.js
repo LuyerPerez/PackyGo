@@ -11,16 +11,16 @@ export async function Login(correo, contrasena) {
     correo,
     contrasena
   });
-  localStorage.setItem("user", JSON.stringify(data));
   return data;
 }
 
-export async function Register({ primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, noDocumento, correo, telefono, contrasena, rol }) {
+export async function Register({ primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, tipoDocumento, noDocumento, correo, telefono, contrasena, rol }) {
   const { data } = await api.post('/register', {
     primer_nombre,
     segundo_nombre,
     primer_apellido,
     segundo_apellido,
+    tipoDocumento,
     noDocumento,
     correo,
     telefono,

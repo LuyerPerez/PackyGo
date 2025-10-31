@@ -116,6 +116,11 @@ function NavBar() {
                   <FontAwesomeIcon icon={faTruck} />
                   <span className="nav-label">Pedidos</span>
                 </Link>
+              ) : user && user.rol === "admin" ? (
+                <Link to="/administracion" className={`nav-link${isActive("/administracion") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
+                  <FontAwesomeIcon icon={faUserLock} />
+                  <span className="nav-label">Administración</span>
+                </Link>
               ) : (
                 <Link to="/explorar" className={`nav-link${isActive("/explorar") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
                   <FontAwesomeIcon icon={faSearch} />
@@ -123,15 +128,6 @@ function NavBar() {
                 </Link>
               )}
             </li>
-
-            {user && user.rol === "admin" && (
-              <li>
-                <Link to="/administracion" className={`nav-link${isActive("/administracion") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
-                  <FontAwesomeIcon icon={faUserLock} />
-                  <span className="nav-label">Administración</span>
-                </Link>
-              </li>
-            )}
 
             <li>
               <Link to="/nosotros" className={`nav-link${isActive("/nosotros") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>

@@ -15,7 +15,13 @@ const config = {
       { key: "segundo_nombre", label: "Segundo Nombre (Opcional)", formOnly: true, required: false },
       { key: "primer_apellido", label: "Primer Apellido" },
       { key: "segundo_apellido", label: "Segundo Apellido (Opcional)", formOnly: true, required: false },
-      { key: "noDocumento", label: "Documento" },
+      { key: "tipoDocumento", label: "Tipo Documento", type: "select", options: [
+        { value: "CC", label: "Cédula de ciudadanía (CC)" },
+        { value: "TI", label: "Tarjeta de identidad (TI)" },
+        { value: "CE", label: "Cédula de extranjería (CE)" },
+        { value: "PA", label: "Pasaporte (PA)" }
+      ]},
+      { key: "noDocumento", label: "Número Documento" },
       { key: "correo", label: "Correo" },
       { key: "telefono", label: "Teléfono" },
       { 

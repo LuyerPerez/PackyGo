@@ -185,6 +185,24 @@ body {
   margin: 0;
 }
 
+/* Fila específica para Tipo de documento + Número de documento */
+.form-row-doc {
+  grid-template-columns: 100px 1fr;
+}
+
+.form-row-doc .input-group:first-child {
+  max-width: 220px;
+}
+
+@media (max-width: 768px) {
+  .form-row-doc {
+    grid-template-columns: 1fr; /* En móvil se apilan como el resto */
+  }
+  .form-row-doc .input-group:first-child {
+    max-width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
   .form-row {
     grid-template-columns: 1fr;
