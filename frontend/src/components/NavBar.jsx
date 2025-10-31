@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faHome, faTruck, faRightFromBracket, faUserLock, faFileContract, faShieldHalved, faCalendarDays, faUserShield, faSearch, faInfoCircle} from "@fortawesome/free-solid-svg-icons";
+import { faUser, faHome, faTruck, faRightFromBracket, faUserLock, faCalendarDays, faUserShield, faSearch, faInfoCircle} from "@fortawesome/free-solid-svg-icons";
 
 function NavBar() {
   const [user, setUser] = useState(null);
@@ -116,11 +116,6 @@ function NavBar() {
                   <FontAwesomeIcon icon={faTruck} />
                   <span className="nav-label">Pedidos</span>
                 </Link>
-              ) : user && user.rol === "admin" ? (
-                <Link to="/administracion" className={`nav-link${isActive("/administracion") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
-                  <FontAwesomeIcon icon={faUserLock} />
-                  <span className="nav-label">Administración</span>
-                </Link>
               ) : (
                 <Link to="/explorar" className={`nav-link${isActive("/explorar") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
                   <FontAwesomeIcon icon={faSearch} />
@@ -128,6 +123,15 @@ function NavBar() {
                 </Link>
               )}
             </li>
+
+            {user && user.rol === "admin" && (
+              <li>
+                <Link to="/administracion" className={`nav-link${isActive("/administracion") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>
+                  <FontAwesomeIcon icon={faUserLock} />
+                  <span className="nav-label">Administración</span>
+                </Link>
+              </li>
+            )}
 
             <li>
               <Link to="/nosotros" className={`nav-link${isActive("/nosotros") ? " active" : ""}`} onClick={() => setIsMenuOpen(false)}>

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import "../assets/LoginForm.css"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUser, faEnvelope, faLock, faIdCard, faPhone, faUserShield, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
+import { faUser, faEnvelope, faLock, faIdCard, faPhone, faUserShield, faEye, faEyeSlash, faUserTag, faAddressCard } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom'
 import { Register } from '../api'
 import VerificationForm from './VerificationForm'
@@ -75,7 +75,6 @@ export default function RegisterForm() {
   }
 
   const handleVerified = (data) => {
-    // Verify API stores user in localStorage, but aseguramos y redirigimos para iniciar sesión automáticamente
     try {
       const user = data?.user ? data.user : data
       if (user && (user.id || user.correo)) {
@@ -84,7 +83,6 @@ export default function RegisterForm() {
         return
       }
     } catch (e) {
-      // si algo falla, mostrar éxito y volver al formulario de verificación cerrado
       console.error("Auto-login tras verificación falló:", e)
     }
     setSuccess("Registro verificado. Por favor inicia sesión.")
@@ -122,6 +120,10 @@ export default function RegisterForm() {
                 <span>Registro</span>
               </h2>
 
+              <p className="form-info-message">
+                Los campos sin <span className="asterisk">*</span> son obligatorios
+              </p>
+
               {success && (
                 <p style={{ color: "green", fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>
                   {success}
@@ -134,56 +136,62 @@ export default function RegisterForm() {
               )}
 
               <form onSubmit={handleSubmit} className="login-form">
-                <div className="input-group">
-                  <FontAwesomeIcon icon={faUser} className="icon" />
-                  <div className="input-wrapper">
-                    <input
-                      type="text"
-                      value={primerNombre}
-                      onChange={(e) => setPrimerNombre(e.target.value)}
-                      required
-                      placeholder=" "
-                    />
-                    <label className="input-label">Primer Nombre</label>
+                <div className="form-row">
+                  <div className="input-group">
+                    <FontAwesomeIcon icon={faUserTag} className="icon" />
+                    <div className="input-wrapper">
+                      <input
+                        type="text"
+                        value={primerNombre}
+                        onChange={(e) => setPrimerNombre(e.target.value)}
+                        required
+                        placeholder=" "
+                      />
+                      <label className="input-label">Primer Nombre</label>
+                    </div>
+                  </div>
+                  <div className="input-group">
+                    <FontAwesomeIcon icon={faUserTag} className="icon" />
+                    <div className="input-wrapper">
+                      <input
+                        type="text"
+                        value={segundoNombre}
+                        onChange={(e) => setSegundoNombre(e.target.value)}
+                        placeholder=" "
+                      />
+                      <label className="input-label">Segundo Nombre *</label>
+                    </div>
                   </div>
                 </div>
-                <div className="input-group">
-                  <FontAwesomeIcon icon={faUser} className="icon" />
-                  <div className="input-wrapper">
-                    <input
-                      type="text"
-                      value={segundoNombre}
-                      onChange={(e) => setSegundoNombre(e.target.value)}
-                      placeholder=" "
-                    />
-                    <label className="input-label">Segundo Nombre (Opcional)</label>
+
+                <div className="form-row">
+                  <div className="input-group">
+                    <FontAwesomeIcon icon={faAddressCard} className="icon" />
+                    <div className="input-wrapper">
+                      <input
+                        type="text"
+                        value={primerApellido}
+                        onChange={(e) => setPrimerApellido(e.target.value)}
+                        required
+                        placeholder=" "
+                      />
+                      <label className="input-label">Primer Apellido</label>
+                    </div>
+                  </div>
+                  <div className="input-group">
+                    <FontAwesomeIcon icon={faAddressCard} className="icon" />
+                    <div className="input-wrapper">
+                      <input
+                        type="text"
+                        value={segundoApellido}
+                        onChange={(e) => setSegundoApellido(e.target.value)}
+                        placeholder=" "
+                      />
+                      <label className="input-label">Segundo Apellido *</label>
+                    </div>
                   </div>
                 </div>
-                <div className="input-group">
-                  <FontAwesomeIcon icon={faUser} className="icon" />
-                  <div className="input-wrapper">
-                    <input
-                      type="text"
-                      value={primerApellido}
-                      onChange={(e) => setPrimerApellido(e.target.value)}
-                      required
-                      placeholder=" "
-                    />
-                    <label className="input-label">Primer Apellido</label>
-                  </div>
-                </div>
-                <div className="input-group">
-                  <FontAwesomeIcon icon={faUser} className="icon" />
-                  <div className="input-wrapper">
-                    <input
-                      type="text"
-                      value={segundoApellido}
-                      onChange={(e) => setSegundoApellido(e.target.value)}
-                      placeholder=" "
-                    />
-                    <label className="input-label">Segundo Apellido (Opcional)</label>
-                  </div>
-                </div>
+
                 <div className="input-group">
                   <FontAwesomeIcon icon={faIdCard} className="icon" />
                   <div className="input-wrapper">

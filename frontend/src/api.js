@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://10.15.9.24:5000/api'
+  baseURL: 'http://192.168.0.4:5000/api'
 })
 
 export default api
@@ -182,7 +182,7 @@ export function getImagenUrl(imagen_url) {
   } else if (imagen_url.startsWith("uploads/")) {
     fileName = imagen_url.replace("uploads/", "");
   }
-  return `http://10.15.9.24:5000/uploads/${fileName}`;
+  return `http://192.168.0.4:5000/uploads/${fileName}`;
 }
 
 export async function editarReserva(id, data) {
