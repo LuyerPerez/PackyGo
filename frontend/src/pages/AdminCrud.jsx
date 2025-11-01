@@ -73,6 +73,7 @@ const config = {
       { key: "fecha_fin", label: "Fecha fin", type: "datetime-local" },
       { key: "direccion_inicio", label: "Dirección inicio" },
       { key: "direccion_destino", label: "Dirección destino" },
+      { key: "total_pago", label: "Tarifa total" },
       { key: "estado_reserva", label: "Estado", type: "select", options: [
         { value: "activa", label: "Activa" },
         { value: "cancelada", label: "Cancelada" },

@@ -41,7 +41,7 @@ const CardVehiculo = ({ vehiculo, onShowModal }) => {
         <h3>{vehiculo.modelo} <span className="vehiculo-ano">({vehiculo.ano_modelo})</span></h3>
         <p className="vehiculo-tipo">{vehiculo.tipo_vehiculo}</p>
         <p><strong>Placa:</strong> {vehiculo.placa}</p>
-        <p><strong>Tarifa diaria:</strong> <span className="tarifa">
+        <p><strong>Tarifa x KM:</strong> <span className="tarifa">
           {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(vehiculo.tarifa_diaria)}
         </span>
         <span className="moneda"></span></p>

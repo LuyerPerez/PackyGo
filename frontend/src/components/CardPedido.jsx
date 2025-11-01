@@ -4,6 +4,11 @@ import { getImagenUrl } from "../api";
 export default function CardPedido({ pedido, onFinalizar, onCancelar }) {
   const { reserva, vehiculo, cliente } = pedido;
 
+  const formatCOP = (valor) => {
+    if (valor === null || valor === undefined || isNaN(Number(valor))) return "—";
+    return Number(valor).toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 });
+  };
+
   const formatearFecha = (fecha) => {
     return new Date(fecha).toLocaleDateString('es-ES', {
       day: '2-digit',
@@ -73,6 +78,11 @@ export default function CardPedido({ pedido, onFinalizar, onCancelar }) {
           <span className={`estado-badge ${reserva.estado_reserva}`}>
             {reserva.estado_reserva}
           </span>
+        </div>
+
+        <div className="card-pedido-total">
+          <span className="card-pedido-info-label">Total pagado:</span>
+          <span className="card-pedido-precio">{formatCOP(reserva.total_pago)}</span>
         </div>
 
         <div className="card-pedido-cliente">

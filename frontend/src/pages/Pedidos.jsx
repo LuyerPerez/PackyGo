@@ -311,7 +311,7 @@ export default function Pedidos() {
         open={modalOpen}
         onClose={() => { setModalOpen(false); setPedidoAcalificar(null); }}
         onSubmit={handleEnviarCalificacion}
-        nombreUsuario={pedidoAcalificar?.cliente?.nombre || ""}
+        nombreUsuario={`${pedidoAcalificar?.cliente?.primer_nombre || ''} ${pedidoAcalificar?.cliente?.primer_apellido || ''}`.trim()}
         rol="cliente"
         loading={calificando}
       />

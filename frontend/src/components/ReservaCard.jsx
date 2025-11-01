@@ -68,6 +68,19 @@ export default function ReservaCard({ reserva, onCancel, onCalificar, yaCalifica
           <div>
             <strong>Destino:</strong> {reserva.direccion_destino}
           </div>
+          {reserva.total_pago !== undefined && reserva.total_pago !== null && (
+            <div>
+              <strong>Total pagado:</strong>{" "}
+              <span style={{ color: "#1b883a", fontWeight: "bold" }}>
+                {new Intl.NumberFormat('es-CO', { 
+                  style: 'currency', 
+                  currency: 'COP', 
+                  minimumFractionDigits: 0, 
+                  maximumFractionDigits: 0 
+                }).format(reserva.total_pago)}
+              </span>
+            </div>
+          )}
         </div>
         <div className="reserva-card-bottom">
           <span className={`reserva-card-estado-badge ${reserva.estado_reserva}`}>

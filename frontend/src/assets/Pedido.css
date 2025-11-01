@@ -132,6 +132,24 @@ body {
   gap: 6px;
 }
 
+/* Total pago */
+.card-pedido-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: #ecfdf5; /* verde muy claro */
+  border: 1px solid #bbf7d0; /* borde suave */
+  border-left: 4px solid #16a34a; /* acento */
+  border-radius: 8px;
+  margin: 6px 0;
+}
+
+.card-pedido-precio {
+  color: #166534;
+  font-weight: 800;
+}
+
 .estado-badge {
   padding: 3px 10px;
   border-radius: 16px;

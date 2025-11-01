@@ -784,6 +784,7 @@ def debug_reserva():
     fecha_fin = data.get("fecha_fin")
     direccion_inicio = data.get("direccion_inicio")
     direccion_destino = data.get("direccion_destino")
+    total_pago = data.get("total_pago")
     if not all([cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino]):
         return {"error": "Todos los campos son obligatorios."}, 400
 
@@ -805,9 +806,9 @@ def debug_reserva():
             return {"error": "El vehículo no está disponible en ese rango de fechas."}, 400
 
         cursor.execute("""
-            INSERT INTO reserva (cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva)
-            VALUES (%s, %s, %s, %s, %s, %s, 'activa')
-        """, (cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino))
+            INSERT INTO reserva (cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva, total_pago)
+            VALUES (%s, %s, %s, %s, %s, %s, 'activa', %s)
+        """, (cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, total_pago))
         conn.commit()
 
         cursor.execute("""
@@ -856,6 +857,7 @@ def crear_reserva():
     fecha_fin = data.get("fecha_fin")
     direccion_inicio = data.get("direccion_inicio")
     direccion_destino = data.get("direccion_destino")
+    total_pago = data.get("total_pago")
     if not all([cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino]):
         return {"error": "Todos los campos son obligatorios."}, 400
 
@@ -877,9 +879,9 @@ def crear_reserva():
             return {"error": "El vehículo no está disponible en ese rango de fechas."}, 400
 
         cursor.execute("""
-            INSERT INTO reserva (cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva)
-            VALUES (%s, %s, %s, %s, %s, %s, 'activa')
-        """, (cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino))
+            INSERT INTO reserva (cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva, total_pago)
+            VALUES (%s, %s, %s, %s, %s, %s, 'activa', %s)
+        """, (cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, total_pago))
         conn.commit()
         return {"message": "Reserva realizada correctamente."}, 201
     except Exception as e:
@@ -898,7 +900,7 @@ def listar_reservas():
     if vehiculo_id:
         cursor.execute(
             """
-            SELECT id, cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva
+            SELECT id, cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva, total_pago
             FROM reserva
             WHERE vehiculo_id=%s AND estado_reserva='activa'
             """,
@@ -907,7 +909,7 @@ def listar_reservas():
     elif cliente_id:
         cursor.execute(
             """
-            SELECT id, cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva
+            SELECT id, cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva, total_pago
             FROM reserva
             WHERE cliente_id=%s
             ORDER BY fecha_inicio DESC
@@ -917,7 +919,7 @@ def listar_reservas():
     else:
         cursor.execute(
             """
-            SELECT id, cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva
+            SELECT id, cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva, total_pago
             FROM reserva
             WHERE estado_reserva='activa'
             """
@@ -933,7 +935,8 @@ def listar_reservas():
             "fecha_fin": r[4].isoformat() if hasattr(r[4], "isoformat") else str(r[4]),
             "direccion_inicio": r[5],
             "direccion_destino": r[6],
-            "estado_reserva": r[7]
+            "estado_reserva": r[7],
+            "total_pago": float(r[8]) if r[8] is not None else None
         })
     cursor.close()
     conn.close()
@@ -947,7 +950,7 @@ def listar_todas_reservas():
     cursor = conn.cursor()
     cursor.execute(
         """
-        SELECT id, cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva
+        SELECT id, cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva, total_pago
         FROM reserva
         ORDER BY fecha_inicio DESC
         """
@@ -963,7 +966,8 @@ def listar_todas_reservas():
             "fecha_fin": r[4].isoformat() if hasattr(r[4], "isoformat") else str(r[4]),
             "direccion_inicio": r[5],
             "direccion_destino": r[6],
-            "estado_reserva": r[7]
+            "estado_reserva": r[7],
+            "total_pago": float(r[8]) if r[8] is not None else None
         })
     cursor.close()
     conn.close()
@@ -1039,7 +1043,7 @@ def pedidos_camionero(camionero_id):
     cursor = conn.cursor()
     try:
         cursor.execute(""" 
-            SELECT r.id, r.cliente_id, r.vehiculo_id, r.fecha_inicio, r.fecha_fin, r.direccion_inicio, r.direccion_destino, r.estado_reserva,
+            SELECT r.id, r.cliente_id, r.vehiculo_id, r.fecha_inicio, r.fecha_fin, r.direccion_inicio, r.direccion_destino, r.estado_reserva, r.total_pago,
                    v.tipo_vehiculo, v.placa, v.modelo, v.ano_modelo, v.imagen_url, v.tarifa_diaria,
                    u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido, u.correo, u.telefono
             FROM reserva r
@@ -1058,25 +1062,26 @@ def pedidos_camionero(camionero_id):
                 "fecha_fin": row[4].isoformat() if hasattr(row[4], "isoformat") else str(row[4]),
                 "direccion_inicio": row[5],
                 "direccion_destino": row[6],
-                "estado_reserva": row[7]
+                "estado_reserva": row[7],
+                "total_pago": float(row[8]) if row[8] is not None else None
             }
             vehiculo = {
                 "id": row[2],
-                "tipo_vehiculo": row[8],
-                "placa": row[9],
-                "modelo": row[10],
-                "ano_modelo": row[11],
-                "imagen_url": row[12],
-                "tarifa_diaria": float(row[13])
+                "tipo_vehiculo": row[9],
+                "placa": row[10],
+                "modelo": row[11],
+                "ano_modelo": row[12],
+                "imagen_url": row[13],
+                "tarifa_diaria": float(row[14])
             }
             cliente = {
                 "id": row[1],
-                "primer_nombre": row[14],
-                "segundo_nombre": row[15],
-                "primer_apellido": row[16],
-                "segundo_apellido": row[17],
-                "correo": row[18],
-                "telefono": row[19]
+                "primer_nombre": row[15],
+                "segundo_nombre": row[16],
+                "primer_apellido": row[17],
+                "segundo_apellido": row[18],
+                "correo": row[19],
+                "telefono": row[20]
             }
             cursor.execute(
                 "SELECT AVG(estrellas) FROM calificacion_usuario WHERE usuario_destino_id=%s", (row[1],)
@@ -1131,7 +1136,7 @@ def reservas_por_usuario(usuario_id):
     cursor = conn.cursor()
     cursor.execute(
         """
-        SELECT id, cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva
+        SELECT id, cliente_id, vehiculo_id, fecha_inicio, fecha_fin, direccion_inicio, direccion_destino, estado_reserva, total_pago
         FROM reserva
         WHERE cliente_id=%s
         ORDER BY fecha_inicio DESC
@@ -1149,7 +1154,8 @@ def reservas_por_usuario(usuario_id):
             "fecha_fin": r[4].isoformat() if hasattr(r[4], "isoformat") else str(r[4]),
             "direccion_inicio": r[5],
             "direccion_destino": r[6],
-            "estado_reserva": r[7]
+            "estado_reserva": r[7],
+            "total_pago": float(r[8]) if r[8] is not None else None
         })
     cursor.close()
     conn.close()
@@ -1573,7 +1579,8 @@ def reservas_detallado():
         SELECT r.id, r.fecha_inicio, r.fecha_fin, r.direccion_inicio, r.direccion_destino, r.estado_reserva,
                c.id, c.primer_nombre, c.segundo_nombre, c.primer_apellido, c.segundo_apellido, c.correo,
                v.id, v.tipo_vehiculo, v.placa,
-               u.id, u.primer_nombre, u.primer_apellido
+               u.id, u.primer_nombre, u.primer_apellido,
+               r.total_pago
         FROM reserva r
         JOIN usuario c ON r.cliente_id = c.id
         JOIN vehiculo v ON r.vehiculo_id = v.id
@@ -1597,7 +1604,8 @@ def reservas_detallado():
             "vehiculo_tipo": r[13],
             "vehiculo_placa": r[14],
             "camionero_id": r[15],
-            "camionero_nombre": f"{r[16]} {r[17]}".strip()
+            "camionero_nombre": f"{r[16]} {r[17]}".strip(),
+            "total_pago": float(r[18]) if r[18] is not None else None
         })
     cursor.close()
     conn.close()

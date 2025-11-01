@@ -153,16 +153,26 @@ const TablaAdmin = ({
                 <tr className="tabla-admin-tr" key={item.id}>
                   {columnasTabla.map((col) => (
                     <td className="tabla-admin-td" key={col.key}>
-                      {col.key === "imagen_url" && item[col.key] ? (
-                        <img
-                          className="tabla-admin-img"
-                          src={getImagenUrl(item[col.key])}
-                          alt="Vehículo"
-                          title="Imagen del vehículo"
-                        />
-                      ) : (
-                        item[col.key]
-                      )}
+                      {(() => {
+                        const val = item[col.key];
+                        if (col.key === "imagen_url" && val) {
+                          return (
+                            <img
+                              className="tabla-admin-img"
+                              src={getImagenUrl(val)}
+                              alt="Vehículo"
+                              title="Imagen del vehículo"
+                            />
+                          );
+                        }
+                        if ((col.key === "tarifa_diaria" || col.key === "total_pago") && (val !== undefined && val !== null)) {
+                          const num = Number(val);
+                          if (!isNaN(num)) {
+                            return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(num);
+                          }
+                        }
+                        return val ?? "—";
+                      })()}
                     </td>
                   ))}
                   <td className="tabla-admin-td">

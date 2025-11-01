@@ -1,7 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import "../assets/ReservaForm.css";
 import { obtenerReservasPorVehiculo, getImagenUrl, debugReserva } from "../api";
 import { useNavigate } from "react-router-dom";
+import RouteMap from "../components/RouteMap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCalendarDays,
+  faLocationDot,
+  faTruck,
+  faTag,
+  faMoneyBillWave,
+  faUser,
+  faEnvelope,
+  faPhone,
+  faWandMagicSparkles,
+  faClock,
+  faLightbulb,
+  faRocket,
+  faCircleInfo,
+  faMap
+} from "@fortawesome/free-solid-svg-icons";
 
 function addHours(date, h) {
   const d = new Date(date);
@@ -44,13 +62,17 @@ export default function Reserva() {
   const [mensajeTipo, setMensajeTipo] = useState("");
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [distanceKm, setDistanceKm] = useState(0);
   const navigate = useNavigate();
   // Eliminado debugInfo
 
   useEffect(() => {
     const v = localStorage.getItem("vehiculoSeleccionado");
     if (v) {
-      setVehiculo(JSON.parse(v));
+      const vehiculoData = JSON.parse(v);
+      console.log("Vehículo cargado desde localStorage:", vehiculoData);
+      console.log("Datos del conductor:", vehiculoData?.conductor);
+      setVehiculo(vehiculoData);
     } else {
       navigate("/explorar", { replace: true });
     }
@@ -180,6 +202,7 @@ export default function Reserva() {
         fecha_fin: fechaFin,
         direccion_inicio: direccionInicio,
         direccion_destino: direccionDestino,
+        total_pago: Number((estimatedPrice || 0).toFixed(2)),
       });
       setMensaje("¡Reserva realizada con éxito! Se ha enviado un correo al conductor.");
       setMensajeTipo("exito");
@@ -196,103 +219,222 @@ export default function Reserva() {
       setLoading(false);
     }
   };
+  // Tarifa por km: asumimos tarifa_diaria como tarifa/km si no hay un campo específico en el backend
+  const ratePerKm = useMemo(() => {
+    if (!vehiculo) return 0;
+    const t = Number(vehiculo.tarifa_diaria) || 0;
+    return t; // Interpretado como COP por km para el cálculo en el mapa
+  }, [vehiculo]);
+
+  const handleDistanceChange = useCallback((km) => {
+    setDistanceKm(km || 0);
+  }, []);
+
+  const handleOriginChange = useCallback((address) => {
+    setDireccionInicio(address);
+  }, []);
+
+  const handleDestinationChange = useCallback((address) => {
+    setDireccionDestino(address);
+  }, []);
+
+  const estimatedPrice = useMemo(() => {
+    return distanceKm > 0 && ratePerKm > 0 ? distanceKm * ratePerKm : 0;
+  }, [distanceKm, ratePerKm]);
   return (
-    <div className="reserva-container" style={{ display: "flex", gap: "32px", justifyContent: "center", alignItems: "flex-start", padding: "32px 0" }}>
-      <div className="reserva-form bloque-form" style={{
-        background: "#fff",
-        borderRadius: "16px",
-        boxShadow: "0 2px 16px #0002",
-        padding: "32px",
-        minWidth: "340px",
-        maxWidth: "400px"
-      }}>
-        <h2 style={{ textAlign: "center", marginBottom: "18px", color: "#083c5d" }}>Reservar vehículo</h2>
+    <div className="pgx-reserva reserva-container">
+      {/* Sidebar con información del vehículo */}
+      <aside className="pgx-reserva-aside reserva-info">
+        {vehiculo && (
+          <div className="pgx-vehicle-card vehicle-card">
+            <img src={getImagenUrl(vehiculo.imagen_url)} alt={vehiculo.modelo} className="pgx-reserva-img reserva-img" />
+            <div className="pgx-vehicle-card-content vehicle-card-content">
+              <h3>
+                {vehiculo.modelo}
+                <span>{vehiculo.ano_modelo}</span>
+              </h3>
+              <div className="pgx-info-item info-item">
+                <b><FontAwesomeIcon icon={faTruck} /> Tipo:</b>
+                <span>{vehiculo.tipo_vehiculo}</span>
+              </div>
+              <div className="pgx-info-item info-item">
+                <b><FontAwesomeIcon icon={faTag} /> Placa:</b>
+                <span>{vehiculo.placa}</span>
+              </div>
+              <div className="pgx-info-item info-item pgx-tarifa tarifa-destacada">
+                <b><FontAwesomeIcon icon={faMoneyBillWave} /> Tarifa/km:</b>
+                <span>{Number(vehiculo.tarifa_diaria).toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 })}</span>
+              </div>
+              <hr />
+              <h4><FontAwesomeIcon icon={faUser} /> Conductor</h4>
+              <div className="pgx-info-item info-item">
+                <b><FontAwesomeIcon icon={faUser} /> Nombre:</b>
+                <span>
+                  {vehiculo.conductor?.primer_nombre || ''} {vehiculo.conductor?.segundo_nombre || ''} {vehiculo.conductor?.primer_apellido || ''} {vehiculo.conductor?.segundo_apellido || ''}
+                </span>
+              </div>
+              <div className="pgx-info-item info-item">
+                <b><FontAwesomeIcon icon={faEnvelope} /> Correo:</b>
+                <span>{vehiculo.conductor?.correo}</span>
+              </div>
+              <div className="pgx-info-item info-item">
+                <b><FontAwesomeIcon icon={faPhone} /> Teléfono:</b>
+                <span>{vehiculo.conductor?.telefono}</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </aside>
+
+      {/* Formulario de reserva */}
+      <main className="pgx-reserva-form reserva-form">
+  <h2><FontAwesomeIcon icon={faWandMagicSparkles} /> Crear Reserva</h2>
         <form onSubmit={handleSubmit} autoComplete="off">
-          <div style={{ marginBottom: "12px" }}>
-            <label>Año:</label>
-            <select
-              value={anio}
-              onChange={e => { setAnio(e.target.value); setMes(""); setDia(""); setHora(""); }}
-              required
-            >
-              <option value="">Selecciona año</option>
-              {years.map(y => (
-                <option key={y} value={y}>{y}</option>
-              ))}
-            </select>
+          {/* Sección: Fecha y Hora */}
+          <div className="pgx-section form-section">
+            <div className="pgx-section-title form-section-title"><FontAwesomeIcon icon={faCalendarDays} /> Fecha y Hora</div>
+            
+            <div className="pgx-date-grid fecha-grid">
+              <div className="pgx-input input-group">
+                <label>Año</label>
+                <select
+                  value={anio}
+                  onChange={e => { setAnio(e.target.value); setMes(""); setDia(""); setHora(""); }}
+                  required
+                >
+                  <option value="">Seleccionar</option>
+                  {years.map(y => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="pgx-input input-group">
+                <label>Mes</label>
+                <select
+                  value={mes}
+                  onChange={e => { setMes(e.target.value); setDia(""); setHora(""); }}
+                  required
+                  disabled={!anio}
+                >
+                  <option value="">Seleccionar</option>
+                  {mesesDisponibles.map(m => (
+                    <option key={m.value} value={m.value}>{m.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="pgx-input input-group">
+                <label>Día</label>
+                <select
+                  value={dia}
+                  onChange={e => { setDia(e.target.value); setHora(""); }}
+                  required
+                  disabled={!anio || mes === ""}
+                >
+                  <option value="">Seleccionar</option>
+                  {diasDisponibles.map(dObj => (
+                    <option key={dObj.dia} value={dObj.dia}>
+                      {dObj.dia}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="pgx-input input-group">
+              <label>Horario (bloques de 3 horas)</label>
+              <select
+                value={hora}
+                onChange={e => setHora(e.target.value)}
+                required
+                disabled={!anio || mes === "" || !dia}
+              >
+                <option value="">Selecciona un bloque horario</option>
+                {horasDisponibles.length === 0 && anio && mes !== "" && dia &&
+                  <option value="" disabled>❌ No hay bloques disponibles</option>
+                }
+                {horasDisponibles.map(h => (
+                  <option key={h.value} value={h.value}>{h.label}</option>
+                ))}
+              </select>
+            </div>
+
+            {fechaFinObj && (
+              <div className="pgx-endtime fecha-fin-block">
+                <FontAwesomeIcon icon={faClock} />
+                <b>Finaliza:</b> {fechaFinObj.toLocaleString('es-CO', { 
+                  weekday: 'short', 
+                  year: 'numeric', 
+                  month: 'short', 
+                  day: 'numeric', 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })}
+              </div>
+            )}
           </div>
-          <div style={{ marginBottom: "12px" }}>
-            <label>Mes:</label>
-            <select
-              value={mes}
-              onChange={e => { setMes(e.target.value); setDia(""); setHora(""); }}
-              required
-              disabled={!anio}
-            >
-              <option value="">Selecciona mes</option>
-              {mesesDisponibles.map(m => (
-                <option key={m.value} value={m.value}>{m.label}</option>
-              ))}
-            </select>
+
+          {/* Sección: Ubicaciones */}
+          <div className="pgx-section form-section">
+            <div className="pgx-section-title form-section-title"><FontAwesomeIcon icon={faLocationDot} /> Ubicaciones</div>
+            
+            <div className="pgx-input input-group">
+              <label>Punto de origen</label>
+              <input
+                type="text"
+                value={direccionInicio}
+                onChange={e => setDireccionInicio(e.target.value)}
+                required
+                placeholder="Ej: Calle 26 # 13-19, Bogotá"
+                autoComplete="off"
+              />
+              <small className="pgx-hint input-hint">
+                <FontAwesomeIcon icon={faLightbulb} /> Incluye ciudad/municipio para mejor precisión
+              </small>
+            </div>
+
+            <div className="pgx-input input-group">
+              <label>Punto de destino</label>
+              <input
+                type="text"
+                value={direccionDestino}
+                onChange={e => setDireccionDestino(e.target.value)}
+                required
+                placeholder="Ej: Carrera 89 # 12-34, Medellín"
+                autoComplete="off"
+              />
+              <small className="pgx-hint input-hint">
+                <FontAwesomeIcon icon={faLightbulb} /> Haz clic en el mapa para seleccionar ubicaciones
+              </small>
+            </div>
           </div>
-          <div style={{ marginBottom: "12px" }}>
-            <label>Día:</label>
-            <select
-              value={dia}
-              onChange={e => { setDia(e.target.value); setHora(""); }}
-              required
-              disabled={!anio || mes === ""}
-            >
-              <option value="">Selecciona día</option>
-              {diasDisponibles.map(dObj => (
-                <option key={dObj.dia} value={dObj.dia}>
-                  {dObj.dia}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div style={{ marginBottom: "12px" }}>
-            <label>Hora (bloques de 3 horas):</label>
-            <select
-              value={hora}
-              onChange={e => setHora(e.target.value)}
-              required
-              disabled={!anio || mes === "" || !dia}
-            >
-              <option value="">Selecciona un bloque</option>
-              {horasDisponibles.length === 0 && anio && mes !== "" && dia &&
-                <option value="" disabled>No hay bloques disponibles</option>
-              }
-              {horasDisponibles.map(h => (
-                <option key={h.value} value={h.value}>{h.label}</option>
-              ))}
-            </select>
-          </div>
-          <div className="fecha-fin-block" style={{ marginBottom: "12px", fontSize: "14px", color: "#555" }}>
-            <span><b>Fecha y hora fin:</b> {fechaFinObj ? fechaFinObj.toLocaleString() : "--"}</span>
-          </div>
-          <div style={{ marginBottom: "12px" }}>
-            <label>Dirección de inicio:</label>
-            <input
-              type="text"
-              value={direccionInicio}
-              onChange={e => setDireccionInicio(e.target.value)}
-              required
-              placeholder="Ej: Calle 123 #45-67"
-              autoComplete="off"
-            />
-          </div>
-          <div style={{ marginBottom: "18px" }}>
-            <label>Dirección de destino:</label>
-            <input
-              type="text"
-              value={direccionDestino}
-              onChange={e => setDireccionDestino(e.target.value)}
-              required
-              placeholder="Ej: Carrera 89 #12-34"
-              autoComplete="off"
-            />
-          </div>
+
+          {/* Resumen de precio */}
+          {vehiculo && estimatedPrice > 0 && (
+            <div className="pgx-price-summary price-summary">
+              <div className="pgx-price-row price-summary-row">
+                <span className="pgx-price-label price-label">Tarifa por km:</span>
+                <span className="pgx-price-value price-value">
+                  {ratePerKm.toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 })}
+                </span>
+              </div>
+              <div className="pgx-price-row price-summary-row">
+                <span className="pgx-price-label price-label">Distancia estimada:</span>
+                <span className="pgx-price-value price-value">{distanceKm.toFixed(2)} km</span>
+              </div>
+              <div className="pgx-price-row price-summary-row">
+                <span className="pgx-price-label price-label"><FontAwesomeIcon icon={faMoneyBillWave} /> TOTAL ESTIMADO:</span>
+                <span className="pgx-price-value price-value">
+                  {estimatedPrice.toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 })}
+                </span>
+              </div>
+              <small>
+                <FontAwesomeIcon icon={faCircleInfo} /> Precio calculado en base a la ruta más corta. Puede variar según tráfico y condiciones reales.
+              </small>
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={
@@ -302,74 +444,37 @@ export default function Reserva() {
               !direccionInicio ||
               !direccionDestino
             }
-            style={{
-              width: "100%",
-              padding: "10px",
-              background: loading ? "#b5c7d6" : "#083c5d",
-              color: "#fff",
-              border: "none",
-              borderRadius: "6px",
-              fontWeight: "bold",
-              fontSize: "16px",
-              cursor: loading ? "not-allowed" : "pointer",
-              marginBottom: "8px"
-            }}
           >
-            {loading ? <span className="spinner"></span> : "Confirmar reserva"}
+            {loading ? <span className="pgx-spinner spinner"></span> : <><FontAwesomeIcon icon={faRocket} /> Confirmar Reserva</>}
           </button>
         </form>
-        {/* Eliminado bloque de debugInfo */}
-        <div className="aviso-finalizacion" style={{ fontSize: "13px", color: "#666", margin: "12px 0 0 0" }}>
-          <b>Nota:</b> Al finalizar tu mudanza, podrás calificar al conductor y al vehículo. Recuerda avisarle al conductor finalizar la reserva.
+
+        <div className="pgx-notice aviso-finalizacion">
+          Al finalizar tu mudanza, podrás calificar al conductor y al vehículo. Recuerda avisar al conductor para finalizar la reserva.
         </div>
+        <br />
         {mensaje && (
-          <div
-            className={mensajeTipo === "exito" ? "mensaje-exito" : "mensaje-error"}
-            style={{
-              marginTop: "16px",
-              color: mensajeTipo === "exito" ? "#1b883a" : "#c0392b",
-              background: mensajeTipo === "exito" ? "#eafaf1" : "#fdecea",
-              border: `1px solid ${mensajeTipo === "exito" ? "#b7e4c7" : "#f5c6cb"}`,
-              borderRadius: "6px",
-              padding: "10px",
-              textAlign: "center"
-            }}
-          >
-            {mensaje} <a href="/" style={{ color: mensajeTipo === "exito" ? "#1b883a" : "#c0392b" }}>Regresar</a>
+          
+          <div className={mensajeTipo === "exito" ? "pgx-msg-success mensaje-exito" : "pgx-msg-error mensaje-error"}>
+            {mensaje}
           </div>
         )}
-      </div>
-      <div className="reserva-info bloque-form" style={{
-        background: "#f8fafc",
-        borderRadius: "16px",
-        boxShadow: "0 2px 16px #0001",
-        padding: "28px 24px",
-        minWidth: "320px",
-        maxWidth: "350px"
-      }}>
-        {vehiculo && (
-          <>
-            <img src={getImagenUrl(vehiculo.imagen_url)} alt={vehiculo.modelo} className="reserva-img" style={{
-              width: "100%",
-              borderRadius: "12px",
-              marginBottom: "16px",
-              objectFit: "cover",
-              maxHeight: "180px"
-            }} />
-            <h3 style={{ marginBottom: "6px", color: "#083c5d" }}>
-              {vehiculo.modelo} <span style={{ color: "#888", fontWeight: "normal" }}>({vehiculo.ano_modelo})</span>
-            </h3>
-            <p><b>Tipo:</b> {vehiculo.tipo_vehiculo}</p>
-            <p><b>Placa:</b> {vehiculo.placa}</p>
-            <p><b>Tarifa diaria:</b> <span style={{ color: "#1b883a" }}>${vehiculo.tarifa_diaria}</span></p>
-            <hr style={{ margin: "16px 0" }} />
-            <h4 style={{ color: "#083c5d", marginBottom: "6px" }}>Conductor</h4>
-            <p><b>Nombre:</b> {vehiculo.conductor?.nombre}</p>
-            <p><b>Correo:</b> {vehiculo.conductor?.correo}</p>
-            <p><b>Teléfono:</b> {vehiculo.conductor?.telefono}</p>
-          </>
-        )}
-      </div>
+      </main>
+
+      {/* Mapa de ruta */}
+      <section className="pgx-reserva-map reserva-mapa">
+        <h3><FontAwesomeIcon icon={faMap} /> Visualización de Ruta</h3>
+        <div className="pgx-map-wrapper map-wrapper">
+          <RouteMap
+            originAddress={direccionInicio}
+            destinationAddress={direccionDestino}
+            ratePerKm={ratePerKm}
+            onDistanceChange={handleDistanceChange}
+            onOriginChange={handleOriginChange}
+            onDestinationChange={handleDestinationChange}
+          />
+        </div>
+      </section>
     </div>
   );
 }
