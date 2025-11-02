@@ -4,6 +4,42 @@ const api = axios.create({
   baseURL: 'http://192.168.0.4:5000/api'
 })
 
+// Interceptor para agregar token JWT a todas las peticiones
+api.interceptors.request.use(
+  (config) => {
+    const userStorage = localStorage.getItem("user");
+    if (userStorage) {
+      try {
+        const user = JSON.parse(userStorage);
+        if (user.token) {
+          config.headers.Authorization = `Bearer ${user.token}`;
+        }
+      } catch (e) {
+        console.error("Error al parsear usuario:", e);
+      }
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Interceptor para manejar errores de autenticación
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expirado o inválido
+      localStorage.removeItem("user");
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api
 
 export async function Login(correo, contrasena) {
@@ -40,6 +76,7 @@ export async function Verify({ correo, code, tipo }) {
     if (tipo === 'login' || tipo === 'register') {
       const user = data?.user ? data.user : data
       if (user && (user.id || user.correo)) {
+        // Guardar usuario CON token JWT
         localStorage.setItem("user", JSON.stringify(user));
       }
     }
@@ -72,11 +109,36 @@ export async function resetPassword({ correo, code, nueva }) {
 
 export async function GoogleLogin(token) {
   const { data } = await api.post('/google-login', { token });
+  // Guardar usuario con token JWT
+  if (data?.user) {
+    localStorage.setItem("user", JSON.stringify(data.user));
+  }
   return data;
 }
 
 export async function GoogleRegister(token, rol) {
   const { data } = await api.post('/google-register', { token, rol });
+  // Guardar usuario con token JWT
+  if (data?.user) {
+    localStorage.setItem("user", JSON.stringify(data.user));
+  }
+  return data;
+}
+
+export async function actualizarFotoPerfil(usuario_id, file) {
+  const fd = new FormData();
+  fd.append('foto', file);
+  const { data } = await api.put(`/usuarios/${usuario_id}/foto`, fd, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+  return data;
+}
+
+export async function cambiarContrasena(usuario_id, actual, nueva) {
+  const { data } = await api.put(`/usuarios/${usuario_id}/cambiar-contrasena`, {
+    actual,
+    nueva
+  });
   return data;
 }
 

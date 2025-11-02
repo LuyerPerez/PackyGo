@@ -82,7 +82,7 @@ export default function LoginForm() {
               </h2>
               {error && <p style={{ color: "red", fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>{error}</p>}
               <form onSubmit={handleSubmit} className="login-form">
-                <div className="input-group">
+                <div className="input-group-lr">
                   <FontAwesomeIcon icon={faEnvelope} className="icon" />
                   <div className="input-wrapper">
                     <input
@@ -95,7 +95,7 @@ export default function LoginForm() {
                     <label className="input-label">Correo Electrónico</label>
                   </div>
                 </div>
-                <div className="input-group">
+                <div className="input-group-lr">
                   <FontAwesomeIcon icon={faLock} className="icon" />
                   <div className="input-wrapper">
                     <input

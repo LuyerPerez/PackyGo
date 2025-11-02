@@ -23,6 +23,8 @@ import HomePrincipal from "./pages/HomePrincipal";
 import HomeCamionero from "./pages/HomeCamionero";
 import Nosotros from "./pages/Nosotros";
 import AprobacionVehiculosPage from "./pages/AprobacionVehiculosPage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Perfil from "./pages/Perfil";
 
 const GOOGLE_CLIENT_ID = "710600040256-60ttnabd8kjbr1051o2giq3gubd0ab4g.apps.googleusercontent.com";
 const NAVBAR_HIDDEN_ROUTES = ["/login", "/register", "/recuperar-contrasena"];
@@ -47,24 +49,108 @@ export default function App() {
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       {showNavBar && <NavBar />}
       <Routes>
+        {/* Rutas públicas */}
         <Route path="/" element={<Home />} />
-        <Route path="/HomePrincipal" element={<HomePrincipal />} />
-        <Route path="/HomeCamionero" element={<HomeCamionero />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/recuperar-contrasena" element={<PasswordReset />} />
-        <Route path="/mis-vehiculos" element={<Vehiculos />} />
         <Route path="/terminos" element={<TerminosCondiciones />} />
         <Route path="/privacidad" element={<PoliticaPrivacidad />} />
-        <Route path="/explorar" element={<Explorar />} /> 
-        <Route path="/reserva" element={<Reserva />} />
-        <Route path="/mis-reservas" element={<MisReservas />} />
-        <Route path="/pedidos" element={<Pedidos />} />
-        <Route path="/administracion" element={<Administracion />} />
-        <Route path="/admin/:tabla" element={<AdminCrud />} />
-        <Route path="/admin/aprobacion-vehiculos" element={<AprobacionVehiculosPage />} />
         <Route path="/nosotros" element={<Nosotros />} />
+        <Route path="/explorar" element={<Explorar />} />
+
+        {/* Ruta de perfil personalizada */}
+        <Route path="/:nombreCompleto/perfil" element={<ProtectedRoute allowedRoles={["cliente", "camionero", "admin"]}><Perfil /></ProtectedRoute>} />
+
+        {/* Rutas protegidas - Solo usuarios autenticados */}
+        <Route 
+          path="/logout" 
+          element={
+            <ProtectedRoute allowedRoles={["cliente", "camionero", "admin"]}>
+              <Logout />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Rutas para CLIENTE */}
+        <Route 
+          path="/HomePrincipal" 
+          element={
+            <ProtectedRoute allowedRoles={["cliente"]}>
+              <HomePrincipal />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/reserva" 
+          element={
+            <ProtectedRoute allowedRoles={["cliente"]}>
+              <Reserva />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/mis-reservas" 
+          element={
+            <ProtectedRoute allowedRoles={["cliente"]}>
+              <MisReservas />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Rutas para CAMIONERO */}
+        <Route 
+          path="/HomeCamionero" 
+          element={
+            <ProtectedRoute allowedRoles={["camionero"]}>
+              <HomeCamionero />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/mis-vehiculos" 
+          element={
+            <ProtectedRoute allowedRoles={["camionero"]}>
+              <Vehiculos />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/pedidos" 
+          element={
+            <ProtectedRoute allowedRoles={["camionero"]}>
+              <Pedidos />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Rutas para ADMIN */}
+        <Route 
+          path="/administracion" 
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Administracion />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/:tabla" 
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminCrud />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin/aprobacion-vehiculos" 
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AprobacionVehiculosPage />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Ruta 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </GoogleOAuthProvider>

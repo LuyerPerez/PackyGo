@@ -54,7 +54,16 @@ export default function ModalCalificarVehiculo({ open, onClose, vehiculo, reserv
         />
         <div style={{ marginTop: 16, display: "flex", gap: 12, justifyContent: "center" }}>
           <button onClick={handleSubmit} className="btn-finalizar" disabled={loading || yaCalifico}>
-            {yaCalifico ? "Ya calificaste" : "Enviar calificación"}
+            {loading ? (
+              <>
+                <span className="btn-spinner"></span>
+                Enviando...
+              </>
+            ) : yaCalifico ? (
+              "Ya calificaste"
+            ) : (
+              "Enviar calificación"
+            )}
           </button>
           <button onClick={onClose} className="btn-cancelar" disabled={loading}>
             Cancelar

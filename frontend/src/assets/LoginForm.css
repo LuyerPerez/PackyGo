@@ -210,7 +210,7 @@ body {
   }
 }
 
-.input-group {
+.input-group-lr {
   display: flex;
   align-items: center;
   background: #fdfdfd;
@@ -223,7 +223,7 @@ body {
   min-width: 0;
 }
 
-.input-group .icon {
+.input-group-lr .icon {
   color: #0097a7;
   margin-right: 10px;
   width: 16px;

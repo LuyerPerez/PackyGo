@@ -181,7 +181,6 @@ export default function Reserva() {
       setMensajeTipo("error");
       return;
     }
-    // Si usuario tiene .user, usar ese objeto, si no, usar usuario directamente
     const usuarioId = usuario.user?.id || usuario.id;
     if (!fechaInicio || !fechaFin) {
       setMensaje("Debes seleccionar fecha y hora.");
@@ -193,6 +192,15 @@ export default function Reserva() {
       setMensajeTipo("error");
       return;
     }
+
+    const confirmacion = window.confirm(
+      `¿Confirmar reserva?`
+    );
+
+    if (!confirmacion) {
+      return;
+    }
+
     setLoading(true);
     try {
       await debugReserva({
@@ -432,6 +440,19 @@ export default function Reserva() {
               <small>
                 <FontAwesomeIcon icon={faCircleInfo} /> Precio calculado en base a la ruta más corta. Puede variar según tráfico y condiciones reales.
               </small>
+            </div>
+          )}
+
+          {/* Aviso de confirmación */}
+          {direccionInicio && direccionDestino && estimatedPrice > 0 && (
+            <div className="pgx-confirmation-notice">
+              <div className="pgx-notice-icon">
+                <FontAwesomeIcon icon={faLightbulb} />
+              </div>
+              <div className="pgx-notice-content">
+                <strong>Verifica tus datos antes de confirmar</strong>
+                <p>Revisa cuidadosamente las ubicaciones de origen y destino en el mapa, así como el precio estimado. Al confirmar la reserva se enviará una notificación al conductor.</p>
+              </div>
             </div>
           )}
 

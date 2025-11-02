@@ -139,7 +139,7 @@ export default function RegisterForm() {
 
               <form onSubmit={handleSubmit} className="login-form">
                 <div className="form-row">
-                  <div className="input-group">
+                  <div className="input-group-lr">
                     <FontAwesomeIcon icon={faUserTag} className="icon" />
                     <div className="input-wrapper">
                       <input
@@ -152,7 +152,7 @@ export default function RegisterForm() {
                       <label className="input-label">Primer Nombre</label>
                     </div>
                   </div>
-                  <div className="input-group">
+                  <div className="input-group-lr">
                     <FontAwesomeIcon icon={faUserTag} className="icon" />
                     <div className="input-wrapper">
                       <input
@@ -167,7 +167,7 @@ export default function RegisterForm() {
                 </div>
 
                 <div className="form-row">
-                  <div className="input-group">
+                  <div className="input-group-lr">
                     <FontAwesomeIcon icon={faAddressCard} className="icon" />
                     <div className="input-wrapper">
                       <input
@@ -180,7 +180,7 @@ export default function RegisterForm() {
                       <label className="input-label">Primer Apellido</label>
                     </div>
                   </div>
-                  <div className="input-group">
+                  <div className="input-group-lr">
                     <FontAwesomeIcon icon={faAddressCard} className="icon" />
                     <div className="input-wrapper">
                       <input
@@ -195,7 +195,7 @@ export default function RegisterForm() {
                 </div>
 
                 <div className="form-row form-row-doc">
-                  <div className="input-group">
+                  <div className="input-group-lr">
                     <FontAwesomeIcon icon={faIdCard} className="icon" />
                     <div className="input-wrapper has-value">
                       <select
@@ -211,7 +211,7 @@ export default function RegisterForm() {
                       <label className="input-label">Tipo</label>
                     </div>
                   </div>
-                  <div className="input-group">
+                  <div className="input-group-lr">
                     <FontAwesomeIcon icon={faIdCard} className="icon" />
                     <div className="input-wrapper">
                       <input
@@ -225,7 +225,7 @@ export default function RegisterForm() {
                     </div>
                   </div>
                 </div>
-                <div className="input-group">
+                <div className="input-group-lr">
                   <FontAwesomeIcon icon={faEnvelope} className="icon" />
                   <div className="input-wrapper">
                     <input
@@ -238,7 +238,7 @@ export default function RegisterForm() {
                     <label className="input-label">Correo Electrónico</label>
                   </div>
                 </div>
-                <div className="input-group">
+                <div className="input-group-lr">
                   <FontAwesomeIcon icon={faPhone} className="icon" />
                   <div className="input-wrapper">
                     <input
@@ -251,7 +251,7 @@ export default function RegisterForm() {
                     <label className="input-label">Teléfono</label>
                   </div>
                 </div>
-                <div className="input-group">
+                <div className="input-group-lr">
                   <FontAwesomeIcon icon={faLock} className="icon" />
                   <div className="input-wrapper">
                     <input
@@ -280,7 +280,7 @@ export default function RegisterForm() {
                 {passwordError && (
                   <p className="error" style={{ marginTop: 6 }}>{passwordError}</p>
                 )}
-                <div className="input-group">
+                <div className="input-group-lr">
                   <FontAwesomeIcon icon={faUserShield} className="icon" />
                   <div className="input-wrapper has-value">
                     <select

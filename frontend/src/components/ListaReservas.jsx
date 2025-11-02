@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import ReservaCard from "./ReservaCard";
 
-const RESERVAS_POR_PAGINA = 4;
+const RESERVAS_POR_PAGINA = 8;
 
 export default function ListaReservas({ reservas, onCalificar, calificadas }) {
   const [pagina, setPagina] = useState(1);
@@ -23,7 +23,6 @@ export default function ListaReservas({ reservas, onCalificar, calificadas }) {
           <ReservaCard
             key={reserva.id}
             reserva={reserva}
-            // onCancel eliminado porque no está definido ni usado aquí
             onCalificar={(res, cbLocal) => onCalificar(res, cbLocal)}
             yaCalificadoProp={calificadas && typeof calificadas === 'object' ? calificadas[reserva.id] : undefined}
           />

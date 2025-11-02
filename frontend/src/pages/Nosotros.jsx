@@ -16,54 +16,45 @@ import {
 import '../assets/Nosotros.css';
 
 function Nosotros() {
-  const features = [
-    {
-      icon: faTruck,
-      title: "Gestión de Vehículos",
-      description: "Registro y administración completa de flotas de transporte con detalles técnicos y tarifas."
-    },
-    {
-      icon: faUsers,
-      title: "Múltiples Roles",
-      description: "Sistema diferenciado para clientes, camioneros y administradores con permisos específicos."
-    },
+  
+
+  // Diferenciales clave que nos distinguen
+  const advantages = [
     {
       icon: faCalendarDays,
-      title: "Reservas Inteligentes",
-      description: "Sistema de reservaciones con cálculo automático de tarifas y disponibilidad en tiempo real."
-    },
-    {
-      icon: faStar,
-      title: "Sistema de Calificaciones",
-      description: "Calificaciones y comentarios bidireccionales entre usuarios y proveedores de servicio."
-    },
-    {
-      icon: faShieldHalved,
-      title: "Seguridad Avanzada",
-      description: "Encriptación de datos, autenticación segura y verificación por correo electrónico."
+      title: 'Puntualidad garantizada',
+      description:
+        'Compromisos de tiempo (SLA) claros y seguimiento de cada etapa para cumplir tus plazos.'
     },
     {
       icon: faUserShield,
-      title: "Administración Completa",
-      description: "Panel administrativo para gestión de usuarios, vehículos, reservas y reportes."
-    }
-  ];
-
-  const teamMembers = [
-    {
-      name: "Equipo de Desarrollo",
-      role: "Full Stack Developers",
-      description: "Desarrolladores especializados en React, Flask y MySQL"
+      title: 'Verificación y confianza',
+      description:
+        'Conductores y vehículos verificados, historial de calificaciones y procesos antifraude.'
     },
     {
-      name: "Equipo de Diseño",
-      role: "UI/UX Designers",
-      description: "Especialistas en experiencia de usuario y diseño responsivo"
+      icon: faShieldHalved,
+      title: 'Seguridad de la carga',
+      description:
+        'Buenas prácticas operativas y cobertura de seguros según el tipo de servicio requerido.'
     },
     {
-      name: "Equipo de Calidad",
-      role: "QA Engineers",
-      description: "Garantizamos la máxima calidad y seguridad de la plataforma"
+      icon: faHandshake,
+      title: 'Transparencia total',
+      description:
+        'Tarifas claras sin costos ocultos y comunicación directa entre cliente y camionero.'
+    },
+    {
+      icon: faTruck,
+      title: 'Cobertura y disponibilidad',
+      description:
+        'Red amplia de camioneros para diferentes tipos de carga y rutas a nivel nacional.'
+    },
+    {
+      icon: faStar,
+      title: 'Experiencia superior',
+      description:
+        'Soporte dedicado y una plataforma rápida, simple y pensada para tu día a día.'
     }
   ];
 
@@ -168,43 +159,23 @@ function Nosotros() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="nosotros-features-section">
-        <div className="nosotros-container-centered">
-          <div className="nosotros-section-header">
-            <h2 className="nosotros-section-title">¿Qué nos hace diferentes?</h2>
-            <p className="nosotros-section-subtitle">Descubre las características que hacen de PackyGo la mejor opción</p>
-          </div>
-          <div className="nosotros-features-grid">
-            {features.map((feature, index) => (
-              <div key={index} className="nosotros-feature-item">
-                <div className="nosotros-feature-icon-circle">
-                  <FontAwesomeIcon icon={feature.icon} />
-                </div>
-                <h3 className="nosotros-feature-title">{feature.title}</h3>
-                <p className="nosotros-feature-description">{feature.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      
 
-      {/* Team Section */}
+      {/* Differentiators Section */}
       <section className="nosotros-team-section">
         <div className="nosotros-container-centered">
           <div className="nosotros-section-header">
-            <h2 className="nosotros-section-title">Nuestro Equipo</h2>
-            <p className="nosotros-section-subtitle">Profesionales comprometidos con la excelencia</p>
+            <h2 className="nosotros-section-title">Lo que nos diferencia</h2>
+            <p className="nosotros-section-subtitle">Ventajas reales frente a alternativas tradicionales</p>
           </div>
           <div className="nosotros-team-grid">
-            {teamMembers.map((member, index) => (
+            {advantages.map((adv, index) => (
               <div key={index} className="nosotros-team-member">
                 <div className="nosotros-team-avatar">
-                  <FontAwesomeIcon icon={faUsers} />
+                  <FontAwesomeIcon icon={adv.icon} />
                 </div>
-                <h3 className="nosotros-team-name">{member.name}</h3>
-                <p className="nosotros-team-position">{member.role}</p>
-                <p className="nosotros-team-bio">{member.description}</p>
+                <h3 className="nosotros-team-name">{adv.title}</h3>
+                <p className="nosotros-team-bio">{adv.description}</p>
               </div>
             ))}
           </div>

@@ -15,7 +15,8 @@ CREATE TABLE usuario (
   telefono VARCHAR(15),
   contrasena VARCHAR(255) NOT NULL,
   rol ENUM('admin', 'cliente', 'camionero') NOT NULL,
-  fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  foto TEXT NULL
 ) ENGINE=InnoDB;
 
 
@@ -102,11 +103,14 @@ CREATE TABLE notificacion (
 ) ENGINE=InnoDB;
 
 INSERT INTO usuario VALUES 
-(1, 'Luyer', '', 'Perez', '', 'CC', '1025143367', 'luyerperez0@gmail.com', '3219423757', 'pass1', 'cliente', DEFAULT),
-(2, 'Alison', '', 'Ospina', '', 'CC', '1034289794', 'alisonospinaariza0126@gmail.com', '3145975921', 'pass2', 'cliente', DEFAULT),
-(3, 'Dina', '', 'Monroy', '', 'CC', '1031423129', 'milaniamalaver94@gmail.com', '3019122987', 'pass3', 'camionero', DEFAULT),
-(4, 'Evelin', '', 'Amaya', '', 'CC', '1074812760', 'evelinjasbleidya@gmail.com', '3222165858', 'pass4', 'camionero', DEFAULT),
-(5, 'Admin', '', 'Usuario', '', 'CC', '1074812761', 'packygonotificaciones@gmail.com', '3001234567', 'adminpass', 'admin', DEFAULT);
+(1, 'Luyer', '', 'Perez', '', 'CC', '1025143367', 'luyerperez0@gmail.com', '3219423757', 'pass1', 'cliente', DEFAULT, NULL),
+(2, 'Alison', '', 'Ospina', '', 'CC', '1034289794', 'alisonospinaariza0126@gmail.com', '3145975921', 'pass2', 'cliente', DEFAULT, NULL),
+(3, 'Dina', '', 'Monroy', '', 'CC', '1031423129', 'milaniamalaver94@gmail.com', '3019122987', 'pass3', 'camionero', DEFAULT, NULL),
+(4, 'Evelin', '', 'Amaya', '', 'CC', '1074812760', 'evelinjasbleidya@gmail.com', '3222165858', 'pass4', 'camionero', DEFAULT, NULL),
+(5, 'Admin', '', 'Usuario', '', 'CC', '1074812761', 'packygonotificaciones@gmail.com', '3001234567', 'adminpass', 'admin', DEFAULT, NULL);
+
+-- Si la base ya existe sin la columna `foto`, aplica este ALTER en tu entorno:
+-- ALTER TABLE usuario ADD COLUMN foto TEXT NULL;
 
 INSERT INTO vehiculo VALUES 
 (1, 3, 'Camión sencillo', 'TZX123', 'Chevrolet NHR', 2021, '/uploads/images/Chevrolet_NHR.jpg', 180000, NULL, NULL, NULL, 'aprobado'),

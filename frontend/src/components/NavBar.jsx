@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faHome, faTruck, faRightFromBracket, faUserLock, faCalendarDays, faUserShield, faSearch, faInfoCircle} from "@fortawesome/free-solid-svg-icons";
+import { getImagenUrl } from "../api";
 
 function NavBar() {
   const [user, setUser] = useState(null);
@@ -35,10 +36,16 @@ function NavBar() {
     };
 
     window.addEventListener("storage", handleStorageChange);
+    const handleUserUpdated = () => {
+      const updatedUser = localStorage.getItem("user");
+      setUser(updatedUser ? JSON.parse(updatedUser) : null);
+    };
+    window.addEventListener('userUpdated', handleUserUpdated);
     window.addEventListener("popstate", handleRouteChange);
 
     return () => {
       window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener('userUpdated', handleUserUpdated);
       window.removeEventListener("popstate", handleRouteChange);
     };
   }, []);
@@ -191,7 +198,16 @@ function NavBar() {
                 aria-expanded={isDropdownOpen}
                 tabIndex={0}
               >
-                <FontAwesomeIcon icon={faUser} />
+                {user.foto ? (
+                  <img
+                    src={getImagenUrl(user.foto) || user.foto}
+                    alt="avatar"
+                    className="user-avatar"
+                    style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <FontAwesomeIcon icon={faUser} />
+                )}
                 <span className="user-name">{user.primer_nombre} {user.primer_apellido}</span>
                 <span className="user-arrow">▾</span>
               </button>
@@ -228,8 +244,8 @@ function NavBar() {
 
                 <div className="dropdown-section">
                   <Link
-                    to="/perfil"
-                    className={`menu-item${isActive("/perfil") ? " active" : ""}`}
+                    to={`/${user.primer_nombre}-${user.primer_apellido}/perfil`}
+                    className={`menu-item${location.pathname.includes('/perfil') ? " active" : ""}`}
                     onClick={() => { setIsDropdownOpen(false); }}
                   >
                     <FontAwesomeIcon icon={faUser} />

@@ -6,6 +6,7 @@ import ModalCalificarVehiculo from "./ModalCalificarVehiculo"; // crea este comp
 export default function ReservaCard({ reserva, onCancel, onCalificar, yaCalificadoProp }) {
   const [vehiculo, setVehiculo] = useState(null);
   const [cancelando, setCancelando] = useState(false);
+  const [calificando, setCalificando] = useState(false);
   // Solo usar la prop yaCalificadoProp, el padre controla el estado
   const yaCalifico = !!yaCalificadoProp;
   const handleCalificadoLocal = () => {};
@@ -16,7 +17,7 @@ export default function ReservaCard({ reserva, onCancel, onCalificar, yaCalifica
       const v = vehiculos.find(v => v.id === reserva.vehiculo_id);
       if (mounted) setVehiculo(v);
     });
-    // Ya no consulta calificaciones, el padre lo controla
+
     return () => { mounted = false; };
   }, [reserva.vehiculo_id, reserva.id, reserva.estado_reserva, yaCalificadoProp]);
 
@@ -88,33 +89,54 @@ export default function ReservaCard({ reserva, onCancel, onCalificar, yaCalifica
           </span>
           {reserva.estado_reserva === "activa" && (
             <button
-              className="reserva-card-cancelar"
+              className={`reserva-card-cancelar ${cancelando ? 'loading' : ''}`}
               onClick={handleCancelar}
               disabled={cancelando}
             >
-              {cancelando ? "Cancelando..." : "Cancelar"}
+              {cancelando ? (
+                <>
+                  <span className="btn-spinner"></span>
+                  Cancelando...
+                </>
+              ) : (
+                "Cancelar"
+              )}
             </button>
           )}
           {/* Botón calificar solo si está finalizada y NO ha calificado (yaCalifico=false) */}
           {reserva.estado_reserva === "finalizada" && !yaCalifico ? (
             <button
-              className="reserva-card-calificar"
+              className={`reserva-card-calificar ${calificando ? 'loading' : ''}`}
               onClick={async () => {
                 if (onCalificar) {
-                  await onCalificar(reserva, handleCalificadoLocal);
+                  setCalificando(true);
+                  try {
+                    await onCalificar(reserva, handleCalificadoLocal);
+                  } finally {
+                    setCalificando(false);
+                  }
                 }
               }}
+              disabled={calificando}
             >
-              Calificar
+              {calificando ? (
+                <>
+                  <span className="btn-spinner"></span>
+                  Calificando...
+                </>
+              ) : (
+                <>
+                  ★ Calificar
+                </>
+              )}
             </button>
           ) : reserva.estado_reserva === "finalizada" && yaCalifico ? (
-            <span className="reserva-card-calificado" style={{color:'#ffb300', fontWeight:'bold', marginLeft:8}}>
+            <span className="reserva-card-calificado">
               ★ Calificado
             </span>
           ) : null}
         </div>
       </div>
-      {/* El modal se despliega desde MisReservas.jsx */}
     </div>
   );
 }

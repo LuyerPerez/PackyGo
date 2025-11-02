@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 from flask_cors import CORS
 from db import get_connection
 from werkzeug.security import generate_password_hash, check_password_hash
+from auth import generate_token, verify_token, token_required, role_required
 import os
 import random
 from datetime import datetime
@@ -28,10 +29,12 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "uploads")
 IMAGES_FOLDER = os.path.join(UPLOAD_FOLDER, "images")
+PROFILE_FOLDER = os.path.join(IMAGES_FOLDER, "profiles")
 DOCS_FOLDER = os.path.join(UPLOAD_FOLDER, "docs")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(IMAGES_FOLDER, exist_ok=True)
 os.makedirs(DOCS_FOLDER, exist_ok=True)
+os.makedirs(PROFILE_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 verification_codes = {}
@@ -40,6 +43,48 @@ reset_codes = {}
 def redondear_hora(dt_str):
     dt = datetime.fromisoformat(dt_str)
     return dt.replace(minute=0, second=0, microsecond=0)
+
+def build_user_dict(row):
+    """
+    Construye un dict de usuario a partir de una fila con el siguiente SELECT:
+    SELECT id, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido,
+           tipoDocumento, noDocumento, correo, telefono, rol, fecha_registro, foto
+    """
+    if not row:
+        return None
+    return {
+        "id": row[0],
+        "primer_nombre": row[1],
+        "segundo_nombre": row[2],
+        "primer_apellido": row[3],
+        "segundo_apellido": row[4],
+        "tipoDocumento": row[5],
+        "noDocumento": row[6],
+        "correo": row[7],
+        "telefono": row[8],
+        "rol": row[9],
+        "fecha_registro": row[10].isoformat() if row[10] else None,
+        "foto": row[11],
+    }
+
+def get_user_by_correo(correo):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT id, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido,
+                   tipoDocumento, noDocumento, correo, telefono, rol, fecha_registro, foto
+            FROM usuario
+            WHERE correo=%s
+            """,
+            (correo,)
+        )
+        row = cursor.fetchone()
+        return build_user_dict(row)
+    finally:
+        cursor.close()
+        conn.close()
 
 @app.route("/api/request-reset", methods=["POST"])
 def request_reset():
@@ -86,19 +131,9 @@ def reset_password():
         conn.commit()
         reset_codes.pop(correo)
         enviarCorreoCambio(correo)
-        # Obtener datos del usuario para iniciar sesión automáticamente en el cliente
-        cursor.execute("SELECT * FROM usuario WHERE correo=%s", (correo,))
-        user = cursor.fetchone()
+        user = get_user_by_correo(correo)
         if user:
-            return ({
-                "id": user[0],
-                "primer_nombre": user[1],
-                "segundo_nombre": user[2],
-                "primer_apellido": user[3],
-                "segundo_apellido": user[4],
-                "correo": user[7],
-                "rol": user[10]
-            }, 200)
+            return (user, 200)
         return {"message": "Contraseña actualizada exitosamente."}, 200
     except Exception as e:
         conn.rollback()
@@ -222,7 +257,8 @@ def verify():
             conn.close()
         verification_codes.pop(correo)
         if user:
-            return ({
+            # Consultar con columnas explícitas para enviar todos los campos necesarios
+            user_data = get_user_by_correo(datos["correo"]) or {
                 "id": user[0],
                 "primer_nombre": user[1],
                 "segundo_nombre": user[2],
@@ -230,13 +266,19 @@ def verify():
                 "segundo_apellido": user[4],
                 "correo": user[7],
                 "rol": user[10]
-            }, 201)
+            }
+            token = generate_token(user_data)
+            return ({**user_data, "token": token}, 201)
         return {"message": "Usuario registrado exitosamente."}, 201
 
     elif tipo == "login":
-        user = verif["user"]
+        # Ignorar el usuario mínimo guardado y obtener datos completos desde DB
+        user_data = get_user_by_correo(correo)
         verification_codes.pop(correo)
-        return jsonify(user), 200
+        if not user_data:
+            return {"error": "Usuario no encontrado"}, 404
+        token = generate_token(user_data)
+        return jsonify({**user_data, "token": token}), 200
 
     return {"error": "Tipo de verificación inválido"}, 400
 
@@ -339,15 +381,21 @@ def google_login():
         conn.close()
         if not user:
             return {"error": "No existe usuario con ese correo"}, 404
-        return {"user": {
-            "id": user[0],
-            "primer_nombre": user[1],
-            "segundo_nombre": user[2],
-            "primer_apellido": user[3],
-            "segundo_apellido": user[4],
-            "correo": user[7],
-            "rol": user[10] 
-        }}, 200
+        # Devolver datos completos (incluye telefono, noDocumento, tipoDocumento)
+        user_data = get_user_by_correo(correo)
+        if not user_data:
+            # Fallback mínimo
+            user_data = {
+                "id": user[0],
+                "primer_nombre": user[1],
+                "segundo_nombre": user[2],
+                "primer_apellido": user[3],
+                "segundo_apellido": user[4],
+                "correo": user[7],
+                "rol": user[10]
+            }
+        token = generate_token(user_data)
+        return {"user": {**user_data, "token": token}}, 200
     except Exception as e:
         msg = str(e)
         # Mensaje más amigable cuando el token indica diferencia de hora
@@ -359,6 +407,90 @@ def google_login():
                 "detalle": msg
             }, 400
         return {"error": msg}, 400
+
+@app.route("/api/usuarios/<int:usuario_id>/foto", methods=["PUT"])
+@token_required
+def actualizar_foto_usuario(usuario_id):
+    """Sube y actualiza la foto de perfil del usuario.
+    Espera multipart/form-data con campo 'foto'. Devuelve { foto: "/uploads/images/profiles/<file>" }
+    """
+    if "foto" not in request.files:
+        return {"error": "Archivo 'foto' es requerido"}, 400
+    foto = request.files["foto"]
+    if not foto.filename:
+        return {"error": "Nombre de archivo inválido"}, 400
+    filename = secure_filename(foto.filename)
+    ext = os.path.splitext(filename)[1]
+    unique_name = f"pf_{datetime.now().strftime('%Y%m%d%H%M%S')}_{random.randint(1000,9999)}{ext}"
+    save_path = os.path.join(PROFILE_FOLDER, unique_name)
+    foto.save(save_path)
+    foto_url = f"/uploads/images/profiles/{unique_name}"
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE usuario SET foto=%s WHERE id=%s", (foto_url, usuario_id))
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
+    return {"foto": foto_url}, 200
+
+@app.route("/api/usuarios/<int:usuario_id>/cambiar-contrasena", methods=["PUT"])
+@token_required
+def cambiar_contrasena_usuario(usuario_id):
+    """Cambia la contraseña del usuario autenticado.
+    Espera JSON con: { actual: string, nueva: string }
+    """
+    data = request.json
+    contrasena_actual = data.get("actual")
+    contrasena_nueva = data.get("nueva")
+    
+    if not all([contrasena_actual, contrasena_nueva]):
+        return {"error": "Contraseña actual y nueva son requeridas"}, 400
+    
+    if len(contrasena_nueva) < 6:
+        return {"error": "La nueva contraseña debe tener al menos 6 caracteres"}, 400
+    
+    # Verificar que el usuario autenticado coincida
+    if request.current_user["id"] != usuario_id:
+        return {"error": "No tienes permiso para cambiar esta contraseña"}, 403
+    
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        # Obtener la contraseña hasheada actual
+        cursor.execute("SELECT contrasena FROM usuario WHERE id=%s", (usuario_id,))
+        user = cursor.fetchone()
+        
+        if not user:
+            return {"error": "Usuario no encontrado"}, 404
+        
+        # Verificar que la contraseña actual sea correcta
+        if not check_password_hash(user[0], contrasena_actual):
+            return {"error": "Contraseña actual incorrecta"}, 400
+        
+        # Hashear y actualizar la nueva contraseña
+        hashed_nueva = generate_password_hash(contrasena_nueva)
+        cursor.execute("UPDATE usuario SET contrasena=%s WHERE id=%s", (hashed_nueva, usuario_id))
+        conn.commit()
+        
+        # Enviar correo de notificación
+        cursor.execute("SELECT correo FROM usuario WHERE id=%s", (usuario_id,))
+        correo_user = cursor.fetchone()
+        if correo_user:
+            enviarCorreoCambio(correo_user[0])
+        
+        return {"message": "Contraseña actualizada exitosamente"}, 200
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 500
+    finally:
+        cursor.close()
+        conn.close()
 
 @app.route("/api/google-register", methods=["POST"])
 def google_register():
@@ -408,15 +540,20 @@ def google_register():
         user = cursor.fetchone()
         cursor.close()
         conn.close()
-        return {"user": {
-            "id": user[0],
-            "primer_nombre": user[1],
-            "segundo_nombre": user[2],
-            "primer_apellido": user[3],
-            "segundo_apellido": user[4],
-            "correo": user[7],
-            "rol": user[10]
-        }}, 201
+        # Devolver datos completos
+        user_data = get_user_by_correo(correo)
+        if not user_data and user:
+            user_data = {
+                "id": user[0],
+                "primer_nombre": user[1],
+                "segundo_nombre": user[2],
+                "primer_apellido": user[3],
+                "segundo_apellido": user[4],
+                "correo": user[7],
+                "rol": user[10]
+            }
+        token = generate_token(user_data)
+        return {"user": {**user_data, "token": token}}, 201
     except Exception as e:
         msg = str(e)
         if "Token used too early" in msg or "token used too early" in msg:
@@ -429,6 +566,7 @@ def google_register():
         return {"error": msg}, 400
 
 @app.route("/api/vehiculos", methods=["POST"])
+@role_required(["camionero"])
 def registrar_vehiculo():
     camionero_id = request.form.get("camionero_id")
     tipo_vehiculo = request.form.get("tipo_vehiculo")
@@ -722,6 +860,7 @@ def listar_vehiculos_pendientes():
         conn.close()
 
 @app.route("/api/vehiculos/<int:vehiculo_id>/aprobar", methods=["PUT"])
+@role_required(["admin"])
 def aprobar_vehiculo(vehiculo_id):
     """Endpoint para que el admin apruebe un vehículo"""
     conn = get_connection()
@@ -757,6 +896,7 @@ def aprobar_vehiculo(vehiculo_id):
         conn.close()
 
 @app.route("/api/vehiculos/<int:vehiculo_id>/denegar", methods=["PUT"])
+@role_required(["admin"])
 def denegar_vehiculo(vehiculo_id):
     """Endpoint para que el admin deniegue un vehículo"""
     conn = get_connection()
@@ -849,6 +989,7 @@ def debug_reserva():
         conn.close()
 
 @app.route("/api/reservas", methods=["POST"])
+@role_required(["cliente"])
 def crear_reserva():
     data = request.json
     cliente_id = data.get("cliente_id")
@@ -1283,6 +1424,7 @@ def listar_usuarios():
     return jsonify(usuarios=lista), 200
 
 @app.route("/api/usuarios", methods=["POST"])
+@role_required(["admin"])
 def crear_usuario():
     data = request.json or {}
     primer_nombre = data.get("primer_nombre")
@@ -1317,6 +1459,7 @@ def crear_usuario():
         conn.close()
 
 @app.route("/api/usuarios/<int:usuario_id>", methods=["PUT"])
+@role_required(["admin"])
 def editar_usuario(usuario_id):
     data = request.json
     primer_nombre = data.get("primer_nombre")

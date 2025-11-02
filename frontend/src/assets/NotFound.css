@@ -1,35 +1,241 @@
+.notfound-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f8fbfd 0%, #e8f4f8 50%, #e1f5fe 100%);
+  padding: 2rem;
+}
+
 .notfound-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.notfound-icon-wrapper {
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, #ffeb3b 0%, #ffc107 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  height: 80vh;
-  background: none;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 24px rgba(255, 193, 7, 0.3);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.notfound-icon {
+  font-size: 3rem;
+  color: #fff;
 }
 
 .notfound-title {
-  font-size: 7rem;
-  font-weight: bold;
-  color: #0097a7;
-  margin-bottom: 0.5rem;
+  font-size: 8rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #0097a7 0%, #083c5d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.notfound-subtitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #083c5d;
+  margin: 1rem 0 0.5rem;
 }
 
 .notfound-message {
-  font-size: 1.5rem;
-  color: #334155;
-  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  color: #546e7a;
+  margin: 0 0 2.5rem;
+  line-height: 1.6;
+  max-width: 450px;
 }
 
-.notfound-link {
-  padding: 0.7rem 2rem;
+.notfound-illustration {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  height: 120px;
+  margin: 2rem 0 3rem;
+}
+
+.notfound-truck {
+  font-size: 4rem;
+  color: #0097a7;
+  position: absolute;
+  top: 20px;
+  left: 0;
+  animation: driveTruck 3s ease-in-out infinite;
+}
+
+.notfound-road {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: repeating-linear-gradient(
+    90deg,
+    #083c5d 0px,
+    #083c5d 20px,
+    transparent 20px,
+    transparent 40px
+  );
+  opacity: 0.3;
+}
+
+.notfound-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.notfound-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 2rem;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.notfound-btn-primary {
+  background: linear-gradient(135deg, #0097a7 0%, #00838f 100%);
+  color: #fff;
+}
+
+.notfound-btn-primary:hover {
+  background: linear-gradient(135deg, #00838f 0%, #006978 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 151, 167, 0.3);
+}
+
+.notfound-btn-secondary {
+  background: #fff;
+  color: #0097a7;
+  border: 2px solid #0097a7;
+}
+
+.notfound-btn-secondary:hover {
   background: #0097a7;
   color: #fff;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 500;
-  transition: background 0.2s;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 151, 167, 0.2);
 }
 
-.notfound-link:hover {
-  background: #006978;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes driveTruck {
+  0% {
+    left: -10%;
+    transform: scaleX(1);
+  }
+  48% {
+    left: 110%;
+    transform: scaleX(1);
+  }
+  50% {
+    left: 110%;
+    transform: scaleX(-1);
+  }
+  98% {
+    left: -10%;
+    transform: scaleX(-1);
+  }
+  100% {
+    left: -10%;
+    transform: scaleX(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .notfound-title {
+    font-size: 6rem;
+  }
+
+  .notfound-subtitle {
+    font-size: 1.6rem;
+  }
+
+  .notfound-message {
+    font-size: 1rem;
+  }
+
+  .notfound-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .notfound-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .notfound-truck {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .notfound-wrapper {
+    padding: 1rem;
+  }
+
+  .notfound-title {
+    font-size: 5rem;
+  }
+
+  .notfound-subtitle {
+    font-size: 1.4rem;
+  }
+
+  .notfound-icon-wrapper {
+    width: 80px;
+    height: 80px;
+  }
+
+  .notfound-icon {
+    font-size: 2.5rem;
+  }
+
+  .notfound-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.95rem;
+  }
 }

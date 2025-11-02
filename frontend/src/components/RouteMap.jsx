@@ -26,6 +26,21 @@ function useDebouncedValue(value, delay = 500) {
   }, [value, delay]);
   return debounced;
 }
+// Límites de Bogotá (bounding box aproximado)
+const BOGOTA_BOUNDS = {
+  north: 4.84,
+  south: 4.47,
+  east: -73.99,
+  west: -74.22
+};
+
+const isInBogota = (lat, lng) => {
+  return lat >= BOGOTA_BOUNDS.south && 
+         lat <= BOGOTA_BOUNDS.north && 
+         lng >= BOGOTA_BOUNDS.west && 
+         lng <= BOGOTA_BOUNDS.east;
+};
+
 export default function RouteMap({ 
   originAddress, 
   destinationAddress, 
@@ -44,10 +59,13 @@ export default function RouteMap({
 
   const [info, setInfo] = useState({ distanceKm: 0, durationMin: 0 });
   const [clickMode, setClickMode] = useState(null);
+  const [isCalculating, setIsCalculating] = useState(false);
 
   const dOrigin = useDebouncedValue(originAddress);
   const dDest = useDebouncedValue(destinationAddress);
   const clickModeRef = useRef(null);
+  const originCoordsRef = useRef(null);
+  const destCoordsRef = useRef(null);
 
   useEffect(() => {
     clickModeRef.current = clickMode;
@@ -60,6 +78,13 @@ export default function RouteMap({
       center: bogota,
       zoom: 12,
       zoomControl: true,
+      maxBounds: L.latLngBounds(
+        [BOGOTA_BOUNDS.south, BOGOTA_BOUNDS.west],
+        [BOGOTA_BOUNDS.north, BOGOTA_BOUNDS.east]
+      ),
+      maxBoundsViscosity: 1.0,
+      minZoom: 11,
+      maxZoom: 18
     });
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "&copy; OpenStreetMap contributors",
@@ -73,24 +98,95 @@ export default function RouteMap({
       
       const { lat, lng } = e.latlng;
       
+      // Validar que el punto esté dentro de Bogotá
+      if (!isInBogota(lat, lng)) {
+        alert('⚠️ Solo puedes seleccionar ubicaciones dentro de Bogotá');
+        return;
+      }
+      
+      const tempMarker = L.marker([lat, lng], {
+        icon: L.divIcon({
+          className: 'temp-marker-pulse',
+          html: '<div style="width:20px;height:20px;background:#ff4444;border-radius:50%;border:3px solid white;box-shadow:0 0 10px rgba(255,68,68,0.5);animation:pulse 1s infinite;"></div>',
+          iconSize: [20, 20]
+        })
+      }).addTo(map);
+      
       try {
-        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&accept-language=es`;
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&accept-language=es&zoom=18`;
         const response = await fetch(url);
         const data = await response.json();
         
-        if (data && data.display_name) {
-          const address = data.display_name;
+        if (data && data.address) {
+          const addr = data.address;
+          
+          // Verificar que realmente sea Bogotá
+          const cityName = addr.city || addr.town || addr.municipality || '';
+          if (!cityName.toLowerCase().includes('bogot')) {
+            alert('⚠️ Solo se permiten ubicaciones en Bogotá');
+            return;
+          }
+          
+          let address = '';
+          
+          // Construir dirección tipo: "Calle 26 #13-19, Chapinero, Bogotá"
+          if (addr.road) {
+            address = addr.road;
+            
+            // Añadir numeración si existe
+            if (addr.house_number) {
+              address += ` #${addr.house_number}`;
+            }
+            
+            // Añadir barrio/localidad
+            if (addr.suburb) {
+              address += `, ${addr.suburb}`;
+            } else if (addr.neighbourhood) {
+              address += `, ${addr.neighbourhood}`;
+            } else if (addr.quarter) {
+              address += `, ${addr.quarter}`;
+            }
+            
+            // Añadir ciudad
+            address += `, Bogotá`;
+          } else {
+            // Si no hay calle, construir con lo disponible
+            const fallbackParts = [];
+            if (addr.suburb) fallbackParts.push(addr.suburb);
+            else if (addr.neighbourhood) fallbackParts.push(addr.neighbourhood);
+            else if (addr.quarter) fallbackParts.push(addr.quarter);
+            
+            fallbackParts.push('Bogotá');
+            
+            address = fallbackParts.join(', ');
+          }
           
           if (mode === 'origin') {
+            if (startMarkerRef.current) {
+              map.removeLayer(startMarkerRef.current);
+            }
+            originCoordsRef.current = [lat, lng];
+            startMarkerRef.current = L.marker([lat, lng]).addTo(map).bindTooltip("Origen", { permanent: false });
             onOriginChange && onOriginChange(address);
             setClickMode(null);
           } else if (mode === 'destination') {
+            if (endMarkerRef.current) {
+              map.removeLayer(endMarkerRef.current);
+            }
+            destCoordsRef.current = [lat, lng];
+            endMarkerRef.current = L.marker([lat, lng]).addTo(map).bindTooltip("Destino", { permanent: false });
             onDestinationChange && onDestinationChange(address);
             setClickMode(null);
           }
         }
       } catch (err) {
         console.error('Error en geocodificación inversa:', err);
+      } finally {
+        setTimeout(() => {
+          if (tempMarker) {
+            map.removeLayer(tempMarker);
+          }
+        }, 300);
       }
     });
 
@@ -185,31 +281,46 @@ export default function RouteMap({
   const geocodeColombia = async (rawQuery) => {
     const q = (rawQuery || "").trim();
     if (q.length < 5) {
-      throw new Error("La dirección es muy corta. Añade ciudad/municipio, p. ej.: 'Calle 26 # 13-19, Bogotá'.");
+      throw new Error("La dirección es muy corta. Añade detalles de la ubicación en Bogotá.");
     }
+    
+    // Priorizar búsquedas en Bogotá
     const tries = [
-      q,
-      `${q}, Colombia`,
+      `${q}, Bogotá`,
       `${q}, Bogotá, Colombia`,
+      q
     ];
-    const base = "https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=1&accept-language=es&countrycodes=co";
-    let lastErr = null;
+    
+    const base = "https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=5&accept-language=es&countrycodes=co";
+    
     for (const t of tries) {
       try {
         const resp = await fetch(`${base}&q=${encodeURIComponent(t)}`);
         if (!resp.ok) {
-          lastErr = new Error(`Nominatim ${resp.status}`);
           continue;
         }
         const j = await resp.json();
-        if (j?.[0]) {
-          return [parseFloat(j[0].lat), parseFloat(j[0].lon)];
+        
+        // Buscar el primer resultado que esté en Bogotá
+        for (const result of j) {
+          const lat = parseFloat(result.lat);
+          const lon = parseFloat(result.lon);
+          
+          if (isInBogota(lat, lon)) {
+            // Verificar también por nombre de ciudad
+            const addr = result.address || {};
+            const cityName = addr.city || addr.town || addr.municipality || '';
+            if (cityName.toLowerCase().includes('bogot')) {
+              return [lat, lon];
+            }
+          }
         }
-      } catch (e) {
-        lastErr = e;
+      } catch {
+        // Continuar con el siguiente intento
+        continue;
       }
     }
-    throw lastErr || new Error("No se pudo geocodificar la dirección");
+    throw new Error("⚠️ No se encontró esta dirección en Bogotá. Verifica que la dirección esté dentro de la ciudad.");
   };
 
   useEffect(() => {
@@ -221,8 +332,16 @@ export default function RouteMap({
         map.removeLayer(routeLayerRef.current);
         routeLayerRef.current = null;
       }
-      if (startMarkerRef.current) { map.removeLayer(startMarkerRef.current); startMarkerRef.current = null; }
-      if (endMarkerRef.current) { map.removeLayer(endMarkerRef.current); endMarkerRef.current = null; }
+      if (!dOrigin && startMarkerRef.current) { 
+        map.removeLayer(startMarkerRef.current); 
+        startMarkerRef.current = null; 
+        originCoordsRef.current = null;
+      }
+      if (!dDest && endMarkerRef.current) { 
+        map.removeLayer(endMarkerRef.current); 
+        endMarkerRef.current = null; 
+        destCoordsRef.current = null;
+      }
       if (animMarkerRef.current) { map.removeLayer(animMarkerRef.current); animMarkerRef.current = null; }
       return;
     }
@@ -230,10 +349,20 @@ export default function RouteMap({
     let cancelled = false;
     (async () => {
       try {
-        const [o, d] = await Promise.all([
-          geocodeColombia(dOrigin),
-          geocodeColombia(dDest),
-        ]);
+        setIsCalculating(true);
+        let o, d;
+        if (originCoordsRef.current) {
+          o = originCoordsRef.current;
+        } else {
+          o = await geocodeColombia(dOrigin);
+        }
+        
+        if (destCoordsRef.current) {
+          d = destCoordsRef.current;
+        } else {
+          d = await geocodeColombia(dDest);
+        }
+        
         if (cancelled) return;
 
         const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${o[1]},${o[0]};${d[1]},${d[0]}?overview=full&geometries=geojson`;
@@ -252,20 +381,28 @@ export default function RouteMap({
 
         const coords = route.geometry.coordinates.map(([lng, lat]) => L.latLng(lat, lng));
         if (routeLayerRef.current) map.removeLayer(routeLayerRef.current);
-        if (startMarkerRef.current) map.removeLayer(startMarkerRef.current);
-        if (endMarkerRef.current) map.removeLayer(endMarkerRef.current);
         if (animMarkerRef.current) { map.removeLayer(animMarkerRef.current); animMarkerRef.current = null; }
 
         const poly = L.polyline(coords, { color: "#2563eb", weight: 5, opacity: 0.9 }).addTo(map);
         routeLayerRef.current = poly;
-        startMarkerRef.current = L.marker(coords[0]).addTo(map).bindTooltip("Inicio", { permanent: false });
-        endMarkerRef.current = L.marker(coords[coords.length - 1]).addTo(map).bindTooltip("Destino", { permanent: false });
+        
+        if (!originCoordsRef.current) {
+          if (startMarkerRef.current) map.removeLayer(startMarkerRef.current);
+          startMarkerRef.current = L.marker(coords[0]).addTo(map).bindTooltip("Inicio", { permanent: false });
+        }
+        
+        if (!destCoordsRef.current) {
+          if (endMarkerRef.current) map.removeLayer(endMarkerRef.current);
+          endMarkerRef.current = L.marker(coords[coords.length - 1]).addTo(map).bindTooltip("Destino", { permanent: false });
+        }
 
         map.fitBounds(poly.getBounds(), { padding: [20, 20] });
         animateMarker(coords);
+        setIsCalculating(false);
       } catch (e) {
         console.error(e);
         setInfo({ distanceKm: 0, durationMin: 0 });
+        setIsCalculating(false);
       }
     })();
 
@@ -276,6 +413,12 @@ export default function RouteMap({
 
   return (
     <div className="pgx-map-container" style={{ width: "100%" }}>
+      {isCalculating && (
+        <div className="pgx-map-loading">
+          <div className="pgx-map-loading-spinner"></div>
+          <div className="pgx-map-loading-text">Calculando ruta...</div>
+        </div>
+      )}
       <div className="pgx-map-controls map-controls">
         <button
           type="button"

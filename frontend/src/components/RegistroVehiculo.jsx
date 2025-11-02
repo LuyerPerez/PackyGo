@@ -234,7 +234,7 @@ function RegistroVehiculo({ onSuccess, editVehiculo }) {
         )}
       </div>
       <div className="form-group">
-        <label>Tarifa diaria ($)</label>
+        <label>Tarifa x KM ($)</label>
         <input
           name="tarifa_diaria"
           type="number"
