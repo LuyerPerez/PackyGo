@@ -58,6 +58,7 @@ export default function App() {
         <Route path="/privacidad" element={<PoliticaPrivacidad />} />
         <Route path="/nosotros" element={<Nosotros />} />
         <Route path="/explorar" element={<Explorar />} />
+        <Route path="/HomePrincipal" element={<HomePrincipal />} />
 
         {/* Ruta de perfil personalizada */}
         <Route path="/:nombreCompleto/perfil" element={<ProtectedRoute allowedRoles={["cliente", "camionero", "admin"]}><Perfil /></ProtectedRoute>} />
@@ -73,14 +74,6 @@ export default function App() {
         />
 
         {/* Rutas para CLIENTE */}
-        <Route 
-          path="/HomePrincipal" 
-          element={
-            <ProtectedRoute allowedRoles={["cliente"]}>
-              <HomePrincipal />
-            </ProtectedRoute>
-          } 
-        />
         <Route 
           path="/reserva" 
           element={
