@@ -1,10 +1,9 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://192.168.0.10:5000/api'
+  baseURL: 'http://10.15.9.26:5000/api'
 })
 
-// Interceptor para agregar token JWT a todas las peticiones
 api.interceptors.request.use(
   (config) => {
     const userStorage = localStorage.getItem("user");
@@ -25,12 +24,10 @@ api.interceptors.request.use(
   }
 );
 
-// Interceptor para manejar errores de autenticación
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expirado o inválido
       localStorage.removeItem("user");
       if (window.location.pathname !== "/login") {
         window.location.href = "/login";
@@ -109,7 +106,6 @@ export async function resetPassword({ correo, code, nueva }) {
 
 export async function GoogleLogin(token) {
   const { data } = await api.post('/google-login', { token });
-  // Guardar usuario con token JWT
   if (data?.user) {
     localStorage.setItem("user", JSON.stringify(data.user));
   }
@@ -118,7 +114,6 @@ export async function GoogleLogin(token) {
 
 export async function GoogleRegister(token, rol) {
   const { data } = await api.post('/google-register', { token, rol });
-  // Guardar usuario con token JWT
   if (data?.user) {
     localStorage.setItem("user", JSON.stringify(data.user));
   }
@@ -244,7 +239,7 @@ export function getImagenUrl(imagen_url) {
   } else if (imagen_url.startsWith("uploads/")) {
     fileName = imagen_url.replace("uploads/", "");
   }
-  return `http://192.168.0.10:5000/uploads/${fileName}`;
+  return `http://10.15.9.26:5000/uploads/${fileName}`;
 }
 
 export async function editarReserva(id, data) {

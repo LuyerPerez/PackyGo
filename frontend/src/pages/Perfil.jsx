@@ -8,7 +8,6 @@ import '../assets/PerfilUnico.css';
 const Perfil = () => {
   const { nombreCompleto } = useParams();
   
-  // Obtener datos del usuario desde localStorage
   const getUserFromStorage = () => {
     const userStorage = localStorage.getItem('user');
     if (userStorage) {
@@ -235,13 +234,6 @@ const Perfil = () => {
                 </div>
                 <span className="perfil-extra-value">{formatearFechaMiembro()}</span>
                 <span className="perfil-extra-label">Miembro desde</span>
-              </div>
-              <div className="perfil-extra-item">
-                <div className="perfil-extra-icon">
-                  <FontAwesomeIcon icon={faIdCard} />
-                </div>
-                <span className="perfil-extra-value">#{user.id}</span>
-                <span className="perfil-extra-label">ID de usuario</span>
               </div>
             </div>
           </div>

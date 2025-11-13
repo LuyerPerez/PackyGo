@@ -327,7 +327,6 @@ export default function Home() {
           <div className="footer-column">
             <h3>MI CUENTA</h3>
             <ul>
-              <li><a href="/perfil">Mi perfil</a></li>
               <li><a href="/pedidos">Historial de reservas</a></li>
               <li><a href="/mis-vehiculos">Mis vehículos</a></li>
               <li><a href="/configuracion">Configuración</a></li>

@@ -44,6 +44,8 @@ PackyGo/
    python -m venv venv
    source ./venv/scripts/activate
    pip install -r requirements.txt
+   // Si sale algun error pon:
+   python.exe -m pip install --upgrade pip
    ```
 
 #### Ejemplo de archivo `.env` para el backend
