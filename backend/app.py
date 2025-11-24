@@ -968,7 +968,7 @@ def debug_reserva():
                 f"Dirección de destino: {direccion_destino}\n\n"
                 "Por favor, revisa tu panel para más detalles."
             )
-            enviarCorreoReserva(conductor[1], mensaje_conductor)
+            enviarCorreoReserva(conductor[2], mensaje_conductor)
 
             mensaje_cliente = (
                 f"Hola {cliente[0]},\n\n"
@@ -976,10 +976,10 @@ def debug_reserva():
                 f"Del {fecha_inicio} al {fecha_fin}.\n"
                 f"Dirección de inicio: {direccion_inicio}\n"
                 f"Dirección de destino: {direccion_destino}\n\n"
-                f"El conductor es: {conductor[0]}, correo: {conductor[1]}.\n"
+                f"El conductor es: {conductor[0]}, correo: {conductor[2]}.\n"
                 "¡Gracias por usar PackyGo!"
             )
-            enviarCorreoReserva(cliente[1], mensaje_cliente)
+            enviarCorreoReserva(cliente[2], mensaje_cliente)
         return {"message": "Reserva realizada y correos enviados (debug)."}, 201
     except Exception as e:
         conn.rollback()
