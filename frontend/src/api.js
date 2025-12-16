@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://192.168.0.4:5000/api'
+  baseURL: 'http://192.168.0.3:5000/api'
 })
 
 api.interceptors.request.use(
@@ -129,6 +129,11 @@ export async function actualizarFotoPerfil(usuario_id, file) {
   return data;
 }
 
+export async function editarPerfil(usuario_id, perfilData) {
+  const { data } = await api.put(`/usuarios/${usuario_id}/perfil`, perfilData);
+  return data;
+}
+
 export async function cambiarContrasena(usuario_id, actual, nueva) {
   const { data } = await api.put(`/usuarios/${usuario_id}/cambiar-contrasena`, {
     actual,
@@ -239,7 +244,7 @@ export function getImagenUrl(imagen_url) {
   } else if (imagen_url.startsWith("uploads/")) {
     fileName = imagen_url.replace("uploads/", "");
   }
-  return `http://192.168.0.4:5000/uploads/${fileName}`;
+  return `http://192.168.0.3:5000/uploads/${fileName}`;
 }
 
 export async function editarReserva(id, data) {

@@ -131,13 +131,13 @@ export default function RegisterForm() {
                   {success}
                 </p>
               )}
-              {error && (
-                <p style={{ color: "red", fontSize: "15px", textAlign: "center", marginBottom: "12px" }}>
-                  {error}
-                </p>
-              )}
 
               <form onSubmit={handleSubmit} className="login-form">
+                {error && (
+                  <p className="error" style={{ color: "red", fontSize: "14px", textAlign: "left", marginBottom: "8px" }}>
+                    {error}
+                  </p>
+                )}
                 <div className="form-row">
                   <div className="input-group-lr">
                     <FontAwesomeIcon icon={faUserTag} className="icon" />

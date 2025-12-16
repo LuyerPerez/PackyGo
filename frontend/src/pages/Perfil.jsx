@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { actualizarFotoPerfil, getImagenUrl, cambiarContrasena } from '../api';
+import { actualizarFotoPerfil, getImagenUrl, cambiarContrasena, editarPerfil } from '../api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserTag, faCalendarAlt, faIdCard } from '@fortawesome/free-solid-svg-icons';
 import '../assets/PerfilUnico.css';
@@ -107,16 +107,46 @@ const Perfil = () => {
       alert('Nombre, apellido y email son obligatorios');
       return;
     }
-    setGuardandoPerfil(true);
-    // Simular un pequeño delay para mostrar la animación
-    setTimeout(() => {
-      setUser(form);
-      // Actualizar localStorage con los nuevos datos
-      const updatedUser = { ...form };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      setEditando(false);
-      setGuardandoPerfil(false);
-    }, 500);
+    const doSave = async () => {
+      setGuardandoPerfil(true);
+      try {
+        // Llamar al backend para persistir cambios
+        const storedRaw = localStorage.getItem('user');
+        const storedUser = storedRaw ? JSON.parse(storedRaw) : null;
+        if (!storedUser?.token) {
+          alert('Tu sesión ha expirado o no estás autenticado. Por favor inicia sesión nuevamente.');
+          window.location.href = '/login';
+          return;
+        }
+
+        const resp = await editarPerfil(user.id, {
+          primer_nombre: form.primer_nombre,
+          segundo_nombre: form.segundo_nombre,
+          primer_apellido: form.primer_apellido,
+          segundo_apellido: form.segundo_apellido,
+          correo: form.correo,
+          telefono: form.telefono,
+          tipoDocumento: form.tipoDocumento,
+          noDocumento: form.noDocumento
+        });
+
+        // Resp contiene el usuario actualizado
+        const updatedUser = resp || form;
+        setUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify({ ...(storedUser || {}), ...updatedUser }));
+        if (typeof window !== 'undefined' && window.dispatchEvent) {
+          window.dispatchEvent(new Event('userUpdated'));
+        }
+        setEditando(false);
+      } catch (err) {
+        const msg = err?.response?.data?.error || err.message || 'Error al guardar cambios';
+        alert(msg);
+      } finally {
+        setGuardandoPerfil(false);
+      }
+    };
+
+    doSave();
   };
 
   // Formatear fecha de registro

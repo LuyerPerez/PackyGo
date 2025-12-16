@@ -159,6 +159,20 @@ def register():
     if not all([primer_nombre, primer_apellido, noDocumento, tipoDocumento, correo, telefono, contrasena, rol]):
         return {"error": "Todos los campos obligatorios deben ser completados"}, 400
 
+    # Verificar si ya existe un usuario con el mismo correo o número de documento
+    conn_check = get_connection()
+    cursor_check = conn_check.cursor()
+    try:
+        cursor_check.execute("SELECT id FROM usuario WHERE correo=%s", (correo,))
+        if cursor_check.fetchone():
+            return {"error": "El correo ya está registrado."}, 400
+        cursor_check.execute("SELECT id FROM usuario WHERE noDocumento=%s", (noDocumento,))
+        if cursor_check.fetchone():
+            return {"error": "El documento ya está registrado."}, 400
+    finally:
+        cursor_check.close()
+        conn_check.close()
+
     codigo = str(random.randint(100000, 999999))
     verification_codes[correo] = {
         "code": codigo,
@@ -1482,6 +1496,64 @@ def editar_usuario(usuario_id):
         )
         conn.commit()
         return {"message": "Usuario actualizado"}, 200
+    except Exception as e:
+        conn.rollback()
+        return {"error": str(e)}, 400
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.route("/api/usuarios/<int:usuario_id>/perfil", methods=["PUT"])
+@token_required
+def editar_perfil_usuario(usuario_id):
+    """
+    Permite al usuario actualizar su propio perfil (o a un admin actualizar cualquier perfil).
+    Campos permitidos: primer_nombre, segundo_nombre, primer_apellido, segundo_apellido,
+    correo, noDocumento, tipoDocumento, telefono
+    """
+    # Verificar permisos: el usuario debe ser el mismo que solicita o ser admin
+    current = getattr(request, 'current_user', None)
+    if not current:
+        return {"error": "No autorizado"}, 401
+    if current.get('rol') != 'admin' and current.get('id') != usuario_id:
+        return {"error": "No tienes permisos para editar este perfil"}, 403
+
+    data = request.json or {}
+    primer_nombre = data.get("primer_nombre")
+    segundo_nombre = data.get("segundo_nombre", "")
+    primer_apellido = data.get("primer_apellido")
+    segundo_apellido = data.get("segundo_apellido", "")
+    correo = data.get("correo")
+    noDocumento = data.get("noDocumento")
+    tipoDocumento = data.get("tipoDocumento")
+    telefono = data.get("telefono")
+
+    if not all([primer_nombre, primer_apellido, correo]):
+        return {"error": "Faltan datos obligatorios"}, 400
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        # Verificar duplicados para correo/noDocumento (si cambian)
+        cursor.execute("SELECT id FROM usuario WHERE correo=%s AND id<>%s", (correo, usuario_id))
+        if cursor.fetchone():
+            return {"error": "El correo ya está registrado."}, 400
+        if noDocumento:
+            cursor.execute("SELECT id FROM usuario WHERE noDocumento=%s AND id<>%s", (noDocumento, usuario_id))
+            if cursor.fetchone():
+                return {"error": "El documento ya está registrado."}, 400
+
+        cursor.execute(
+            "UPDATE usuario SET primer_nombre=%s, segundo_nombre=%s, primer_apellido=%s, segundo_apellido=%s, correo=%s, noDocumento=%s, tipoDocumento=%s, telefono=%s WHERE id=%s",
+            (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, correo, noDocumento, tipoDocumento, telefono, usuario_id)
+        )
+        conn.commit()
+        # Devolver datos actualizados
+        cursor.execute("SELECT id, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, tipoDocumento, noDocumento, correo, telefono, rol, fecha_registro, foto FROM usuario WHERE id=%s", (usuario_id,))
+        row = cursor.fetchone()
+        user_data = build_user_dict(row)
+        return jsonify(user_data), 200
     except Exception as e:
         conn.rollback()
         return {"error": str(e)}, 400
